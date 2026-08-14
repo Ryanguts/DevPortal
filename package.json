@@ -1,0 +1,20 @@
+{
+  "name": "devportal",
+  "version": "2.0.0",
+  "description": "DevPortal — front estático + API TypeScript (contas protegidas)",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "npx --yes tsx server.ts",
+    "build": "npx --yes tsc",
+    "start": "node dist/server.js",
+    "start:ts": "npx --yes tsx server.ts"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "tsx": "^4.23.12",
+    "typescript": "^5.9.3"
+  }
+}

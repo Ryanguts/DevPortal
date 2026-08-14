@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DevPortal: linguagens de programação, áreas de carreira em TI, lógica de programação com cursos gratuitos e busca de faculdades e cursos no Brasil e no mundo.">
+  <title>DevPortal | Programação, Carreiras & Faculdades</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <canvas id="matrix-bg" aria-hidden="true"></canvas>
+
+  <div id="splash-screen" class="splash-screen" aria-hidden="false">
+    <canvas id="splash-matrix" aria-hidden="true"></canvas>
+    <div class="splash-center">
+      <div class="splash-logo">🚀</div>
+      <h1 class="splash-title">Dev<span>Portal</span></h1>
+      <p class="splash-sub">carregando seu mapa em tecnologia…</p>
+      <div class="splash-bar"><span></span></div>
+    </div>
+  </div>
+
+  <div class="site-wrapper">
+
+    <header class="main-header">
+      <div class="header-container">
+        <div class="header-top">
+          <h1 class="brand-title"><span class="emoji-icon">🚀</span> DevPortal</h1>
+          <div class="header-actions">
+            <button class="auth-chip" id="auth-chip" title="Conta">Entrar</button>
+            <button class="theme-btn" id="theme-btn" title="Alternar tema" aria-label="Alternar tema">☀️</button>
+          </div>
+        </div>
+        <p class="brand-subtitle">Linguagens, carreiras, lógica e faculdades — um mapa claro para quem está começando (ou recomeçando) na tecnologia.</p>
+
+        <nav class="main-nav">
+          <button class="nav-btn active" data-page="home">🏠 Início</button>
+          <button class="nav-btn" data-page="linguagens">💻 Linguagens</button>
+          <button class="nav-btn" data-page="areas">🎯 Áreas de TI</button>
+          <button class="nav-btn" data-page="logica">🧠 Lógica</button>
+          <button class="nav-btn" data-page="trilhas">🗺️ Trilhas</button>
+          <button class="nav-btn" data-page="faculdades">🎓 Faculdades</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main-content">
+
+      <section id="page-home" class="page-view active">
+
+        <div class="hero-code-card">
+          <div class="code-window">
+            <div class="code-window-bar">
+              <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+              <span class="code-window-title">bem-vindo.js</span>
+            </div>
+            <pre class="code-window-body"><code><span class="code-line"><span class="ln">1</span><span class="tok-comment">// Toda grande jornada começa com uma primeira linha de código.</span></span><span class="code-line"><span class="ln">2</span></span><span class="code-line"><span class="ln">3</span><span class="tok-keyword">const</span> <span class="tok-var">devportal</span> = {</span><span class="code-line"><span class="ln">4</span>  <span class="tok-prop">linguagens</span>: <span class="tok-number" id="code-count-langs">17</span>,</span><span class="code-line"><span class="ln">5</span>  <span class="tok-prop">areas</span>: <span class="tok-number" id="code-count-areas">9</span>,</span><span class="code-line"><span class="ln">6</span>  <span class="tok-prop">faculdades</span>: <span class="tok-string">"9.000+"</span>,</span><span class="code-line"><span class="ln">7</span>  <span class="tok-prop">seuProximoPasso</span>: <span class="tok-keyword">true</span></span><span class="code-line"><span class="ln">8</span>};</span><span class="code-line"><span class="ln">9</span></span><span class="code-line"><span class="ln">10</span><span class="tok-fn">console</span>.<span class="tok-fn">log</span>(<span class="tok-string">"Bem-vindo(a) ao DevPortal!"</span>)<span class="cursor-blink">▍</span></span></code></pre>
+          </div>
+          <div class="hero-code-text">
+            <span class="eyebrow">🚀 Seu ponto de partida em tecnologia</span>
+            <h2>Encontre o caminho certo <span class="gradient-text">para programar</span></h2>
+            <p>Compare linguagens, explore áreas de carreira, pratique lógica com cursos recomendados e pesquise faculdades de TI no Brasil e no exterior — tudo organizado em um só lugar.</p>
+            <div class="hero-actions">
+              <button class="btn-primary" id="btn-hero-langs">Explorar Linguagens</button>
+              <button class="btn-ghost" id="btn-hero-quiz">🎯 Qual linguagem combina comigo?</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card" id="btn-go-langs">
+            <span class="stat-icon">💻</span>
+            <div class="stat-info">
+              <strong id="count-langs">17</strong>
+              <span>Linguagens Mapeadas</span>
+            </div>
+          </div>
+          <div class="stat-card" id="btn-go-areas">
+            <span class="stat-icon">🎯</span>
+            <div class="stat-info">
+              <strong id="count-areas">9</strong>
+              <span>Áreas Profissionais</span>
+            </div>
+          </div>
+          <div class="stat-card" id="btn-go-logica">
+            <span class="stat-icon">🧠</span>
+            <div class="stat-info">
+              <strong id="count-cursos">8</strong>
+              <span>Cursos de Lógica Recomendados</span>
+            </div>
+          </div>
+          <div class="stat-card" id="btn-go-unis">
+            <span class="stat-icon">🎓</span>
+            <div class="stat-info">
+              <strong>9.000+</strong>
+              <span>Universidades Mundiais</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="home-section-title">Por onde começar</h3>
+        <div class="features-grid">
+          <button class="feature-card" id="feat-compare">
+            <span class="feature-icon">⚖️</span>
+            <strong>Comparar linguagens</strong>
+            <span>Escolha até 3 e veja o contraste lado a lado</span>
+          </button>
+          <button class="feature-card" id="feat-favoritos">
+            <span class="feature-icon">⭐</span>
+            <strong>Favoritos</strong>
+            <span>Guarde o que fizer mais sentido para você</span>
+          </button>
+          <button class="feature-card" id="feat-logica">
+            <span class="feature-icon">🧠</span>
+            <strong>Lógica de programação</strong>
+            <span>Conceitos claros e cursos para praticar</span>
+          </button>
+          <button class="feature-card" id="feat-faculdades">
+            <span class="feature-icon">🎓</span>
+            <strong>Faculdades e cursos</strong>
+            <span>Pesquise por cidade, estado ou tipo de curso</span>
+          </button>
+          <button class="feature-card" id="feat-trilhas">
+            <span class="feature-icon">🗺️</span>
+            <strong>Trilhas e glossário</strong>
+            <span>Roteiros de estudo e termos do dia a dia</span>
+          </button>
+        </div>
+
+        <section class="home-info-block">
+          <h3 class="home-section-title">Como usar este portal</h3>
+          <div class="info-columns">
+            <article class="guia-card">
+              <h3>1. Oriente-se</h3>
+              <p>Se você não sabe por onde começar, abra o quiz na home ou a página de Trilhas. Elas não substituem a prática, mas evitam que você estude cinco coisas ao mesmo tempo sem direção.</p>
+            </article>
+            <article class="guia-card">
+              <h3>2. Compare com critério</h3>
+              <p>O comparador mostra diferenças reais entre linguagens — quando cada uma brilha. Use isso para escolher a próxima habilidade, não para entrar em guerra de fanbases.</p>
+            </article>
+            <article class="guia-card">
+              <h3>3. Pratique lógica</h3>
+              <p>Antes de memorizar sintaxe, domine sequência, decisão e repetição. A seção de lógica reúne conceitos, mini-desafios e cursos gratuitos e pagos.</p>
+            </article>
+            <article class="guia-card">
+              <h3>4. Pesquise formação</h3>
+              <p>A busca de faculdades usa uma base mundial (dataset Hipo). Confirme sempre no site oficial da instituição grades, modalidades e processos seletivos.</p>
+            </article>
+          </div>
+          <p class="text-muted text-sm leading-relaxed" style="margin-top:1rem;">
+            O DevPortal é orientativo: o mercado muda, as vagas variam por região e a melhor stack depende do problema.
+            Seu diferencial continua sendo projetos concluídos, clareza ao explicar decisões e constância de estudo.
+          </p>
+        </section>
+
+
+        <section class="home-info-block">
+          <h3 class="home-section-title">Conta local e privacidade</h3>
+          <div class="guia-card">
+            <p>O botão <strong>Entrar</strong> cria uma conta <em>neste navegador</em> com e-mail e senha. Os dados ficam no <code>localStorage</code> (favoritos podem ser vinculados à conta). Não enviamos credenciais a um servidor: é um protótipo didático de autenticação. Em um produto real, isso seria uma API com banco de dados, hash forte (bcrypt/argon2) e HTTPS.</p>
+            <p style="margin-top:0.6rem;">Limpar dados do site no navegador apaga a conta local. Use apenas senhas de teste aqui.</p>
+          </div>
+        </section>
+
+      </section>
+
+      <section id="page-linguagens" class="page-view">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">💻</span> Linguagens de Programação</h2>
+            <p class="section-desc">Toque em um card para ver detalhes. Use ⚖️ para comparar até três linguagens ou ⭐ para salvar as favoritas.</p>
+          </div>
+          <div class="filter-box">
+            <input type="text" id="search-lang-input" placeholder="🔍 Filtrar linguagem (ex: Python, Rust)..." autocomplete="off">
+          </div>
+        </header>
+
+        <div class="linguagens-layout">
+          <aside class="lang-sidebar" id="lang-sidebar">
+            <h3 class="sidebar-title">Categorias</h3>
+            <button class="sidebar-btn active" data-categoria="todas">📚 Todas <span class="count-badge" id="cnt-todas">—</span></button>
+            <button class="sidebar-btn" data-categoria="linguagem">💻 Linguagens de Programação <span class="count-badge" id="cnt-linguagem">—</span></button>
+            <button class="sidebar-btn" data-categoria="web">🌐 Fundamentos Web <span class="count-badge" id="cnt-web">—</span></button>
+            <button class="sidebar-btn" data-categoria="dados">🗄️ Consulta a Dados <span class="count-badge" id="cnt-dados">—</span></button>
+            <button class="sidebar-btn" data-categoria="favoritos">⭐ Favoritas <span class="count-badge" id="cnt-favoritos">0</span></button>
+
+            <div class="info-callout callout-sidebar">
+              <h4>🤔 SQL, HTML e CSS são linguagens de programação?</h4>
+              <p>Tecnicamente, <strong>não</strong> — pelo menos não no sentido estrito. <strong>HTML</strong> é uma linguagem de <em>marcação</em> (descreve estrutura de conteúdo) e <strong>CSS</strong> é uma linguagem de <em>estilização</em>: nenhuma das duas tem lógica programável (variáveis, laços, condicionais). O <strong>SQL</strong> é uma linguagem de <em>consulta e manipulação de dados</em> — mais poderosa, mas ainda fora da definição clássica de "linguagem de programação de propósito geral". Mesmo assim, as três são <strong>fundamentais</strong> para quase qualquer carreira em tecnologia, por isso ganharam espaço garantido aqui.</p>
+            </div>
+          </aside>
+
+          <div class="lang-main">
+            <div class="grid" id="lang-grid"></div>
+            <div class="info-callout callout-api-desktop">
+              <h4>🔌 O que é uma API?</h4>
+              <p><strong>API</strong> (Application Programming Interface) é um <em>contrato</em> que permite que um sistema fale com outro de forma padronizada. Na prática web, quase sempre significa um endpoint HTTP (REST ou GraphQL) que recebe pedidos e devolve dados em JSON. Linguagens como <strong>JavaScript/TypeScript</strong>, <strong>Python (FastAPI)</strong>, <strong>Go</strong>, <strong>Java (Spring)</strong> e <strong>C# (ASP.NET)</strong> são as mais usadas para <em>criar</em> APIs; no front-end você as <em>consome</em> com <code>fetch</code>, Axios, etc. GraphQL e SQL também aparecem neste portal porque são formas de consultar dados que alimentam essas APIs.</p>
+            </div>
+          </div>
+        </div>
+        <div class="info-callout callout-api-mobile">
+          <h4>🔌 O que é uma API?</h4>
+          <p><strong>API</strong> (Application Programming Interface) é um <em>contrato</em> que permite que um sistema fale com outro de forma padronizada. Na prática web: endpoint HTTP (REST ou GraphQL) que devolve JSON. JS/TS, Python, Go, Java e C# são as mais usadas para criar APIs.</p>
+        </div>
+      </section>
+
+      <section id="page-areas" class="page-view">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">🎯</span> Áreas & Carreiras em TI</h2>
+            <p class="section-desc">Veja o que cada especialidade exige e quais linguagens costumam aparecer no dia a dia da área.</p>
+          </div>
+          <div class="filter-box">
+            <input type="text" id="search-area-input" placeholder="🔍 Filtrar área (ex: Dados, Cyber, Mobile)..." autocomplete="off">
+          </div>
+        </header>
+
+        <div class="grid" id="areas-grid"></div>
+      </section>
+
+      <section id="page-logica" class="page-view">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">🧠</span> Lógica de Programação</h2>
+            <p class="section-desc">A base que sustenta qualquer linguagem. Revise os conceitos essenciais e encontre cursos — muitos gratuitos — para praticar.</p>
+          </div>
+        </header>
+
+        <div class="logic-intro">
+          <p><strong>Lógica de programação</strong> é o conjunto de técnicas para organizar o raciocínio e resolver problemas de forma clara e estruturada — independentemente da linguagem que você use depois. Quem domina lógica aprende <em>qualquer</em> linguagem com mais velocidade: Python, JavaScript, Java ou C# são, em essência, sintaxes diferentes para as mesmas ideias — sequência, decisão e repetição.</p>
+        </div>
+
+        <h3 class="subsection-title">📐 Conceitos Fundamentais</h3>
+        <div class="grid" id="concepts-grid"></div>
+
+        <h3 class="subsection-title">🎯 Desafio Rápido</h3>
+        <p class="section-desc">Responda e leia a explicação na hora. Sem nota, sem pressão — só treino.</p>
+        <div class="quiz-inline" id="logic-quiz-grid"></div>
+
+        <h3 class="subsection-title">📚 Onde Estudar (cursos recomendados)</h3>
+        <div class="chip-row" id="course-filter-chips">
+          <button class="chip active" data-filtro="todos">Todos</button>
+          <button class="chip" data-filtro="Gratuito">🆓 Gratuitos</button>
+          <button class="chip" data-filtro="Pago">💳 Pagos</button>
+        </div>
+        <div class="grid" id="courses-grid"></div>
+      </section>
+
+      <section id="page-trilhas" class="page-view">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">🗺️</span> Trilhas, glossário e guias</h2>
+            <p class="section-desc">Roteiros de estudo, termos essenciais do dia a dia e respostas para dúvidas comuns — para explorar com calma, sem pressa.</p>
+          </div>
+        </header>
+
+        <div class="segmented" id="trilhas-mode-toggle" role="tablist">
+          <button class="segmented-btn active" data-tmode="trilhas" role="tab">🗺️ Trilhas</button>
+          <button class="segmented-btn" data-tmode="glossario" role="tab">📖 Glossário</button>
+          <button class="segmented-btn" data-tmode="ferramentas" role="tab">🛠️ Ferramentas</button>
+          <button class="segmented-btn" data-tmode="faq" role="tab">❓ FAQ</button>
+          <button class="segmented-btn" data-tmode="guias" role="tab">📘 Guias</button>
+        </div>
+
+        <div id="trilhas-panel">
+          <p class="section-desc" style="margin-bottom:1rem;">Escolha um caminho e avance por etapas. Os tempos são estimativas com dedicação parcial.</p>
+          <div class="grid" id="trilhas-grid"></div>
+        </div>
+        <div id="glossario-panel" style="display:none;">
+          <div class="filter-box" style="margin-bottom:1rem;">
+            <input type="text" id="search-glossario" placeholder="🔍 Buscar termo (ex: API, Git, JWT)..." autocomplete="off">
+          </div>
+          <div class="glossary-grid" id="glossario-grid"></div>
+        </div>
+        <div id="ferramentas-panel" style="display:none;">
+          <div class="grid" id="ferramentas-grid"></div>
+        </div>
+        <div id="faq-panel" style="display:none;">
+          <div class="faq-list" id="faq-list"></div>
+        </div>
+        <div id="guias-panel" style="display:none;">
+          <div class="guias-wrap" id="guias-wrap"></div>
+          <h3 class="subsection-title">Notas de mercado</h3>
+          <div class="grid" id="mercado-grid"></div>
+          <h3 class="subsection-title">Dicas de estudo</h3>
+          <div class="grid" id="dicas-grid"></div>
+        </div>
+      </section>
+
+      <section id="page-faculdades" class="page-view">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">🎓</span> Faculdades & Cursos de TI</h2>
+            <p class="section-desc">Busque instituições por país, estado e cidade, ou navegue pelo catálogo geral de cursos de tecnologia.</p>
+          </div>
+        </header>
+
+        <div class="segmented" id="search-mode-toggle" role="tablist">
+          <button class="segmented-btn active" data-mode="faculdades" role="tab" aria-selected="true">🏫 Buscar Faculdades</button>
+          <button class="segmented-btn" data-mode="cursos" role="tab" aria-selected="false">📚 Catálogo de Cursos de TI</button>
+        </div>
+
+        <div id="faculdades-panel">
+          <div class="search-box">
+            <form class="search-form" id="search-form">
+              <div class="form-group">
+                <label for="country">País *</label>
+                <input type="text" id="country" placeholder="Ex: Brasil, Portugal, Estados Unidos" value="Brasil" required autocomplete="off">
+              </div>
+
+              <div class="form-group">
+                <label for="state">Estado / Província (Opcional)</label>
+                <input type="text" id="state" placeholder="Ex: Paraná, São Paulo, California" autocomplete="off">
+              </div>
+
+              <div class="form-group">
+                <label for="city">Cidade ou Sigla (Opcional)</label>
+                <input type="text" id="city" placeholder="Ex: Jacarezinho, Curitiba, UENP" autocomplete="off">
+              </div>
+
+              <button type="submit" id="search-btn" class="submit-btn">
+                <span>🔍</span> Pesquisar
+              </button>
+            </form>
+
+            <div class="form-group-checkbox">
+              <label class="checkbox-label"><input type="checkbox" id="ead-filter"> Mostrar apenas instituições com sinalização de <strong>EAD</strong> no nome</label>
+              <small class="hint">Heurística baseada no nome da instituição (ex: "Polo EAD", "Virtual"). Para confirmar a modalidade oficial de um curso, consulte o site da faculdade.</small>
+            </div>
+
+            <div class="quick-tags">
+              <span>Atalhos rápidos:</span>
+              <button class="quick-tag-btn" data-c="Brasil" data-s="Paraná" data-ci="Jacarezinho">📍 Jacarezinho - PR</button>
+              <button class="quick-tag-btn" data-c="Brasil" data-s="Paraná" data-ci="">📍 Paraná</button>
+              <button class="quick-tag-btn" data-c="Brasil" data-s="São Paulo" data-ci="">📍 São Paulo</button>
+              <button class="quick-tag-btn" data-c="Brasil" data-s="" data-ci="">🇧🇷 Brasil</button>
+              <button class="quick-tag-btn" data-c="Estados Unidos" data-s="" data-ci="">🇺🇸 EUA</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="cursos-panel" style="display:none;">
+          <div class="search-box">
+            <div class="form-group">
+              <label for="course-search-input">Buscar curso</label>
+              <input type="text" id="course-search-input" placeholder="Ex: Ciência da Computação, Redes, Jogos Digitais..." autocomplete="off">
+            </div>
+            <div class="chip-row" id="course-level-chips">
+              <button class="chip active" data-nivel="todos">Todos os níveis</button>
+              <button class="chip" data-nivel="Tecnólogo">Tecnólogo</button>
+              <button class="chip" data-nivel="Bacharelado">Bacharelado</button>
+              <button class="chip" data-nivel="Engenharia">Engenharia</button>
+            </div>
+            <div class="chip-row" id="course-modality-chips">
+              <button class="chip active" data-modalidade="todas">Presencial + EAD</button>
+              <button class="chip" data-modalidade="Presencial">Presencial</button>
+              <button class="chip" data-modalidade="EAD">EAD</button>
+            </div>
+            <p class="hint">Catálogo geral dos cursos de TI mais comuns no Brasil, com duração e modalidades típicas. Para saber exatamente quais cursos uma faculdade específica oferece, pesquise o nome dela na aba "Buscar Faculdades" e acesse o site oficial.</p>
+          </div>
+        </div>
+
+        <div id="results-container" class="results-wrapper">
+          <div class="empty">
+            <span class="empty-icon">🏫</span>
+            <p>Preencha os campos acima ou escolha um atalho rápido para listar as instituições.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="main-footer">
+      <p>DevPortal • Construído para desenvolvedores e estudantes • Base de universidades: dataset Hipo (jsDelivr) • Catálogo de cursos e recomendações organizados manualmente para fins de orientação geral</p>
+    </footer>
+
+  </div>
+
+  <div class="comparator-bar" id="comparator-bar">
+    <span id="comparator-count">0 linguagens selecionadas</span>
+    <div class="comparator-chips" id="comparator-chips"></div>
+    <div class="comparator-actions">
+      <button class="btn-ghost-sm" id="btn-clear-compare">Limpar</button>
+      <button class="btn-primary-sm" id="btn-open-compare" disabled>Comparar ⚖️</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="compare-modal-overlay">
+    <div class="modal-box modal-box-wide">
+      <button class="modal-close" id="close-compare-modal" aria-label="Fechar">✕</button>
+      <h3>⚖️ Comparador de Linguagens</h3>
+      <div id="compare-table-wrap"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="quiz-modal-overlay">
+    <div class="modal-box">
+      <button class="modal-close" id="close-quiz-modal" aria-label="Fechar">✕</button>
+      <div id="quiz-content"></div>
+    </div>
+  </div>
+
+  
+  <div class="modal-overlay" id="admin-modal-overlay">
+    <div class="modal-box modal-box-wide">
+      <button class="modal-close" id="close-admin-modal" aria-label="Fechar">✕</button>
+      <h3>🛡️ Painel do moderador</h3>
+      <p class="auth-note">Contas registradas no backend (arquivo <code>data/users.json</code>).</p>
+      <div id="admin-content"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="auth-modal-overlay">
+    <div class="modal-box">
+      <button class="modal-close" id="close-auth-modal" aria-label="Fechar">✕</button>
+      <div id="auth-content"></div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="data.js"></script>
+  <script src="script.js" defer></script>
+</body>
+</html>

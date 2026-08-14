@@ -2880,7 +2880,7 @@ function renderAuthForms(mode) {
   const isLogin = mode === "login";
   el.innerHTML = `
     <h3>${isLogin ? "Entrar na conta" : "Criar conta"}</h3>
-    <p class="auth-note">Conta local neste navegador. E-mail e senha ficam no localStorage do DevPortal — útil para lembrar favoritos e preferências. Não é um servidor na nuvem.</p>
+    <p class="auth-note">Crie uma conta ou entre com o e-mail e a senha que você cadastrou.</p>
     <form id="auth-form" class="auth-form">
       <div class="form-group">
         <label for="auth-email">E-mail</label>
@@ -3330,11 +3330,11 @@ function renderAuthFormsApi(mode) {
   const isLogin = mode === "login";
   el.innerHTML = `
     <h3>${isLogin ? "Entrar na conta" : "Criar conta"}</h3>
-    <p class="auth-note">Contas no servidor local do DevPortal (<code>npm start</code> → porta 3847). Senhas com hash scrypt. O e-mail do moderador é <strong>r.guts</strong>.</p>
+    <p class="auth-note">Crie uma conta ou entre com o e-mail e a senha que você cadastrou.</p>
     <form id="auth-form" class="auth-form">
       <div class="form-group">
         <label for="auth-email">E-mail</label>
-        <input type="text" id="auth-email" required placeholder="voce@email.com ou r.guts" autocomplete="username">
+        <input type="text" id="auth-email" required placeholder="voce@email.com" autocomplete="username">
       </div>
       <div class="form-group">
         <label for="auth-pass">Senha (mín. 6 caracteres)</label>
@@ -3353,9 +3353,10 @@ function renderAuthFormsApi(mode) {
   `;
   apiHealth().then(ok => {
     const st = document.getElementById("auth-api-status");
-    if (st) st.innerHTML = ok
-      ? '🟢 API online'
-      : '🔴 API offline — o site precisa do backend no ar.';
+    if (st) {
+      if (!ok) st.textContent = "Não foi possível conectar. Tente de novo em instantes.";
+      else st.textContent = "";
+    }
   });
   mountGoogleButton();
   el.querySelector("#auth-go-register")?.addEventListener("click", () => renderAuthFormsApi("register"));
@@ -3401,9 +3402,7 @@ function renderAuthLoggedApi(me) {
     <h3>Sua conta</h3>
     <p class="auth-note">Conectado como <strong>${me.email}</strong>${me.role === "admin" ? " · <span class=\"admin-badge\">moderador</span>" : ""}</p>
     <ul class="auth-meta">
-      <li>Favoritos: <strong>${(me.favorites || []).length}</strong></li>
-      <li>Papel: <strong>${me.role || "user"}</strong></li>
-      <li>Desde: <strong>${me.createdAt ? new Date(me.createdAt).toLocaleString("pt-BR") : "—"}</strong></li>
+      <li>Favoritos salvos: <strong>${(me.favorites || []).length}</strong></li>
     </ul>
     <div class="hero-actions" style="margin-top:1rem;">
       <button class="btn-primary" id="auth-sync-favs">Salvar favoritos no servidor</button>
@@ -3487,15 +3486,20 @@ async function mountGoogleButton() {
     const cfg = await apiFetch("/api/config");
     clientId = cfg.googleClientId;
   } catch {
-    wrap.innerHTML = '<p class="auth-note">Login Google indisponível (API offline).</p>';
+    const div = document.querySelector(".auth-divider");
+    if (div) div.style.display = "none";
+    wrap.style.display = "none";
     return;
   }
   if (!clientId) {
-    wrap.innerHTML = '<p class="auth-note">Login com Google: configure <code>GOOGLE_CLIENT_ID</code> no Render (opcional).</p>';
+    // Google não configurado: esconde a área inteira (não mostra texto técnico)
+    const div = document.querySelector(".auth-divider");
+    if (div) div.style.display = "none";
+    wrap.style.display = "none";
     return;
   }
   if (!window.google?.accounts?.id) {
-    wrap.innerHTML = '<p class="auth-note">Carregando Google… atualize o modal em alguns segundos.</p>';
+    wrap.innerHTML = "";
     setTimeout(mountGoogleButton, 800);
     return;
   }

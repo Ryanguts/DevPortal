@@ -65,6 +65,7 @@ const IS_PROD = NODE_ENV === "production";
 
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "r.guts").trim().toLowerCase();
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "02022010";
+const GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID || "").trim();
 
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
@@ -521,6 +522,97 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       saveSessions(sessions);
     }
     sendJSON(req, res, 200, { ok: true });
+    return;
+  }
+
+
+  if (pathname === "/api/config" && req.method === "GET") {
+    sendJSON(req, res, 200, {
+      googleClientId: GOOGLE_CLIENT_ID || null,
+      googleEnabled: Boolean(GOOGLE_CLIENT_ID),
+    });
+    return;
+  }
+
+  if (pathname === "/api/auth/google" && req.method === "POST") {
+    if (!rateLimit(`auth:${ip}`, RATE_MAX_AUTH)) {
+      sendJSON(req, res, 429, { error: "Muitas tentativas. Aguarde um minuto." });
+      return;
+    }
+    if (!GOOGLE_CLIENT_ID) {
+      sendJSON(req, res, 503, { error: "Login com Google não configurado no servidor." });
+      return;
+    }
+    const body = (await readBody(req)) as { credential?: string };
+    const credential = String(body.credential || "");
+    if (!credential || credential.length < 20) {
+      sendJSON(req, res, 400, { error: "Token Google inválido." });
+      return;
+    }
+    try {
+      const verifyUrl =
+        "https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(credential);
+      const gRes = await fetch(verifyUrl);
+      if (!gRes.ok) {
+        sendJSON(req, res, 401, { error: "Token Google rejeitado." });
+        return;
+      }
+      const g = (await gRes.json()) as {
+        aud?: string;
+        email?: string;
+        email_verified?: string | boolean;
+        sub?: string;
+      };
+      if (g.aud !== GOOGLE_CLIENT_ID) {
+        sendJSON(req, res, 401, { error: "Token não pertence a este app." });
+        return;
+      }
+      if (String(g.email_verified) !== "true") {
+        sendJSON(req, res, 401, { error: "E-mail Google não verificado." });
+        return;
+      }
+      const email = normalizeEmail(g.email);
+      if (!email) {
+        sendJSON(req, res, 400, { error: "Google não retornou e-mail." });
+        return;
+      }
+
+      ensureAdminUser();
+      const users = getUsers();
+      let user = users.find((u) => u.email === email);
+      if (!user) {
+        user = {
+          id: crypto.randomBytes(8).toString("hex"),
+          email,
+          passwordHash: hashPassword(crypto.randomBytes(24).toString("hex")),
+          role: email === ADMIN_EMAIL ? "admin" : "user",
+          createdAt: new Date().toISOString(),
+          favorites: [],
+          failedLogins: 0,
+          lockedUntil: null,
+        };
+        users.push(user);
+      } else {
+        clearFails(user);
+        if (email === ADMIN_EMAIL) user.role = "admin";
+      }
+      saveUsers(users);
+
+      const token = newToken();
+      const sessions = getSessions();
+      sessions[token] = { email, createdAt: Date.now() };
+      saveSessions(sessions);
+
+      sendJSON(req, res, 200, {
+        token,
+        email: user.email,
+        role: user.role,
+        favorites: user.favorites || [],
+      });
+    } catch (e) {
+      console.error(e);
+      sendJSON(req, res, 500, { error: "Falha ao validar Google." });
+    }
     return;
   }
 

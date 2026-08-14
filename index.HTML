@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -190,24 +191,24 @@
             <button class="sidebar-btn" data-categoria="dados">🗄️ Consulta a Dados <span class="count-badge" id="cnt-dados">—</span></button>
             <button class="sidebar-btn" data-categoria="favoritos">⭐ Favoritas <span class="count-badge" id="cnt-favoritos">0</span></button>
 
-            <div class="info-callout callout-sidebar">
-              <h4>🤔 SQL, HTML e CSS são linguagens de programação?</h4>
-              <p>Tecnicamente, <strong>não</strong> — pelo menos não no sentido estrito. <strong>HTML</strong> é uma linguagem de <em>marcação</em> (descreve estrutura de conteúdo) e <strong>CSS</strong> é uma linguagem de <em>estilização</em>: nenhuma das duas tem lógica programável (variáveis, laços, condicionais). O <strong>SQL</strong> é uma linguagem de <em>consulta e manipulação de dados</em> — mais poderosa, mas ainda fora da definição clássica de "linguagem de programação de propósito geral". Mesmo assim, as três são <strong>fundamentais</strong> para quase qualquer carreira em tecnologia, por isso ganharam espaço garantido aqui.</p>
-            </div>
+            <details class="info-callout callout-sidebar callout-collapsible">
+              <summary>💡 HTML, CSS e SQL são programação?</summary>
+              <p>No sentido estrito, <strong>não</strong>. <strong>HTML</strong> é marcação, <strong>CSS</strong> é estilo e <strong>SQL</strong> é consulta a dados. Nenhuma substitui uma linguagem com lógica completa — mas as três são <strong>fundamentais</strong> em TI, por isso estão neste catálogo.</p>
+            </details>
           </aside>
 
           <div class="lang-main">
             <div class="grid" id="lang-grid"></div>
-            <div class="info-callout callout-api-desktop">
-              <h4>🔌 O que é uma API?</h4>
-              <p><strong>API</strong> (Application Programming Interface) é um <em>contrato</em> que permite que um sistema fale com outro de forma padronizada. Na prática web, quase sempre significa um endpoint HTTP (REST ou GraphQL) que recebe pedidos e devolve dados em JSON. Linguagens como <strong>JavaScript/TypeScript</strong>, <strong>Python (FastAPI)</strong>, <strong>Go</strong>, <strong>Java (Spring)</strong> e <strong>C# (ASP.NET)</strong> são as mais usadas para <em>criar</em> APIs; no front-end você as <em>consome</em> com <code>fetch</code>, Axios, etc. GraphQL e SQL também aparecem neste portal porque são formas de consultar dados que alimentam essas APIs.</p>
-            </div>
+            <details class="info-callout callout-api-desktop callout-collapsible">
+              <summary>🔌 O que é uma API?</summary>
+              <p><strong>API</strong> é um contrato entre sistemas. Na web, costuma ser um endpoint HTTP que devolve JSON. JS/TS, Python, Go, Java e C# são comuns para <em>criar</em> APIs; no front você as <em>consome</em>.</p>
+            </details>
           </div>
         </div>
-        <div class="info-callout callout-api-mobile">
-          <h4>🔌 O que é uma API?</h4>
-          <p><strong>API</strong> (Application Programming Interface) é um <em>contrato</em> que permite que um sistema fale com outro de forma padronizada. Na prática web: endpoint HTTP (REST ou GraphQL) que devolve JSON. JS/TS, Python, Go, Java e C# são as mais usadas para criar APIs.</p>
-        </div>
+        <details class="info-callout callout-api-mobile callout-collapsible">
+          <summary>🔌 O que é uma API?</summary>
+          <p><strong>API</strong>: contrato entre sistemas, em geral HTTP + JSON. Usada o tempo todo em apps e sites.</p>
+        </details>
       </section>
 
       <section id="page-areas" class="page-view">

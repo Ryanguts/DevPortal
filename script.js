@@ -3347,14 +3347,17 @@ function renderAuthFormsApi(mode) {
         ? 'Não tem conta? <button type="button" class="linkish" id="auth-go-register">Criar uma</button>'
         : 'Já tem conta? <button type="button" class="linkish" id="auth-go-login">Entrar</button>'}
     </p>
+    <div class="auth-divider">ou</div>
+    <div class="google-btn-wrap" id="google-btn-wrap"></div>
     <p class="auth-note" id="auth-api-status" style="margin-top:0.8rem;"></p>
   `;
   apiHealth().then(ok => {
     const st = document.getElementById("auth-api-status");
     if (st) st.innerHTML = ok
-      ? '🟢 API online em <code>localhost:3847</code>'
-      : '🔴 API offline — rode <code>npm install && npm start</code> na pasta do projeto.';
+      ? '🟢 API online'
+      : '🔴 API offline — o site precisa do backend no ar.';
   });
+  mountGoogleButton();
   el.querySelector("#auth-go-register")?.addEventListener("click", () => renderAuthFormsApi("register"));
   el.querySelector("#auth-go-login")?.addEventListener("click", () => renderAuthFormsApi("login"));
   el.querySelector("#auth-form")?.addEventListener("submit", async (e) => {
@@ -3472,3 +3475,59 @@ document.addEventListener("DOMContentLoaded", () => {
   // re-inicializa auth com versão API (substitui handlers do chip)
   try { initAuth(); } catch (e) { console.warn(e); }
 });
+
+
+// ---------- Google Sign-In ----------
+async function mountGoogleButton() {
+  const wrap = document.getElementById("google-btn-wrap");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  let clientId = null;
+  try {
+    const cfg = await apiFetch("/api/config");
+    clientId = cfg.googleClientId;
+  } catch {
+    wrap.innerHTML = '<p class="auth-note">Login Google indisponível (API offline).</p>';
+    return;
+  }
+  if (!clientId) {
+    wrap.innerHTML = '<p class="auth-note">Login com Google: configure <code>GOOGLE_CLIENT_ID</code> no Render (opcional).</p>';
+    return;
+  }
+  if (!window.google?.accounts?.id) {
+    wrap.innerHTML = '<p class="auth-note">Carregando Google… atualize o modal em alguns segundos.</p>';
+    setTimeout(mountGoogleButton, 800);
+    return;
+  }
+  window.google.accounts.id.initialize({
+    client_id: clientId,
+    callback: async (response) => {
+      try {
+        const data = await apiFetch("/api/auth/google", {
+          method: "POST",
+          body: JSON.stringify({ credential: response.credential })
+        });
+        localStorage.setItem(SESSION_TOKEN_KEY, data.token);
+        if (Array.isArray(data.favorites)) {
+          favoritos = new Set(data.favorites);
+          salvarFavoritos();
+          updateSidebarCounts();
+          aplicarFiltrosLinguagens();
+        }
+        showToast(data.role === "admin" ? "Moderador (Google)" : "Entrada com Google ok");
+        updateAuthChipApi();
+        fecharModal("auth-modal-overlay");
+        if (data.role === "admin") openAdminPanel();
+      } catch (e) {
+        showToast(e.message || "Falha no login Google");
+      }
+    }
+  });
+  window.google.accounts.id.renderButton(wrap, {
+    theme: "outline",
+    size: "large",
+    shape: "pill",
+    text: "continue_with",
+    width: 280
+  });
+}

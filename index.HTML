@@ -385,20 +385,38 @@
       </section>
 
     <section id="page-chat" class="page-view">
-        <header class="section-header">
+        <header class="section-header chat-header-bar">
           <div>
             <h2><span class="emoji-icon">💬</span> Mensagens</h2>
-            <p class="section-desc">Tire dúvidas com a equipe ou acompanhe conversas. Moderadores e o dono respondem por aqui.</p>
+            <p class="section-desc">Suporte com a equipe, conversas privadas e anúncios oficiais.</p>
+          </div>
+          <div class="chat-header-actions">
+            <div class="chat-tabs" id="chat-tabs">
+              <button type="button" class="chip active" data-chat-tab="all">Todas</button>
+              <button type="button" class="chip" data-chat-tab="support">Suporte</button>
+              <button type="button" class="chip" data-chat-tab="dm">Privadas</button>
+              <button type="button" class="chip" data-chat-tab="announce">Anúncios</button>
+            </div>
           </div>
         </header>
+        <div class="chat-add-row">
+          <input type="text" id="chat-add-user" placeholder="@username para iniciar DM…" autocomplete="off" maxlength="40">
+          <button type="button" class="btn-primary" id="chat-add-btn">Adicionar</button>
+          <div id="chat-lookup-results" class="chat-lookup" hidden></div>
+        </div>
         <div class="chat-layout" id="chat-root">
           <aside class="chat-threads" id="chat-threads"></aside>
           <div class="chat-main">
             <div class="chat-messages" id="chat-messages"></div>
             <form class="chat-compose" id="chat-compose" action="javascript:void(0)" onsubmit="return false;">
-              <input type="text" id="chat-input" placeholder="Escreva sua mensagem…" maxlength="1000" autocomplete="off">
-              <button type="submit" class="btn-primary">Enviar</button>
+              <label class="chat-file-btn" title="Anexar arquivo">
+                📎
+                <input type="file" id="chat-file" accept="image/*,.txt,.pdf,.js,.ts,.py,.java,.css,.html,.json,.md" hidden>
+              </label>
+              <input type="text" id="chat-input" placeholder="Escreva sua mensagem…" maxlength="4000" autocomplete="off">
+              <button type="button" class="btn-primary" id="chat-send-btn">Enviar</button>
             </form>
+            <p class="chat-file-name text-xs text-muted" id="chat-file-label" hidden></p>
           </div>
         </div>
       </section>

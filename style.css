@@ -3370,3 +3370,111 @@ body.owner-view .chat-person.active {
 #page-chat.active .chat-layout {
   margin-top: 0.5rem;
 }
+
+/* —— Chat expandido —— */
+.chat-header-bar { align-items: flex-start; }
+.chat-header-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chat-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  position: relative;
+}
+.chat-add-row input {
+  flex: 1;
+  min-width: 160px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 0.55rem 0.75rem;
+  font-family: var(--font-body);
+}
+.chat-lookup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+}
+.chat-lookup-item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+.chat-lookup-item:hover { background: var(--primary-light); }
+.chat-lookup-item span { font-size: 0.75rem; color: var(--text-muted); }
+.chat-file-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.chat-file-btn:hover { border-color: var(--primary); }
+.chat-attach { margin-top: 0.35rem; }
+.chat-attach-img {
+  max-width: min(240px, 70vw);
+  border-radius: 8px;
+  display: block;
+}
+.chat-file-link {
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* —— Mobile simplificado —— */
+@media (max-width: 720px) {
+  .site-wrapper { padding: 0 0.85rem; }
+  .main-header { padding: 0.75rem 0 0.65rem; margin-bottom: 1.1rem; }
+  .brand-title { font-size: 1.2rem; }
+  .brand-subtitle { font-size: 0.78rem; margin-bottom: 0.7rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .nav-btn { padding: 0.4rem 0.7rem; font-size: 0.78rem; }
+  .hero-code-card { grid-template-columns: 1fr; gap: 1rem; }
+  .code-window { display: none; } /* menos poluição no celular */
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+  .stat-card { padding: 0.85rem; }
+  .stat-info strong { font-size: 1.15rem; }
+  .features-grid { grid-template-columns: 1fr 1fr; gap: 0.55rem; }
+  .feature-card { padding: 0.9rem; }
+  .feature-card span { display: none; }
+  .home-info-block { display: none; } /* textos longos só no desktop */
+  .section-header { margin-bottom: 1rem; }
+  .section-header h2 { font-size: 1.15rem; }
+  .grid { grid-template-columns: 1fr; gap: 0.75rem; }
+  .chat-layout { grid-template-columns: 1fr; min-height: 360px; }
+  .chat-threads { max-height: 180px; }
+  .chat-main { min-height: 280px; }
+  .filter-box input { min-width: 0; width: 100%; }
+  .linguagens-layout { display: block; }
+  .lang-sidebar { margin-bottom: 0.75rem; }
+  .callout-api-desktop, .callout-sidebar { display: none; }
+  .modal-box { width: 94vw; max-height: 88vh; }
+  .painel-stats { grid-template-columns: 1fr 1fr; }
+  .owner-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 420px) {
+  .stats-grid, .features-grid { grid-template-columns: 1fr; }
+  .nav-btn { font-size: 0.72rem; padding: 0.35rem 0.55rem; }
+}

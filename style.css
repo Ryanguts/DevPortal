@@ -3285,3 +3285,88 @@ body.owner-view .main-header {
 body.owner-view .main-nav .nav-btn.active {
   box-shadow: 0 0 16px rgba(225, 29, 72, 0.25);
 }
+
+
+/* Chat Discord-like sidebar */
+.chat-side-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0.25rem 0 0.6rem;
+  font-family: var(--font-mono);
+}
+.chat-person {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 10px;
+  padding: 0.55rem 0.5rem;
+  cursor: pointer;
+  color: var(--text);
+  text-align: left;
+  font-family: var(--font-body);
+  margin-bottom: 0.25rem;
+  transition: var(--transition);
+}
+.chat-person:hover, .chat-person.active {
+  background: var(--primary-light);
+  border-color: rgba(181,108,255,0.35);
+}
+body.owner-view .chat-person:hover,
+body.owner-view .chat-person.active {
+  border-color: rgba(225,29,72,0.4);
+}
+.chat-person-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.chat-person-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.chat-person-info strong {
+  font-size: 0.86rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-person-info small {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Páginas ativas ocupam o fluxo normal (sem sumir no rodapé) */
+.page-view { display: none; }
+.page-view.active { display: block; }
+
+#page-chat.active .chat-layout {
+  margin-top: 0.5rem;
+}

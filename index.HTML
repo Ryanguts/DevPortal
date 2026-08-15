@@ -384,7 +384,89 @@
         </div>
       </section>
 
-    </main>
+    <section id="page-chat" class="page-view">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">💬</span> Mensagens</h2>
+            <p class="section-desc">Tire dúvidas com a equipe ou acompanhe conversas. Moderadores e o dono respondem por aqui.</p>
+          </div>
+        </header>
+        <div class="chat-layout" id="chat-root">
+          <aside class="chat-threads" id="chat-threads"></aside>
+          <div class="chat-main">
+            <div class="chat-messages" id="chat-messages"></div>
+            <form class="chat-compose" id="chat-compose" action="javascript:void(0)" onsubmit="return false;">
+              <input type="text" id="chat-input" placeholder="Escreva sua mensagem…" maxlength="1000" autocomplete="off">
+              <button type="submit" class="btn-primary">Enviar</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+<section id="page-painel" class="page-view">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">⚔️</span> Painel da equipe</h2>
+            <p class="section-desc">Contas, papéis, timeouts, bans e acesso assistido. Organizado para operação rápida.</p>
+          </div>
+        </header>
+        <div id="painel-page-root" class="painel-shell"></div>
+      </section>
+
+<section id="page-owner-dash" class="page-view owner-only-page">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">🩸</span> Centro de comando</h2>
+            <p class="section-desc">Visão do dono — pulso do portal, alertas e atalhos. Só você vê este tema carmesim.</p>
+          </div>
+        </header>
+        <div id="owner-dash-root" class="owner-grid"></div>
+      </section>
+
+<section id="page-owner-perfis" class="page-view owner-only-page">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">👥</span> Todos os perfis</h2>
+            <p class="section-desc">Membros, moderadores e metadados de cada conta.</p>
+          </div>
+          <div class="filter-box">
+            <input type="text" id="owner-search-perfis" placeholder="🔍 Buscar por e-mail, user ou nome..." autocomplete="off">
+          </div>
+        </header>
+        <div id="owner-perfis-root" class="owner-cards"></div>
+      </section>
+
+<section id="page-owner-equipe" class="page-view owner-only-page">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">🛡️</span> Equipe e permissões</h2>
+            <p class="section-desc">Promova moderadores e defina o que cada um pode fazer.</p>
+          </div>
+        </header>
+        <div id="owner-equipe-root" class="owner-cards"></div>
+      </section>
+
+<section id="page-owner-mod" class="page-view owner-only-page">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">⚖️</span> Moderação</h2>
+            <p class="section-desc">Timeouts ativos, bans e ações em massa.</p>
+          </div>
+        </header>
+        <div id="owner-mod-root" class="owner-cards"></div>
+      </section>
+
+<section id="page-owner-intel" class="page-view owner-only-page">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">📡</span> Inteligência do portal</h2>
+            <p class="section-desc">Estatísticas, saúde da API e notas operacionais.</p>
+          </div>
+        </header>
+        <div id="owner-intel-root" class="owner-grid"></div>
+      </section>
+
+</main>
 
     <footer class="main-footer">
       <p>DevPortal • Construído para desenvolvedores e estudantes • Base de universidades: dataset Hipo (jsDelivr) • Catálogo de cursos e recomendações organizados manualmente para fins de orientação geral</p>
@@ -418,87 +500,19 @@
 
   
   
-      <section id="page-chat" class="page-view">
-        <header class="section-header">
-          <div>
-            <h2><span class="emoji-icon">💬</span> Mensagens</h2>
-            <p class="section-desc">Tire dúvidas com a equipe ou acompanhe conversas. Moderadores e o dono respondem por aqui.</p>
-          </div>
-        </header>
-        <div class="chat-layout" id="chat-root">
-          <aside class="chat-threads" id="chat-threads"></aside>
-          <div class="chat-main">
-            <div class="chat-messages" id="chat-messages"></div>
-            <form class="chat-compose" id="chat-compose">
-              <input type="text" id="chat-input" placeholder="Escreva sua mensagem…" maxlength="1000" autocomplete="off">
-              <button type="submit" class="btn-primary">Enviar</button>
-            </form>
-          </div>
-        </div>
-      </section>
+      
 
-      <section id="page-painel" class="page-view">
-        <header class="section-header">
-          <div>
-            <h2><span class="emoji-icon">⚔️</span> Painel da equipe</h2>
-            <p class="section-desc">Contas, papéis, timeouts, bans e acesso assistido. Organizado para operação rápida.</p>
-          </div>
-        </header>
-        <div id="painel-page-root" class="painel-shell"></div>
-      </section>
+      
 
-      <section id="page-owner-dash" class="page-view owner-only-page">
-        <header class="section-header">
-          <div>
-            <h2><span class="emoji-icon">🩸</span> Centro de comando</h2>
-            <p class="section-desc">Visão do dono — pulso do portal, alertas e atalhos. Só você vê este tema carmesim.</p>
-          </div>
-        </header>
-        <div id="owner-dash-root" class="owner-grid"></div>
-      </section>
+      
 
-      <section id="page-owner-perfis" class="page-view owner-only-page">
-        <header class="section-header">
-          <div>
-            <h2><span class="emoji-icon">👥</span> Todos os perfis</h2>
-            <p class="section-desc">Membros, moderadores e metadados de cada conta.</p>
-          </div>
-          <div class="filter-box">
-            <input type="text" id="owner-search-perfis" placeholder="🔍 Buscar por e-mail, user ou nome..." autocomplete="off">
-          </div>
-        </header>
-        <div id="owner-perfis-root" class="owner-cards"></div>
-      </section>
+      
 
-      <section id="page-owner-equipe" class="page-view owner-only-page">
-        <header class="section-header">
-          <div>
-            <h2><span class="emoji-icon">🛡️</span> Equipe e permissões</h2>
-            <p class="section-desc">Promova moderadores e defina o que cada um pode fazer.</p>
-          </div>
-        </header>
-        <div id="owner-equipe-root" class="owner-cards"></div>
-      </section>
+      
 
-      <section id="page-owner-mod" class="page-view owner-only-page">
-        <header class="section-header">
-          <div>
-            <h2><span class="emoji-icon">⚖️</span> Moderação</h2>
-            <p class="section-desc">Timeouts ativos, bans e ações em massa.</p>
-          </div>
-        </header>
-        <div id="owner-mod-root" class="owner-cards"></div>
-      </section>
+      
 
-      <section id="page-owner-intel" class="page-view owner-only-page">
-        <header class="section-header">
-          <div>
-            <h2><span class="emoji-icon">📡</span> Inteligência do portal</h2>
-            <p class="section-desc">Estatísticas, saúde da API e notas operacionais.</p>
-          </div>
-        </header>
-        <div id="owner-intel-root" class="owner-grid"></div>
-      </section>
+      
 
 
   <div class="modal-overlay" id="profile-modal-overlay">

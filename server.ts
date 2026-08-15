@@ -1249,16 +1249,23 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
     }
     const chat = getChat();
     const staff = isStaff(user);
+    const users = getUsers();
     const threads = (chat.threads || [])
       .filter((th) => staff || th.memberEmail === user.email)
-      .map((th) => ({
-        id: th.id,
-        memberEmail: th.memberEmail,
-        subject: th.subject,
-        updatedAt: th.updatedAt,
-        preview: th.messages.length ? th.messages[th.messages.length - 1].text.slice(0, 80) : "",
-        count: th.messages.length,
-      }))
+      .map((th) => {
+        const u = users.find((x) => x.email === th.memberEmail);
+        return {
+          id: th.id,
+          memberEmail: th.memberEmail,
+          memberName: (u?.displayName || u?.username || th.memberEmail.split("@")[0] || th.memberEmail),
+          memberUsername: u?.username || "",
+          memberAvatar: u?.avatarUrl || "",
+          subject: th.subject,
+          updatedAt: th.updatedAt,
+          preview: th.messages.length ? th.messages[th.messages.length - 1].text.slice(0, 80) : "",
+          count: th.messages.length,
+        };
+      })
       .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
     sendJSON(req, res, 200, { threads, staff });
     return;

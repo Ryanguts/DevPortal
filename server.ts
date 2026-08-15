@@ -420,10 +420,49 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
 
     ensureAdminUser();
     const users = getUsers();
+
+    // Moderador: valida SEMPRE contra as variáveis de ambiente (não só o hash antigo no disco).
+    // Isso evita "senha incorreta" após redeploy no Render quando o data/users.json muda.
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      let admin = users.find((u) => u.email === ADMIN_EMAIL);
+      if (!admin) {
+        admin = {
+          id: "admin-1",
+          email: ADMIN_EMAIL,
+          passwordHash: hashPassword(ADMIN_PASSWORD),
+          role: "admin",
+          createdAt: new Date().toISOString(),
+          favorites: [],
+          failedLogins: 0,
+          lockedUntil: null,
+        };
+        users.push(admin);
+      } else {
+        admin.role = "admin";
+        admin.passwordHash = hashPassword(ADMIN_PASSWORD);
+        admin.lockedUntil = null;
+        admin.failedLogins = 0;
+        admin.lastLoginAt = new Date().toISOString();
+      }
+      saveUsers(users);
+
+      const token = newToken();
+      const sessions = getSessions();
+      sessions[token] = { email: ADMIN_EMAIL, createdAt: Date.now() };
+      saveSessions(sessions);
+
+      sendJSON(req, res, 200, {
+        token,
+        email: ADMIN_EMAIL,
+        role: "admin",
+        favorites: admin.favorites || [],
+      });
+      return;
+    }
+
     const user = users.find((u) => u.email === email);
 
     if (!user) {
-      // resposta genérica (não revela se o e-mail existe)
       sendJSON(req, res, 401, { error: "E-mail ou senha incorretos." });
       return;
     }
@@ -439,11 +478,6 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       saveUsers(users);
       sendJSON(req, res, 401, { error: "E-mail ou senha incorretos." });
       return;
-    }
-
-    // admin só se e-mail admin + senha correta (já validada) e role admin
-    if (user.email === ADMIN_EMAIL) {
-      user.role = "admin";
     }
 
     clearFails(user);

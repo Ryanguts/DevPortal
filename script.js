@@ -3339,6 +3339,7 @@ async function updateAuthChipApi() {
   try {
     const me = await apiFetch("/api/me");
     window.__dpMe = me;
+    try { applyClientEffects(me); } catch (_) {}
     chip.classList.add("auth-chip-on", "is-logged");
     const base = (me.displayName || me.username || (me.email || "?").split("@")[0] || "?").trim();
     const letter = (base.charAt(0) || "?").toUpperCase();
@@ -4846,3 +4847,384 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // openProfilePanel: ensure works when called with no args from avatar
+
+
+// ========== Efeitos + 30 poderes (cliente) ==========
+function applySiteBanner(banner) {
+  let el = document.getElementById("site-global-banner");
+  if (!banner || !banner.text) {
+    if (el) el.remove();
+    return;
+  }
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "site-global-banner";
+    el.className = "site-global-banner";
+    document.body.prepend(el);
+  }
+  el.textContent = banner.text;
+}
+
+function clearScareOverlays() {
+  ["scare-bsod", "scare-countdown", "scare-intrusion", "scare-blame", "scare-jump", "scare-watching"].forEach((id) => {
+    document.getElementById(id)?.remove();
+  });
+  document.body.classList.remove("scare-cursor", "scare-matrix-lag", "scare-ghost-type");
+  document.documentElement.style.cursor = "";
+}
+
+function applyClientEffects(me) {
+  if (!me) return;
+  window.__dpMe = me;
+  const fx = me.effects || {};
+  applySiteBanner(me.siteBanner);
+
+  // chapéu no avatar
+  const chip = document.getElementById("avatar-chip") || document.querySelector(".avatar-chip");
+  if (chip) {
+    let hat = chip.querySelector(".avatar-hat");
+    if (fx.hat) {
+      if (!hat) {
+        hat = document.createElement("span");
+        hat.className = "avatar-hat";
+        hat.textContent = "🐴";
+        chip.appendChild(hat);
+      }
+    } else if (hat) hat.remove();
+  }
+
+  // badges / intern
+  let badgeBar = document.getElementById("fun-badge-bar");
+  const badges = [...(fx.badges || [])];
+  if (fx.intern) badges.unshift("Estagiário do DevPortal");
+  if (badges.length) {
+    if (!badgeBar) {
+      badgeBar = document.createElement("div");
+      badgeBar.id = "fun-badge-bar";
+      badgeBar.className = "fun-badge-bar";
+      document.body.appendChild(badgeBar);
+    }
+    badgeBar.innerHTML = badges.map((b) => `<span class="fun-badge">${String(b).replace(/</g, "&lt;")}</span>`).join("");
+  } else if (badgeBar) badgeBar.remove();
+
+  // warnings
+  let warnBar = document.getElementById("warn-banner");
+  if ((fx.warnings || []).length) {
+    if (!warnBar) {
+      warnBar = document.createElement("div");
+      warnBar.id = "warn-banner";
+      warnBar.className = "warn-banner";
+      document.body.appendChild(warnBar);
+    }
+    const last = fx.warnings[fx.warnings.length - 1];
+    warnBar.innerHTML = `⚠️ Aviso da equipe (${fx.warnings.length}): <strong>${String(last.reason || "").replace(/</g, "&lt;")}</strong>`;
+  } else if (warnBar) warnBar.remove();
+
+  // mute toast once
+  if (fx.muted && !window.__muteToastShown) {
+    window.__muteToastShown = true;
+    try { showToast("Chat silenciado até " + new Date(fx.mutedUntil).toLocaleString("pt-BR")); } catch (_) {}
+  }
+
+  // scare effects
+  const sc = fx.scare || {};
+  clearScareOverlays();
+
+  if (sc.bsod) {
+    const o = document.createElement("div");
+    o.id = "scare-bsod";
+    o.className = "scare-overlay scare-bsod";
+    o.innerHTML = `<pre>FATAL ERROR @ DevPortal
+heap corrupted at 0xDEADBEEF
+session dumped
+
+Press F5 to recover...</pre>`;
+    document.body.appendChild(o);
+  }
+  if (sc.countdown) {
+    const o = document.createElement("div");
+    o.id = "scare-countdown";
+    o.className = "scare-overlay scare-countdown";
+    let left = 59;
+    o.innerHTML = `<div class="scare-count-box"><h2>Sua conta será apagada em</h2><div id="scare-count-num">0:59</div><p class="text-muted">não feche esta aba</p></div>`;
+    document.body.appendChild(o);
+    const tick = setInterval(() => {
+      left -= 1;
+      const el = document.getElementById("scare-count-num");
+      if (!el || left < 0) {
+        clearInterval(tick);
+        o.innerHTML = `<div class="scare-count-box"><h2>mentira :)</h2><p>Pode respirar.</p><button type="button" class="btn-primary" id="scare-count-ok">OK</button></div>`;
+        document.getElementById("scare-count-ok")?.addEventListener("click", () => o.remove());
+        return;
+      }
+      el.textContent = "0:" + String(left).padStart(2, "0");
+    }, 1000);
+  }
+  if (sc.cursor) {
+    document.body.classList.add("scare-cursor");
+    document.documentElement.style.cursor = "none";
+  }
+  if (sc.jumpScare) {
+    const o = document.createElement("div");
+    o.id = "scare-jump";
+    o.className = "scare-jump";
+    o.textContent = "BOO";
+    document.body.appendChild(o);
+    setTimeout(() => o.remove(), 450);
+  }
+  if (sc.ghostType) document.body.classList.add("scare-ghost-type");
+  if (sc.intrusion) {
+    const o = document.createElement("div");
+    o.id = "scare-intrusion";
+    o.className = "scare-overlay scare-intrusion";
+    o.innerHTML = `<div class="scare-count-box"><h2>🚨 Invasão detectada</h2><p>IP logado de outro país · sessão comprometida</p><button type="button" class="btn-primary" id="scare-protect">Proteger conta</button></div>`;
+    document.body.appendChild(o);
+    document.getElementById("scare-protect")?.addEventListener("click", () => {
+      o.remove();
+      try { goToPage("home"); } catch (_) { location.href = "/"; }
+    });
+  }
+  if (sc.matrixLag) document.body.classList.add("scare-matrix-lag");
+  if (sc.blameDeploy) {
+    const o = document.createElement("div");
+    o.id = "scare-blame";
+    o.className = "scare-overlay scare-blame";
+    const name = (me.displayName || me.email || "você").replace(/</g, "&lt;");
+    o.innerHTML = `<div class="scare-count-box"><h2>Build failed</h2><p>blamed user: <strong>${name}</strong></p><p>commit: oops</p><button type="button" class="btn-ghost" id="scare-revert">Revert</button></div>`;
+    document.body.appendChild(o);
+    document.getElementById("scare-revert")?.addEventListener("click", () => o.remove());
+  }
+  if (sc.watching) {
+    const o = document.createElement("div");
+    o.id = "scare-watching";
+    o.className = "scare-watching";
+    o.title = "owner is watching";
+    o.textContent = "👁️";
+    document.body.appendChild(o);
+  }
+  if (sc.ghostChat && document.getElementById("chat-messages")) {
+    // injeta uma bolha fantasma só visual se estiver no chat
+  }
+}
+
+// ghost type: backspace letters slowly in focused inputs
+document.addEventListener("input", (e) => {
+  if (!document.body.classList.contains("scare-ghost-type")) return;
+  const t = e.target;
+  if (!(t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement)) return;
+  if (t.dataset.ghosting) return;
+  t.dataset.ghosting = "1";
+  setTimeout(() => {
+    if (t.value && t.value.length > 0) t.value = t.value.slice(0, -1);
+    delete t.dataset.ghosting;
+  }, 400);
+}, true);
+
+async function staffPower(action, email, extra = {}) {
+  return apiFetch("/api/admin/powers", {
+    method: "POST",
+    body: JSON.stringify({ action, email, ...extra }),
+  });
+}
+
+function powerButtonsHtml(email, isOwner) {
+  const e = String(email).replace(/"/g, "");
+  const serio = `
+    <div class="power-group"><span class="power-label">Sério</span>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="warn" data-e="${e}">Aviso</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="mute" data-e="${e}" data-min="30">Mute 30m</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="unmute" data-e="${e}">Unmute</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="note" data-e="${e}">Nota interna</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="readonly" data-e="${e}" data-min="60">Só leitura</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="clear_readonly" data-e="${e}">Tirar só leitura</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="clear_warns" data-e="${e}">Limpar avisos</button>
+    </div>`;
+  const fun = `
+    <div class="power-group"><span class="power-label">Resenha</span>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="hat" data-e="${e}" data-min="30">🐴 Chapéu</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="caps" data-e="${e}" data-min="10">CAPS</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="nick" data-e="${e}" data-min="30">Nick zoado</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="duck" data-e="${e}" data-min="15">🦆 Pato</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="badge" data-e="${e}">Badge</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="timeout_theater" data-e="${e}" data-min="15">Timeout teatral</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="intern" data-e="${e}" data-min="60">Estagiário</button>
+    </div>`;
+  const terror = isOwner ? `
+    <div class="power-group"><span class="power-label">Terror (dono)</span>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="scare_bsod" data-e="${e}" data-min="1">BSOD</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="scare_countdown" data-e="${e}" data-min="1">Countdown</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="scare_cursor" data-e="${e}" data-min="1">Cursor</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="scare_jump" data-e="${e}">Jump scare</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="scare_ghost_type" data-e="${e}" data-min="1">Texto fantasma</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="scare_intrusion" data-e="${e}" data-min="1">Invasão</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="scare_matrix" data-e="${e}" data-min="1">Matrix lag</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="scare_ghost_chat" data-e="${e}" data-min="3">Chat fantasma</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="scare_blame" data-e="${e}" data-min="1">Blame deploy</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="scare_watching" data-e="${e}" data-min="3">👁️ Watching</button>
+      <button type="button" class="btn-ghost btn-tiny pwr" data-a="clear_scare" data-e="${e}">Limpar sustos</button>
+    </div>` : "";
+  return serio + fun + terror;
+}
+
+function bindPowerButtons(root) {
+  root.querySelectorAll(".pwr").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const action = btn.getAttribute("data-a");
+      const email = btn.getAttribute("data-e");
+      const minutes = Number(btn.getAttribute("data-min") || 15);
+      let reason = "";
+      if (["warn", "note", "badge", "nick", "timeout_theater", "set_banner"].includes(action)) {
+        reason = prompt(action === "badge" ? "Texto da badge:" : action === "nick" ? "Novo nick temporário:" : "Motivo / texto:") || "";
+        if (["warn", "note"].includes(action) && !reason) return;
+      }
+      try {
+        await staffPower(action, email, { minutes, reason, text: reason });
+        showToast("Ação aplicada: " + action);
+        if (typeof renderPainelPage === "function") renderPainelPage();
+        if (typeof renderOwnerMod === "function") renderOwnerMod();
+      } catch (err) {
+        showToast(err.message || "Falha na ação");
+      }
+    });
+  });
+}
+
+// Hook: após me carregado
+const _updateAuthChipApiOrig = typeof updateAuthChipApi === "function" ? updateAuthChipApi : null;
+if (_updateAuthChipApiOrig) {
+  updateAuthChipApi = async function () {
+    await _updateAuthChipApiOrig.apply(this, arguments);
+    try {
+      const token = localStorage.getItem(SESSION_TOKEN_KEY);
+      if (!token) return;
+      const me = await apiFetch("/api/me");
+      applyClientEffects(me);
+    } catch (_) {}
+  };
+}
+
+// Poll leve de efeitos
+setInterval(async () => {
+  if (!localStorage.getItem(SESSION_TOKEN_KEY)) return;
+  try {
+    const me = await apiFetch("/api/me");
+    applyClientEffects(me);
+  } catch (_) {}
+}, 20000);
+
+// Expand painel table actions — patch after render if possible
+const _renderPainelPage = typeof renderPainelPage === "function" ? renderPainelPage : null;
+if (_renderPainelPage) {
+  renderPainelPage = async function () {
+    await _renderPainelPage.apply(this, arguments);
+    const root = document.getElementById("painel-page-root");
+    if (!root) return;
+    const isOwner = window.__dpMe?.role === "owner";
+    // toolbar extra
+    if (!document.getElementById("power-toolbar")) {
+      const tb = document.createElement("div");
+      tb.id = "power-toolbar";
+      tb.className = "power-toolbar";
+      tb.innerHTML = `
+        <button type="button" class="btn-ghost btn-tiny" id="pwr-lottery">🎲 Sorteio estagiário</button>
+        ${isOwner ? `<button type="button" class="btn-ghost btn-tiny" id="pwr-banner">📢 Banner global</button>
+        <button type="button" class="btn-ghost btn-tiny" id="pwr-clear-banner">Limpar banner</button>
+        <button type="button" class="btn-ghost btn-tiny" id="pwr-clear-scares">Limpar todos os sustos</button>
+        <button type="button" class="btn-ghost btn-tiny" id="pwr-audit">📋 Auditoria</button>` : ""}
+        <button type="button" class="btn-ghost btn-tiny" id="pwr-reports">🚩 Reports</button>
+      `;
+      root.prepend(tb);
+      document.getElementById("pwr-lottery")?.addEventListener("click", async () => {
+        try {
+          const r = await staffPower("intern_lottery", "");
+          showToast("Estagiário da hora: " + (r.displayName || r.email));
+        } catch (e) { showToast(e.message); }
+      });
+      document.getElementById("pwr-banner")?.addEventListener("click", async () => {
+        const text = prompt("Texto do banner:");
+        if (!text) return;
+        const minutes = Number(prompt("Minutos no ar:", "60") || 60);
+        try {
+          await staffPower("set_banner", "", { text, reason: text, minutes });
+          showToast("Banner no ar");
+        } catch (e) { showToast(e.message); }
+      });
+      document.getElementById("pwr-clear-banner")?.addEventListener("click", async () => {
+        try { await staffPower("clear_banner", ""); showToast("Banner limpo"); } catch (e) { showToast(e.message); }
+      });
+      document.getElementById("pwr-clear-scares")?.addEventListener("click", async () => {
+        try { await staffPower("clear_all_scares", ""); showToast("Sustos limpos"); } catch (e) { showToast(e.message); }
+      });
+      document.getElementById("pwr-audit")?.addEventListener("click", async () => {
+        try {
+          const data = await apiFetch("/api/admin/audit");
+          const lines = (data.audit || []).slice(0, 30).map((a) => `${a.at} · ${a.by} · ${a.action} · ${a.target || ""}`).join("\n");
+          alert(lines || "Sem eventos");
+        } catch (e) { showToast(e.message); }
+      });
+      document.getElementById("pwr-reports")?.addEventListener("click", async () => {
+        try {
+          const data = await apiFetch("/api/admin/reports");
+          const lines = (data.reports || []).slice(0, 20).map((r) => `${r.status} · ${r.kind} · ${r.target} · ${r.reason}`).join("\n");
+          alert(lines || "Nenhum report");
+        } catch (e) { showToast(e.message); }
+      });
+    }
+    // inject power rows under each user email cell if table exists
+    root.querySelectorAll("tbody tr").forEach((tr) => {
+      if (tr.dataset.powersBound) return;
+      const email = tr.querySelector("[data-email]")?.getAttribute("data-email")
+        || tr.querySelector("td")?.textContent?.match(/[\w.+-]+@[\w.-]+/)?.[0];
+      if (!email) return;
+      tr.dataset.powersBound = "1";
+      const td = document.createElement("td");
+      td.colSpan = 4;
+      td.className = "power-cell";
+      td.innerHTML = powerButtonsHtml(email, isOwner);
+      const wrap = document.createElement("tr");
+      wrap.className = "power-row";
+      wrap.appendChild(td);
+      tr.after(wrap);
+      bindPowerButtons(wrap);
+    });
+  };
+}
+
+const _renderOwnerMod = typeof renderOwnerMod === "function" ? renderOwnerMod : null;
+if (_renderOwnerMod) {
+  renderOwnerMod = async function () {
+    await _renderOwnerMod.apply(this, arguments);
+    const root = document.getElementById("owner-mod-root");
+    if (!root || document.getElementById("owner-powers-help")) return;
+    const box = document.createElement("div");
+    box.id = "owner-powers-help";
+    box.className = "guia-card mt-2";
+    box.innerHTML = `<h3>30 poderes ativos</h3>
+      <p class="text-sm text-muted">Use o <strong>Painel</strong> na lista de contas: Sério, Resenha e Terror (só dono). 
+      Banner global, sorteio de estagiário e auditoria ficam na barra do painel.</p>`;
+    root.prepend(box);
+  };
+}
+
+// Macros no chat compose
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    if (!window.__dpMe?.macros?.length) return;
+    const compose = document.getElementById("chat-compose");
+    if (!compose || document.getElementById("macro-bar")) return;
+    const bar = document.createElement("div");
+    bar.id = "macro-bar";
+    bar.className = "macro-bar";
+    bar.innerHTML = window.__dpMe.macros.map((m) =>
+      `<button type="button" class="btn-ghost btn-tiny macro-btn" data-body="${String(m.body).replace(/"/g, "&quot;")}">${m.fun ? "😏 " : ""}${m.title}</button>`
+    ).join("");
+    compose.parentElement?.insertBefore(bar, compose);
+    bar.querySelectorAll(".macro-btn").forEach((b) => {
+      b.addEventListener("click", () => {
+        const input = document.getElementById("chat-input");
+        if (input) input.value = b.getAttribute("data-body") || "";
+      });
+    });
+  }, 1500);
+});
+

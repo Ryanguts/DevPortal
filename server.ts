@@ -47,6 +47,20 @@ const OWNER_PERMS: ModPermissions = {
   manageMods: true,
 };
 
+interface UserWarning {
+  id: string;
+  reason: string;
+  by: string;
+  at: string;
+}
+
+interface StaffNote {
+  id: string;
+  text: string;
+  by: string;
+  at: string;
+}
+
 interface UserRecord {
   id: string;
   email: string;
@@ -57,17 +71,53 @@ interface UserRecord {
   lastLoginAt?: string;
   failedLogins?: number;
   lockedUntil?: string | null;
-  /** Timeout manual do moderador (ISO date). */
   timeoutUntil?: string | null;
-  /** Ban permanente. */
+  /** Mensagem teatral no timeout (resenha). */
+  timeoutMessage?: string | null;
   banned?: boolean;
   bannedAt?: string | null;
   banReason?: string | null;
   username?: string;
   displayName?: string;
+  /** Nick temporário de resenha (sobrescreve display). */
+  displayNameOverride?: string | null;
+  displayNameOverrideUntil?: string | null;
   avatarUrl?: string;
   bio?: string;
   permissions?: ModPermissions;
+  /** Avisos oficiais */
+  warnings?: UserWarning[];
+  /** Mute só de chat */
+  mutedUntil?: string | null;
+  muteReason?: string | null;
+  /** Notas internas da equipe */
+  staffNotes?: StaffNote[];
+  /** Badges de resenha */
+  badges?: string[];
+  /** Chapéu de burro até */
+  hatUntil?: string | null;
+  /** CAPS only até */
+  capsUntil?: string | null;
+  /** Eco do pato até */
+  duckUntil?: string | null;
+  /** Título estagiário até */
+  internUntil?: string | null;
+  /** Modo só leitura (chat bloqueado além do mute, etc.) */
+  readOnlyUntil?: string | null;
+  readOnlyScope?: "chat" | "all" | null;
+  /** Efeitos de susto ativos (só owner aplica) */
+  scareEffects?: {
+    bsodUntil?: string | null;
+    countdownUntil?: string | null;
+    cursorUntil?: string | null;
+    jumpScare?: boolean;
+    ghostTypeUntil?: string | null;
+    intrusionUntil?: string | null;
+    matrixLagUntil?: string | null;
+    ghostChatUntil?: string | null;
+    blameDeployUntil?: string | null;
+    watchingUntil?: string | null;
+  };
 }
 
 interface PublicUser {
@@ -79,6 +129,7 @@ interface PublicUser {
   favorites: string[];
   lastLoginAt?: string;
   timeoutUntil?: string | null;
+  timeoutMessage?: string | null;
   banned?: boolean;
   bannedAt?: string | null;
   banReason?: string | null;
@@ -88,6 +139,12 @@ interface PublicUser {
   bio?: string;
   permissions?: ModPermissions;
   hasPassword: boolean;
+  warningsCount?: number;
+  mutedUntil?: string | null;
+  badges?: string[];
+  hatUntil?: string | null;
+  internUntil?: string | null;
+  staffNotesCount?: number;
 }
 
 interface BanEntry {
@@ -114,6 +171,9 @@ const USERS_FILE = path.join(DATA_DIR, "users.json");
 const SESSIONS_FILE = path.join(DATA_DIR, "sessions.json");
 const BANS_FILE = path.join(DATA_DIR, "bans.json");
 const CHAT_FILE = path.join(DATA_DIR, "chat.json");
+const AUDIT_FILE = path.join(DATA_DIR, "audit.json");
+const REPORTS_FILE = path.join(DATA_DIR, "reports.json");
+const SITE_META_FILE = path.join(DATA_DIR, "site-meta.json");
 const NODE_ENV = process.env.NODE_ENV || "development";
 const IS_PROD = NODE_ENV === "production";
 
@@ -155,6 +215,9 @@ function ensureData(): void {
   if (!fs.existsSync(SESSIONS_FILE)) writeJSON(SESSIONS_FILE, {});
   if (!fs.existsSync(BANS_FILE)) writeJSON(BANS_FILE, []);
   if (!fs.existsSync(CHAT_FILE)) writeJSON(CHAT_FILE, { threads: [] });
+  if (!fs.existsSync(AUDIT_FILE)) writeJSON(AUDIT_FILE, []);
+  if (!fs.existsSync(REPORTS_FILE)) writeJSON(REPORTS_FILE, []);
+  if (!fs.existsSync(SITE_META_FILE)) writeJSON(SITE_META_FILE, { banner: null, macros: defaultMacros() });
 }
 
 function readJSON<T>(file: string, fallback: T): T {
@@ -340,6 +403,105 @@ function getChat(): { threads: ChatThread[] } {
 function saveChat(data: { threads: ChatThread[] }): void {
   writeJSON(CHAT_FILE, data);
 }
+
+function defaultMacros(): { id: string; title: string; body: string; fun?: boolean }[] {
+  return [
+    { id: "m1", title: "Erro completo", body: "Por favor, envie a mensagem de erro completa (texto, não só print cortado) e o trecho do código." },
+    { id: "m2", title: "Formatar código", body: "Cole o código entre crases triplas (``` ) pra ficar legível. Diz também o que você esperava vs o que aconteceu." },
+    { id: "m3", title: "Trilha Web", body: "Sugestão: comece pela Trilha Web no menu Trilhas — HTML/CSS → JS → um framework. Qualquer dúvida, manda aqui." },
+    { id: "f1", title: "Lê o erro", body: "Interessante. E se você tentasse *ler o erro*? 👀", fun: true },
+    { id: "f2", title: "Na minha máquina", body: "Funciona na minha máquina 😎. Brincadeira — vamos achar o bug juntos. Manda o trecho.", fun: true },
+    { id: "f3", title: "VS Code", body: "Já tentou desligar e ligar o VS Code? (Sério, resolve 30% dos fantasmas.)", fun: true },
+  ];
+}
+
+interface AuditEntry {
+  id: string;
+  at: string;
+  by: string;
+  action: string;
+  target?: string;
+  detail?: string;
+}
+
+function appendAudit(by: string, action: string, target?: string, detail?: string): void {
+  const list = readJSON<AuditEntry[]>(AUDIT_FILE, []);
+  list.unshift({
+    id: crypto.randomBytes(6).toString("hex"),
+    at: new Date().toISOString(),
+    by,
+    action,
+    target,
+    detail: detail ? String(detail).slice(0, 300) : undefined,
+  });
+  writeJSON(AUDIT_FILE, list.slice(0, 2000));
+}
+
+function untilFromMinutes(minutes: number): string {
+  return new Date(Date.now() + Math.max(1, minutes) * 60 * 1000).toISOString();
+}
+
+function isStillActive(iso?: string | null): boolean {
+  if (!iso) return false;
+  const t = Date.parse(iso);
+  return !Number.isNaN(t) && Date.now() < t;
+}
+
+function effectiveDisplayName(u: UserRecord): string {
+  if (isStillActive(u.displayNameOverrideUntil) && u.displayNameOverride) {
+    return u.displayNameOverride;
+  }
+  return (u.displayName || u.username || u.email.split("@")[0] || u.email).trim();
+}
+
+function getSiteMeta(): {
+  banner: { text: string; until: string; by: string } | null;
+  macros: { id: string; title: string; body: string; fun?: boolean }[];
+} {
+  const meta = readJSON<{
+    banner?: { text: string; until: string; by: string } | null;
+    macros?: { id: string; title: string; body: string; fun?: boolean }[];
+  }>(SITE_META_FILE, { banner: null, macros: defaultMacros() });
+  if (!meta.macros || !meta.macros.length) meta.macros = defaultMacros();
+  if (meta.banner && !isStillActive(meta.banner.until)) meta.banner = null;
+  return { banner: meta.banner || null, macros: meta.macros };
+}
+
+function saveSiteMeta(meta: ReturnType<typeof getSiteMeta>): void {
+  writeJSON(SITE_META_FILE, meta);
+}
+
+function buildClientEffects(user: UserRecord) {
+  const sc = user.scareEffects || {};
+  return {
+    hat: isStillActive(user.hatUntil),
+    caps: isStillActive(user.capsUntil),
+    duck: isStillActive(user.duckUntil),
+    intern: isStillActive(user.internUntil),
+    muted: isStillActive(user.mutedUntil),
+    muteReason: user.muteReason || null,
+    mutedUntil: user.mutedUntil || null,
+    readOnly: isStillActive(user.readOnlyUntil),
+    readOnlyScope: user.readOnlyScope || null,
+    badges: user.badges || [],
+    warnings: user.warnings || [],
+    displayName: effectiveDisplayName(user),
+    timeoutMessage: user.timeoutMessage || null,
+    scare: {
+      bsod: isStillActive(sc.bsodUntil),
+      countdown: isStillActive(sc.countdownUntil),
+      cursor: isStillActive(sc.cursorUntil),
+      jumpScare: Boolean(sc.jumpScare),
+      ghostType: isStillActive(sc.ghostTypeUntil),
+      intrusion: isStillActive(sc.intrusionUntil),
+      matrixLag: isStillActive(sc.matrixLagUntil),
+      ghostChat: isStillActive(sc.ghostChatUntil),
+      blameDeploy: isStillActive(sc.blameDeployUntil),
+      watching: isStillActive(sc.watchingUntil),
+    },
+  };
+}
+
 
 function displayNameOf(u: UserRecord | undefined, email: string): string {
   if (!u) return email.split("@")[0] || email;
@@ -646,24 +808,37 @@ function clearFails(user: UserRecord): void {
 }
 
 function toPublic(u: UserRecord): PublicUser {
+  const role: Role =
+    u.role === "owner" || u.email === ADMIN_EMAIL
+      ? "owner"
+      : u.role === "moderator"
+        ? "moderator"
+        : "user";
   return {
     id: u.id,
     email: u.email,
-    role: u.role,
+    role,
     createdAt: u.createdAt,
     favoritesCount: (u.favorites || []).length,
     favorites: u.favorites || [],
     lastLoginAt: u.lastLoginAt,
     timeoutUntil: u.timeoutUntil || null,
+    timeoutMessage: u.timeoutMessage || null,
     banned: Boolean(u.banned),
     bannedAt: u.bannedAt || null,
     banReason: u.banReason || null,
     username: u.username || "",
-    displayName: u.displayName || "",
+    displayName: effectiveDisplayName(u),
     avatarUrl: u.avatarUrl || "",
     bio: u.bio || "",
-    permissions: u.role === "moderator" ? getPerms(u) : u.role === "owner" ? OWNER_PERMS : undefined,
+    permissions: role === "moderator" ? getPerms(u) : role === "owner" ? OWNER_PERMS : undefined,
     hasPassword: Boolean(u.passwordHash),
+    warningsCount: (u.warnings || []).length,
+    mutedUntil: u.mutedUntil || null,
+    badges: u.badges || [],
+    hatUntil: u.hatUntil || null,
+    internUntil: u.internUntil || null,
+    staffNotesCount: (u.staffNotes || []).length,
   };
 }
 
@@ -879,8 +1054,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       sendJSON(req, res, 403, {
         error: "Conta em timeout.",
         code: "TIMEOUT",
-        reason: "Um moderador suspendeu temporariamente sua conta.",
+        reason: user.timeoutMessage || "Um moderador suspendeu temporariamente sua conta.",
         timeoutUntil: user.timeoutUntil || null,
+        timeoutMessage: user.timeoutMessage || null,
       });
       return;
     }
@@ -898,6 +1074,18 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
         : user.role === "moderator"
           ? "moderator"
           : "user";
+    // limpa jumpScare one-shot após entregar
+    const effects = buildClientEffects(user);
+    if (user.scareEffects?.jumpScare) {
+      user.scareEffects.jumpScare = false;
+      const users = getUsers();
+      const idx = users.findIndex((x) => x.email === user.email);
+      if (idx >= 0) {
+        users[idx].scareEffects = user.scareEffects;
+        saveUsers(users);
+      }
+    }
+    const meta = getSiteMeta();
     sendJSON(req, res, 200, {
       email: user.email,
       role,
@@ -905,10 +1093,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       createdAt: user.createdAt,
       lastLoginAt: user.lastLoginAt,
       username: user.username || "",
-      displayName: user.displayName || "",
+      displayName: effects.displayName,
       avatarUrl: user.avatarUrl || "",
       bio: user.bio || "",
       permissions: getPerms(user),
+      effects,
+      siteBanner: meta.banner,
+      macros: isStaff(user) ? meta.macros : undefined,
     });
     return;
   }
@@ -1555,7 +1746,25 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       fileData?: string;
       fileMime?: string;
     };
-    const text = String(body.text || "").trim().slice(0, 4000);
+    if (isStillActive(user.mutedUntil) || (isStillActive(user.readOnlyUntil) && (user.readOnlyScope === "chat" || user.readOnlyScope === "all"))) {
+      sendJSON(req, res, 403, {
+        error: user.muteReason || "Você está silenciado no chat no momento.",
+        code: "MUTED",
+        mutedUntil: user.mutedUntil || user.readOnlyUntil,
+      });
+      return;
+    }
+    let text = String(body.text || "").trim().slice(0, 4000);
+    if (text && isStillActive(user.capsUntil) && text !== text.toUpperCase()) {
+      sendJSON(req, res, 400, {
+        error: "O SENHOR MODERADOR EXIGE CAIXA ALTA. TENTE DE NOVO.",
+        code: "CAPS_ONLY",
+      });
+      return;
+    }
+    if (text && isStillActive(user.duckUntil)) {
+      text = text + " 🦆";
+    }
     const fileData = body.fileData ? String(body.fileData) : "";
     const fileName = body.fileName ? String(body.fileName).slice(0, 120) : "";
     const fileMime = body.fileMime ? String(body.fileMime).slice(0, 80) : "";
@@ -1795,6 +2004,407 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
     });
     return;
   }
+
+
+  /** Macros + banner públicos (staff vê macros) */
+  if (pathname === "/api/site-meta" && req.method === "GET") {
+    const meta = getSiteMeta();
+    const user = userFromToken(req);
+    sendJSON(req, res, 200, {
+      banner: meta.banner,
+      macros: user && isStaff(user) ? meta.macros : [],
+    });
+    return;
+  }
+
+  if (pathname === "/api/report" && req.method === "POST") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const body = (await readBody(req)) as { target?: string; reason?: string; kind?: string };
+    const reports = readJSON<{ id: string; at: string; by: string; target: string; reason: string; kind: string; status: string }[]>(REPORTS_FILE, []);
+    reports.unshift({
+      id: crypto.randomBytes(6).toString("hex"),
+      at: new Date().toISOString(),
+      by: user.email,
+      target: String(body.target || "").slice(0, 200),
+      reason: String(body.reason || "").slice(0, 500),
+      kind: String(body.kind || "other").slice(0, 40),
+      status: "open",
+    });
+    writeJSON(REPORTS_FILE, reports.slice(0, 500));
+    appendAudit(user.email, "report", body.target, body.reason);
+    sendJSON(req, res, 200, { ok: true });
+    return;
+  }
+
+  if (pathname === "/api/admin/reports" && req.method === "GET") {
+    const staff = requireStaff(req);
+    if (!staff) {
+      sendJSON(req, res, 403, { error: "Acesso restrito." });
+      return;
+    }
+    sendJSON(req, res, 200, { reports: readJSON(REPORTS_FILE, []) });
+    return;
+  }
+
+  if (pathname === "/api/admin/audit" && req.method === "GET") {
+    const staff = requireStaff(req);
+    if (!staff || normalizeRole(staff) !== "owner") {
+      sendJSON(req, res, 403, { error: "Só o dono vê a auditoria." });
+      return;
+    }
+    sendJSON(req, res, 200, { audit: readJSON(AUDIT_FILE, []) });
+    return;
+  }
+
+  /**
+   * Poderes unificados da equipe / dono
+   * body: { action, email?, minutes?, reason?, text?, badge?, scope? }
+   */
+  if (pathname === "/api/admin/powers" && req.method === "POST") {
+    const staff = requireStaff(req);
+    if (!staff) {
+      sendJSON(req, res, 403, { error: "Acesso restrito à equipe." });
+      return;
+    }
+    const body = (await readBody(req)) as Record<string, unknown>;
+    const action = String(body.action || "");
+    const targetEmail = normalizeEmail(body.email);
+    const minutes = Math.min(Math.max(Number(body.minutes) || 15, 1), 60 * 24 * 7);
+    const reason = String(body.reason || body.text || "").slice(0, 400);
+    const isOwner = normalizeRole(staff) === "owner" || staff.email === ADMIN_EMAIL;
+
+    const users = getUsers();
+    const idx = targetEmail ? users.findIndex((u) => u.email === targetEmail) : -1;
+    const target = idx >= 0 ? users[idx] : null;
+
+    const needTarget = ![
+      "set_banner",
+      "clear_banner",
+      "intern_lottery",
+      "clear_all_scares",
+    ].includes(action);
+
+    if (needTarget && !target) {
+      sendJSON(req, res, 404, { error: "Conta alvo não encontrada." });
+      return;
+    }
+    if (target && (target.email === ADMIN_EMAIL || normalizeRole(target) === "owner") && !isOwner) {
+      sendJSON(req, res, 403, { error: "Não pode aplicar poderes no dono." });
+      return;
+    }
+
+    const scareOwnerOnly = [
+      "scare_bsod",
+      "scare_countdown",
+      "scare_cursor",
+      "scare_jump",
+      "scare_ghost_type",
+      "scare_intrusion",
+      "scare_matrix",
+      "scare_ghost_chat",
+      "scare_blame",
+      "scare_watching",
+      "clear_scare",
+    ];
+    if (scareOwnerOnly.includes(action) && !isOwner) {
+      sendJSON(req, res, 403, { error: "Só o dono usa o modo terror." });
+      return;
+    }
+
+    const touchScare = () => {
+      if (!target!.scareEffects) target!.scareEffects = {};
+    };
+
+    switch (action) {
+      case "warn": {
+        if (!target) break;
+        target.warnings = target.warnings || [];
+        target.warnings.push({
+          id: crypto.randomBytes(4).toString("hex"),
+          reason: reason || "Aviso da equipe",
+          by: staff.email,
+          at: new Date().toISOString(),
+        });
+        appendAudit(staff.email, "warn", target.email, reason);
+        break;
+      }
+      case "clear_warns": {
+        if (!target) break;
+        target.warnings = [];
+        appendAudit(staff.email, "clear_warns", target.email);
+        break;
+      }
+      case "mute": {
+        if (!target) break;
+        target.mutedUntil = untilFromMinutes(minutes);
+        target.muteReason = reason || "Silenciado no chat pela equipe.";
+        appendAudit(staff.email, "mute", target.email, `${minutes}min`);
+        break;
+      }
+      case "unmute": {
+        if (!target) break;
+        target.mutedUntil = null;
+        target.muteReason = null;
+        appendAudit(staff.email, "unmute", target.email);
+        break;
+      }
+      case "note": {
+        if (!target) break;
+        target.staffNotes = target.staffNotes || [];
+        target.staffNotes.unshift({
+          id: crypto.randomBytes(4).toString("hex"),
+          text: reason || "(nota vazia)",
+          by: staff.email,
+          at: new Date().toISOString(),
+        });
+        target.staffNotes = target.staffNotes.slice(0, 50);
+        appendAudit(staff.email, "staff_note", target.email);
+        break;
+      }
+      case "readonly": {
+        if (!target) break;
+        target.readOnlyUntil = untilFromMinutes(minutes);
+        target.readOnlyScope = body.scope === "all" ? "all" : "chat";
+        appendAudit(staff.email, "readonly", target.email, String(target.readOnlyScope));
+        break;
+      }
+      case "clear_readonly": {
+        if (!target) break;
+        target.readOnlyUntil = null;
+        target.readOnlyScope = null;
+        appendAudit(staff.email, "clear_readonly", target.email);
+        break;
+      }
+      case "hat": {
+        if (!target) break;
+        target.hatUntil = untilFromMinutes(minutes);
+        appendAudit(staff.email, "hat", target.email);
+        break;
+      }
+      case "clear_hat": {
+        if (!target) break;
+        target.hatUntil = null;
+        break;
+      }
+      case "caps": {
+        if (!target) break;
+        target.capsUntil = untilFromMinutes(Math.min(minutes, 60));
+        appendAudit(staff.email, "caps", target.email);
+        break;
+      }
+      case "clear_caps": {
+        if (!target) break;
+        target.capsUntil = null;
+        break;
+      }
+      case "nick": {
+        if (!target) break;
+        target.displayNameOverride = (reason || "recruta_do_console.log").slice(0, 40);
+        target.displayNameOverrideUntil = untilFromMinutes(minutes);
+        appendAudit(staff.email, "nick", target.email, target.displayNameOverride);
+        break;
+      }
+      case "clear_nick": {
+        if (!target) break;
+        target.displayNameOverride = null;
+        target.displayNameOverrideUntil = null;
+        break;
+      }
+      case "duck": {
+        if (!target) break;
+        target.duckUntil = untilFromMinutes(Math.min(minutes, 120));
+        appendAudit(staff.email, "duck", target.email);
+        break;
+      }
+      case "clear_duck": {
+        if (!target) break;
+        target.duckUntil = null;
+        break;
+      }
+      case "badge": {
+        if (!target) break;
+        const badge = (reason || "Copiou do Google e funcionou").slice(0, 60);
+        target.badges = Array.from(new Set([...(target.badges || []), badge])).slice(0, 12);
+        appendAudit(staff.email, "badge", target.email, badge);
+        break;
+      }
+      case "clear_badges": {
+        if (!target) break;
+        target.badges = [];
+        break;
+      }
+      case "timeout_theater": {
+        if (!target) break;
+        target.timeoutUntil = untilFromMinutes(minutes);
+        target.timeoutMessage =
+          reason ||
+          "Você foi banido para o reino do undefined. Reflita sobre seus var. (timeout teatral)";
+        appendAudit(staff.email, "timeout_theater", target.email);
+        break;
+      }
+      case "intern": {
+        if (!target) break;
+        target.internUntil = untilFromMinutes(minutes);
+        appendAudit(staff.email, "intern", target.email);
+        break;
+      }
+      case "intern_lottery": {
+        const pool = users.filter(
+          (u) => normalizeRole(u) === "user" && !u.banned && u.email !== ADMIN_EMAIL
+        );
+        if (!pool.length) {
+          sendJSON(req, res, 400, { error: "Nenhum membro elegível." });
+          return;
+        }
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        pick.internUntil = untilFromMinutes(60);
+        appendAudit(staff.email, "intern_lottery", pick.email);
+        saveUsers(users);
+        sendJSON(req, res, 200, { ok: true, email: pick.email, displayName: effectiveDisplayName(pick) });
+        return;
+      }
+      case "set_banner": {
+        if (!isOwner) {
+          sendJSON(req, res, 403, { error: "Só o dono cria banner global." });
+          return;
+        }
+        const meta = getSiteMeta();
+        meta.banner = {
+          text: reason || "Aviso do DevPortal",
+          until: untilFromMinutes(minutes),
+          by: staff.email,
+        };
+        saveSiteMeta(meta);
+        appendAudit(staff.email, "set_banner", undefined, meta.banner.text);
+        sendJSON(req, res, 200, { ok: true, banner: meta.banner });
+        return;
+      }
+      case "clear_banner": {
+        if (!isOwner) {
+          sendJSON(req, res, 403, { error: "Só o dono." });
+          return;
+        }
+        const meta = getSiteMeta();
+        meta.banner = null;
+        saveSiteMeta(meta);
+        appendAudit(staff.email, "clear_banner");
+        sendJSON(req, res, 200, { ok: true });
+        return;
+      }
+      case "scare_bsod": {
+        touchScare();
+        target!.scareEffects!.bsodUntil = untilFromMinutes(Math.min(minutes, 2));
+        appendAudit(staff.email, "scare_bsod", target!.email);
+        break;
+      }
+      case "scare_countdown": {
+        touchScare();
+        target!.scareEffects!.countdownUntil = untilFromMinutes(Math.min(minutes, 2));
+        appendAudit(staff.email, "scare_countdown", target!.email);
+        break;
+      }
+      case "scare_cursor": {
+        touchScare();
+        target!.scareEffects!.cursorUntil = untilFromMinutes(Math.min(minutes, 2));
+        appendAudit(staff.email, "scare_cursor", target!.email);
+        break;
+      }
+      case "scare_jump": {
+        touchScare();
+        target!.scareEffects!.jumpScare = true;
+        appendAudit(staff.email, "scare_jump", target!.email);
+        break;
+      }
+      case "scare_ghost_type": {
+        touchScare();
+        target!.scareEffects!.ghostTypeUntil = untilFromMinutes(Math.min(minutes, 2));
+        appendAudit(staff.email, "scare_ghost_type", target!.email);
+        break;
+      }
+      case "scare_intrusion": {
+        touchScare();
+        target!.scareEffects!.intrusionUntil = untilFromMinutes(Math.min(minutes, 2));
+        appendAudit(staff.email, "scare_intrusion", target!.email);
+        break;
+      }
+      case "scare_matrix": {
+        touchScare();
+        target!.scareEffects!.matrixLagUntil = untilFromMinutes(Math.min(minutes, 2));
+        appendAudit(staff.email, "scare_matrix", target!.email);
+        break;
+      }
+      case "scare_ghost_chat": {
+        touchScare();
+        target!.scareEffects!.ghostChatUntil = untilFromMinutes(Math.min(minutes, 5));
+        appendAudit(staff.email, "scare_ghost_chat", target!.email);
+        break;
+      }
+      case "scare_blame": {
+        touchScare();
+        target!.scareEffects!.blameDeployUntil = untilFromMinutes(Math.min(minutes, 2));
+        appendAudit(staff.email, "scare_blame", target!.email);
+        break;
+      }
+      case "scare_watching": {
+        touchScare();
+        target!.scareEffects!.watchingUntil = untilFromMinutes(Math.min(minutes, 5));
+        appendAudit(staff.email, "scare_watching", target!.email);
+        break;
+      }
+      case "clear_scare": {
+        if (!target) break;
+        target.scareEffects = {};
+        appendAudit(staff.email, "clear_scare", target.email);
+        break;
+      }
+      case "clear_all_scares": {
+        if (!isOwner) {
+          sendJSON(req, res, 403, { error: "Só o dono." });
+          return;
+        }
+        for (const u of users) u.scareEffects = {};
+        appendAudit(staff.email, "clear_all_scares");
+        saveUsers(users);
+        sendJSON(req, res, 200, { ok: true });
+        return;
+      }
+      default:
+        sendJSON(req, res, 400, { error: "Ação desconhecida: " + action });
+        return;
+    }
+
+    saveUsers(users);
+    sendJSON(req, res, 200, {
+      ok: true,
+      user: target ? toPublic(target) : null,
+      effects: target ? buildClientEffects(target) : null,
+    });
+    return;
+  }
+
+  /** Notas internas (staff) */
+  if (pathname === "/api/admin/notes" && req.method === "GET") {
+    const staff = requireStaff(req);
+    if (!staff) {
+      sendJSON(req, res, 403, { error: "Acesso restrito." });
+      return;
+    }
+    const host = req.headers.host || "localhost";
+    const url = new URL(req.url || "/", `http://${host}`);
+    const email = normalizeEmail(url.searchParams.get("email"));
+    const u = getUsers().find((x) => x.email === email);
+    if (!u) {
+      sendJSON(req, res, 404, { error: "Conta não encontrada." });
+      return;
+    }
+    sendJSON(req, res, 200, { notes: u.staffNotes || [], warnings: u.warnings || [] });
+    return;
+  }
+
 
   sendJSON(req, res, 404, { error: "Rota não encontrada." });
 }

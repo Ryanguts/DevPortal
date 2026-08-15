@@ -1099,7 +1099,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       permissions: getPerms(user),
       effects,
       siteBanner: meta.banner,
-      macros: isStaff(user) ? meta.macros : undefined,
+      macros: isStaff(user) ? meta.macros : [],
     });
     return;
   }

@@ -4067,15 +4067,46 @@ function stopChatPoll() {
   }
 }
 
+let __chatLastMsgKey = "";
+let __chatNotifyReady = false;
+
 function startChatPoll() {
   stopChatPoll();
-  __chatPollTimer = setInterval(() => {
-    const page = document.getElementById("page-chat");
-    if (!page || !page.classList.contains("active")) return;
+  __chatPollTimer = setInterval(async () => {
     if (!localStorage.getItem(SESSION_TOKEN_KEY)) return;
-    renderChatPage({ silent: true });
+    const page = document.getElementById("page-chat");
+    const onChat = page && page.classList.contains("active");
+    try {
+      // Notificação global: checa threads mesmo fora da página de chat
+      const data = await apiFetch("/api/chat/threads?tab=all");
+      const threads = data.threads || [];
+      let newestKey = "";
+      let newestPreview = "";
+      let newestTitle = "";
+      for (const th of threads) {
+        const key = String(th.updatedAt || "") + "|" + String(th.id) + "|" + String(th.count || 0);
+        if (!newestKey || String(th.updatedAt || "") > newestKey.split("|")[0]) {
+          newestKey = key;
+          newestPreview = th.preview || "Nova mensagem";
+          newestTitle = th.title || th.memberName || "Mensagens";
+        }
+      }
+      if (__chatNotifyReady && newestKey && newestKey !== __chatLastMsgKey) {
+        // evita notificar a própria ação imediatamente demais
+        siteNotify("💬 " + newestTitle, newestPreview, {
+          onClick: () => { try { goToPage("chat"); } catch (_) {} },
+        });
+        // badge no botão de chat se existir
+        const btn = document.getElementById("btn-chat");
+        if (btn && !onChat) btn.classList.add("has-unread");
+      }
+      if (newestKey) __chatLastMsgKey = newestKey;
+      __chatNotifyReady = true;
+    } catch (_) {}
+    if (onChat) renderChatPage({ silent: true });
   }, 5000);
 }
+
 
 async function renderChatPage(opts = {}) {
   const silent = !!opts.silent;
@@ -4092,6 +4123,7 @@ async function renderChatPage(opts = {}) {
     __chatStaff = !!data.staff;
     const threads = data.threads || [];
 
+    try { syncMacroBar(window.__dpMe); } catch (_) {}
     // tabs active state
     document.querySelectorAll("#chat-tabs .chip").forEach((c) => {
       c.classList.toggle("active", c.dataset.chatTab === __chatTab);
@@ -4282,13 +4314,15 @@ async function openChatThread(id, silent = false) {
         const act = btn.getAttribute("data-act");
         if (!mid || !__chatThreadId) return;
         if (act === "del") {
-          if (!confirm("Apagar esta mensagem?")) return;
+          const ok = await siteConfirm("Apagar esta mensagem? Essa ação não pode ser desfeita.", "Apagar mensagem");
+          if (!ok) return;
           try {
             await apiFetch("/api/chat/delete", {
               method: "POST",
               body: JSON.stringify({ threadId: __chatThreadId, messageId: mid }),
             });
             showToast("Mensagem apagada");
+            siteNotify("Mensagem apagada", "A mensagem foi removida da conversa.");
             await openChatThread(__chatThreadId);
             await renderChatPage({ silent: true });
           } catch (err) {
@@ -4300,7 +4334,7 @@ async function openChatThread(id, silent = false) {
           const current = (textEl?.childNodes[0]?.textContent || textEl?.textContent || "")
             .replace(/\s*\(editada\)\s*$/, "")
             .trim();
-          const next = prompt("Editar mensagem:", current);
+          const next = await sitePrompt("Novo texto da mensagem:", current, "Editar mensagem");
           if (next == null) return;
           const trimmed = next.trim();
           if (!trimmed) {
@@ -4317,6 +4351,7 @@ async function openChatThread(id, silent = false) {
               }),
             });
             showToast("Mensagem editada");
+            siteNotify("Mensagem editada", "Sua alteração foi salva.");
             await openChatThread(__chatThreadId);
           } catch (err) {
             showToast(err.message || "Não foi possível editar");
@@ -4876,6 +4911,11 @@ function clearScareOverlays() {
 function applyClientEffects(me) {
   if (!me) return;
   window.__dpMe = me;
+  // Nunca manter macros de staff na sessão de membro
+  if (me.role !== "owner" && me.role !== "moderator") {
+    me.macros = undefined;
+  }
+  try { syncMacroBar(me); } catch (_) {}
   const fx = me.effects || {};
   applySiteBanner(me.siteBanner);
 
@@ -5206,25 +5246,135 @@ if (_renderOwnerMod) {
   };
 }
 
-// Macros no chat compose
-document.addEventListener("DOMContentLoaded", () => {
+
+// ========== Diálogos do site (sem alert/confirm/prompt nativos) ==========
+function ensureDialogHost() {
+  let host = document.getElementById("site-dialog-host");
+  if (host) return host;
+  host = document.createElement("div");
+  host.id = "site-dialog-host";
+  host.innerHTML = `
+    <div class="site-dialog-overlay" id="site-dialog-overlay" hidden>
+      <div class="site-dialog" role="dialog" aria-modal="true">
+        <h3 id="site-dialog-title">Confirmação</h3>
+        <p id="site-dialog-msg" class="site-dialog-msg"></p>
+        <input type="text" id="site-dialog-input" class="site-dialog-input" hidden />
+        <div class="site-dialog-actions">
+          <button type="button" class="btn-ghost" id="site-dialog-cancel">Cancelar</button>
+          <button type="button" class="btn-primary" id="site-dialog-ok">OK</button>
+        </div>
+      </div>
+    </div>
+    <div class="site-notify-stack" id="site-notify-stack"></div>
+  `;
+  document.body.appendChild(host);
+  return host;
+}
+
+function siteConfirm(message, title = "Confirmar") {
+  ensureDialogHost();
+  const overlay = document.getElementById("site-dialog-overlay");
+  const titleEl = document.getElementById("site-dialog-title");
+  const msgEl = document.getElementById("site-dialog-msg");
+  const input = document.getElementById("site-dialog-input");
+  const ok = document.getElementById("site-dialog-ok");
+  const cancel = document.getElementById("site-dialog-cancel");
+  titleEl.textContent = title;
+  msgEl.textContent = message;
+  input.hidden = true;
+  input.value = "";
+  overlay.hidden = false;
+  return new Promise((resolve) => {
+    const done = (val) => {
+      overlay.hidden = true;
+      ok.onclick = null;
+      cancel.onclick = null;
+      resolve(val);
+    };
+    ok.onclick = () => done(true);
+    cancel.onclick = () => done(false);
+    overlay.onclick = (e) => { if (e.target === overlay) done(false); };
+  });
+}
+
+function sitePrompt(message, defaultValue = "", title = "Editar") {
+  ensureDialogHost();
+  const overlay = document.getElementById("site-dialog-overlay");
+  const titleEl = document.getElementById("site-dialog-title");
+  const msgEl = document.getElementById("site-dialog-msg");
+  const input = document.getElementById("site-dialog-input");
+  const ok = document.getElementById("site-dialog-ok");
+  const cancel = document.getElementById("site-dialog-cancel");
+  titleEl.textContent = title;
+  msgEl.textContent = message;
+  input.hidden = false;
+  input.value = defaultValue || "";
+  overlay.hidden = false;
+  setTimeout(() => input.focus(), 50);
+  return new Promise((resolve) => {
+    const done = (val) => {
+      overlay.hidden = true;
+      ok.onclick = null;
+      cancel.onclick = null;
+      resolve(val);
+    };
+    ok.onclick = () => done(input.value);
+    cancel.onclick = () => done(null);
+    input.onkeydown = (e) => {
+      if (e.key === "Enter") { e.preventDefault(); done(input.value); }
+      if (e.key === "Escape") done(null);
+    };
+    overlay.onclick = (e) => { if (e.target === overlay) done(null); };
+  });
+}
+
+/** Notificação visual do site (nova mensagem etc.) */
+function siteNotify(title, body, opts = {}) {
+  ensureDialogHost();
+  const stack = document.getElementById("site-notify-stack");
+  if (!stack) return;
+  const el = document.createElement("div");
+  el.className = "site-notify";
+  el.innerHTML = `<strong>${String(title).replace(/</g, "&lt;")}</strong><span>${String(body || "").replace(/</g, "&lt;")}</span>`;
+  stack.appendChild(el);
+  const ttl = opts.ttl || 4500;
   setTimeout(() => {
-    if (!window.__dpMe?.macros?.length) return;
-    const compose = document.getElementById("chat-compose");
-    if (!compose || document.getElementById("macro-bar")) return;
-    const bar = document.createElement("div");
+    el.classList.add("leaving");
+    setTimeout(() => el.remove(), 300);
+  }, ttl);
+  el.addEventListener("click", () => {
+    el.remove();
+    if (typeof opts.onClick === "function") opts.onClick();
+  });
+}
+
+/** Macros: SOMENTE owner / moderator. Membros nunca veem. */
+function syncMacroBar(me) {
+  const existing = document.getElementById("macro-bar");
+  const isStaff = me && (me.role === "owner" || me.role === "moderator");
+  const list = isStaff && Array.isArray(me.macros) ? me.macros : [];
+  if (!isStaff || !list.length) {
+    if (existing) existing.remove();
+    return;
+  }
+  const compose = document.getElementById("chat-compose");
+  if (!compose) return;
+  let bar = existing;
+  if (!bar) {
+    bar = document.createElement("div");
     bar.id = "macro-bar";
     bar.className = "macro-bar";
-    bar.innerHTML = window.__dpMe.macros.map((m) =>
-      `<button type="button" class="btn-ghost btn-tiny macro-btn" data-body="${String(m.body).replace(/"/g, "&quot;")}">${m.fun ? "😏 " : ""}${m.title}</button>`
-    ).join("");
     compose.parentElement?.insertBefore(bar, compose);
-    bar.querySelectorAll(".macro-btn").forEach((b) => {
-      b.addEventListener("click", () => {
-        const input = document.getElementById("chat-input");
-        if (input) input.value = b.getAttribute("data-body") || "";
-      });
+  }
+  bar.innerHTML = list.map((m) =>
+    `<button type="button" class="btn-ghost btn-tiny macro-btn" data-body="${String(m.body).replace(/"/g, "&quot;")}">${m.fun ? "😏 " : ""}${String(m.title).replace(/</g, "&lt;")}</button>`
+  ).join("");
+  bar.querySelectorAll(".macro-btn").forEach((b) => {
+    b.addEventListener("click", () => {
+      const input = document.getElementById("chat-input");
+      if (input) input.value = b.getAttribute("data-body") || "";
     });
-  }, 1500);
-});
+  });
+}
+
 

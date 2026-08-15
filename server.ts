@@ -173,6 +173,7 @@ const USERS_FILE = path.join(DATA_DIR, "users.json");
 const SESSIONS_FILE = path.join(DATA_DIR, "sessions.json");
 const BANS_FILE = path.join(DATA_DIR, "bans.json");
 const CHAT_FILE = path.join(DATA_DIR, "chat.json");
+const FRIENDS_FILE = path.join(DATA_DIR, "friends.json");
 const AUDIT_FILE = path.join(DATA_DIR, "audit.json");
 const REPORTS_FILE = path.join(DATA_DIR, "reports.json");
 const SITE_META_FILE = path.join(DATA_DIR, "site-meta.json");
@@ -217,6 +218,7 @@ function ensureData(): void {
   if (!fs.existsSync(SESSIONS_FILE)) writeJSON(SESSIONS_FILE, {});
   if (!fs.existsSync(BANS_FILE)) writeJSON(BANS_FILE, []);
   if (!fs.existsSync(CHAT_FILE)) writeJSON(CHAT_FILE, { threads: [] });
+  if (!fs.existsSync(FRIENDS_FILE)) writeJSON(FRIENDS_FILE, { requests: [] });
   if (!fs.existsSync(AUDIT_FILE)) writeJSON(AUDIT_FILE, []);
   if (!fs.existsSync(REPORTS_FILE)) writeJSON(REPORTS_FILE, []);
   if (!fs.existsSync(SITE_META_FILE)) writeJSON(SITE_META_FILE, { banner: null, macros: defaultMacros() });
@@ -352,7 +354,14 @@ function saveSessions(sessions: SessionMap): void {
 }
 
 
-type ChatKind = "support" | "dm" | "announce";
+type ChatKind = "support" | "dm" | "announce" | "group";
+
+interface ChatReplyRef {
+  id: string;
+  text: string;
+  from: string;
+  fromDisplayName?: string;
+}
 
 interface ChatMessage {
   id: string;
@@ -363,6 +372,8 @@ interface ChatMessage {
   fileName?: string;
   fileData?: string;
   fileMime?: string;
+  replyTo?: ChatReplyRef;
+  forwarded?: boolean;
 }
 
 interface ChatThread {
@@ -370,11 +381,26 @@ interface ChatThread {
   kind: ChatKind;
   /** support: e-mail do membro */
   memberEmail?: string;
-  /** dm: e-mails dos dois participantes */
+  /** dm / group: e-mails dos participantes */
   participants?: string[];
+  /** group */
+  createdBy?: string;
+  groupName?: string;
   subject: string;
   updatedAt: string;
   messages: ChatMessage[];
+}
+
+interface FriendRequest {
+  id: string;
+  from: string;
+  to: string;
+  at: string;
+  status: "pending" | "accepted" | "rejected";
+}
+
+interface FriendsData {
+  requests: FriendRequest[];
 }
 
 const ANNOUNCE_ID = "announce-global";
@@ -404,6 +430,37 @@ function getChat(): { threads: ChatThread[] } {
 }
 function saveChat(data: { threads: ChatThread[] }): void {
   writeJSON(CHAT_FILE, data);
+}
+
+function getFriendsData(): FriendsData {
+  const d = readJSON<FriendsData>(FRIENDS_FILE, { requests: [] });
+  if (!Array.isArray(d.requests)) d.requests = [];
+  return d;
+}
+function saveFriendsData(d: FriendsData): void {
+  writeJSON(FRIENDS_FILE, d);
+}
+
+function areFriends(a: string, b: string): boolean {
+  const ea = normalizeEmail(a);
+  const eb = normalizeEmail(b);
+  if (ea === eb) return false;
+  return getFriendsData().requests.some(
+    (r) =>
+      r.status === "accepted" &&
+      ((r.from === ea && r.to === eb) || (r.from === eb && r.to === ea))
+  );
+}
+
+function listFriendEmails(email: string): string[] {
+  const e = normalizeEmail(email);
+  const out = new Set<string>();
+  for (const r of getFriendsData().requests) {
+    if (r.status !== "accepted") continue;
+    if (r.from === e) out.add(r.to);
+    if (r.to === e) out.add(r.from);
+  }
+  return [...out];
 }
 
 function defaultMacros(): { id: string; title: string; body: string; fun?: boolean }[] {
@@ -511,10 +568,12 @@ function displayNameOf(u: UserRecord | undefined, email: string): string {
 }
 
 function canAccessThread(user: UserRecord, th: ChatThread): boolean {
-  if (isStaff(user)) return true;
+  if (isStaff(user) && (th.kind === "support" || th.kind === "announce")) return true;
   if (th.kind === "announce") return true;
-  if (th.kind === "support") return th.memberEmail === user.email;
-  if (th.kind === "dm") return (th.participants || []).includes(user.email);
+  if (th.kind === "support") return isStaff(user) || th.memberEmail === user.email;
+  if (th.kind === "dm" || th.kind === "group") {
+    return (th.participants || []).includes(user.email);
+  }
   return false;
 }
 
@@ -1671,7 +1730,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
               ? staff
                 ? displayNameOf(peer, peerEmail)
                 : "Equipe DevPortal"
-              : displayNameOf(peer, peerEmail);
+              : th.kind === "group"
+                ? "👥 " + (th.groupName || th.subject || "Grupo")
+                : displayNameOf(peer, peerEmail);
         const last = th.messages.length ? th.messages[th.messages.length - 1] : null;
         return {
           id: th.id,
@@ -1757,6 +1818,138 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
     return;
   }
 
+  if (pathname === "/api/friends" && req.method === "GET") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const data = getFriendsData();
+    const users = getUsers();
+    const incoming = data.requests
+      .filter((r) => r.to === user.email && r.status === "pending")
+      .map((r) => {
+        const u = users.find((x) => x.email === r.from);
+        return {
+          id: r.id,
+          from: r.from,
+          at: r.at,
+          username: u?.username || "",
+          displayName: displayNameOf(u, r.from),
+          avatarUrl: u?.avatarUrl || "",
+        };
+      });
+    const outgoing = data.requests
+      .filter((r) => r.from === user.email && r.status === "pending")
+      .map((r) => {
+        const u = users.find((x) => x.email === r.to);
+        return {
+          id: r.id,
+          to: r.to,
+          at: r.at,
+          username: u?.username || "",
+          displayName: displayNameOf(u, r.to),
+        };
+      });
+    const friends = listFriendEmails(user.email).map((email) => {
+      const u = users.find((x) => x.email === email);
+      return {
+        email,
+        username: u?.username || "",
+        displayName: displayNameOf(u, email),
+        avatarUrl: u?.avatarUrl || "",
+      };
+    });
+    sendJSON(req, res, 200, { friends, incoming, outgoing });
+    return;
+  }
+
+  if (pathname === "/api/friends/request" && req.method === "POST") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const block = assertUserActive(user);
+    if (block) {
+      sendJSON(req, res, 403, { error: block });
+      return;
+    }
+    const body = (await readBody(req)) as { username?: string; email?: string };
+    const users = getUsers();
+    let target: UserRecord | undefined;
+    if (body.email) target = users.find((u) => u.email === normalizeEmail(body.email));
+    else {
+      const un = String(body.username || "").trim().replace(/^@/, "").toLowerCase();
+      if (!un) {
+        sendJSON(req, res, 400, { error: "Informe @username." });
+        return;
+      }
+      target = users.find((u) => (u.username || "").toLowerCase() === un);
+    }
+    if (!target) {
+      sendJSON(req, res, 404, { error: "Usuário não encontrado. A pessoa precisa ter @username no perfil." });
+      return;
+    }
+    if (target.email === user.email) {
+      sendJSON(req, res, 400, { error: "Não dá para adicionar a si mesmo." });
+      return;
+    }
+    if (areFriends(user.email, target.email)) {
+      sendJSON(req, res, 200, { ok: true, alreadyFriends: true });
+      return;
+    }
+    const data = getFriendsData();
+    const existing = data.requests.find(
+      (r) =>
+        r.status === "pending" &&
+        ((r.from === user.email && r.to === target!.email) ||
+          (r.from === target!.email && r.to === user.email))
+    );
+    if (existing) {
+      // se o outro já te pediu, aceita automaticamente
+      if (existing.from === target.email && existing.to === user.email) {
+        existing.status = "accepted";
+        saveFriendsData(data);
+        sendJSON(req, res, 200, { ok: true, accepted: true, requestId: existing.id });
+        return;
+      }
+      sendJSON(req, res, 200, { ok: true, pending: true, requestId: existing.id });
+      return;
+    }
+    const reqRow: FriendRequest = {
+      id: crypto.randomBytes(6).toString("hex"),
+      from: user.email,
+      to: target.email,
+      at: new Date().toISOString(),
+      status: "pending",
+    };
+    data.requests.push(reqRow);
+    saveFriendsData(data);
+    sendJSON(req, res, 200, { ok: true, pending: true, requestId: reqRow.id });
+    return;
+  }
+
+  if (pathname === "/api/friends/respond" && req.method === "POST") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const body = (await readBody(req)) as { requestId?: string; accept?: boolean };
+    const data = getFriendsData();
+    const reqRow = data.requests.find((r) => r.id === body.requestId);
+    if (!reqRow || reqRow.to !== user.email || reqRow.status !== "pending") {
+      sendJSON(req, res, 404, { error: "Pedido não encontrado." });
+      return;
+    }
+    reqRow.status = body.accept ? "accepted" : "rejected";
+    saveFriendsData(data);
+    sendJSON(req, res, 200, { ok: true, status: reqRow.status });
+    return;
+  }
+
+  /** Abre DM só se já forem amigos */
   if (pathname === "/api/chat/dm" && req.method === "POST") {
     const user = userFromToken(req);
     if (!user) {
@@ -1782,11 +1975,18 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       target = users.find((u) => (u.username || "").toLowerCase() === un);
     }
     if (!target) {
-      sendJSON(req, res, 404, { error: "Usuário não encontrado. Peça para a pessoa definir um username no perfil." });
+      sendJSON(req, res, 404, { error: "Usuário não encontrado." });
       return;
     }
     if (target.email === user.email) {
       sendJSON(req, res, 400, { error: "Não dá para conversar consigo mesmo." });
+      return;
+    }
+    if (!areFriends(user.email, target.email)) {
+      sendJSON(req, res, 403, {
+        error: "Vocês ainda não são amigos. Envie um pedido de amizade e aguarde o aceite.",
+        code: "NOT_FRIENDS",
+      });
       return;
     }
     const chat = getChat();
@@ -1815,6 +2015,101 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
     return;
   }
 
+  /**
+   * Criar grupo: precisa de 2+ amigos.
+   * Se só 1 pessoa → abre DM em vez de grupo.
+   * Só o criador precisa ter os outros como amigos.
+   */
+  if (pathname === "/api/chat/group" && req.method === "POST") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const block = assertUserActive(user);
+    if (block) {
+      sendJSON(req, res, 403, { error: block });
+      return;
+    }
+    const body = (await readBody(req)) as { usernames?: string[]; emails?: string[]; name?: string };
+    const users = getUsers();
+    const targets: UserRecord[] = [];
+    const names = Array.isArray(body.usernames) ? body.usernames : [];
+    const emails = Array.isArray(body.emails) ? body.emails : [];
+    for (const un of names) {
+      const u = users.find((x) => (x.username || "").toLowerCase() === String(un).trim().replace(/^@/, "").toLowerCase());
+      if (u && u.email !== user.email) targets.push(u);
+    }
+    for (const em of emails) {
+      const u = users.find((x) => x.email === normalizeEmail(em));
+      if (u && u.email !== user.email) targets.push(u);
+    }
+    // unique by email
+    const map = new Map<string, UserRecord>();
+    for (const t of targets) map.set(t.email, t);
+    const unique = [...map.values()];
+    if (!unique.length) {
+      sendJSON(req, res, 400, { error: "Selecione pelo menos um amigo." });
+      return;
+    }
+    for (const t of unique) {
+      if (!areFriends(user.email, t.email)) {
+        sendJSON(req, res, 403, {
+          error: `Você precisa ser amigo de @${t.username || t.email} antes de incluir no grupo.`,
+        });
+        return;
+      }
+    }
+    // 1 pessoa → DM
+    if (unique.length === 1) {
+      const target = unique[0];
+      const chat = getChat();
+      const pair = [user.email, target.email].sort();
+      let th = (chat.threads || []).find(
+        (t) =>
+          t.kind === "dm" &&
+          t.participants &&
+          t.participants.length === 2 &&
+          [...t.participants].sort().join("|") === pair.join("|")
+      );
+      if (!th) {
+        th = {
+          id: crypto.randomBytes(8).toString("hex"),
+          kind: "dm",
+          participants: pair,
+          subject: `DM ${displayNameOf(user, user.email)} ↔ ${displayNameOf(target, target.email)}`,
+          updatedAt: new Date().toISOString(),
+          messages: [],
+        };
+        chat.threads = chat.threads || [];
+        chat.threads.push(th);
+        saveChat(chat);
+      }
+      sendJSON(req, res, 200, { ok: true, kind: "dm", threadId: th.id, thread: th });
+      return;
+    }
+    const participants = [user.email, ...unique.map((u) => u.email)];
+    const groupName = String(body.name || "").trim().slice(0, 40) ||
+      ("Grupo: " + unique.map((u) => displayNameOf(u, u.email)).slice(0, 3).join(", "));
+    const chat = getChat();
+    const th: ChatThread = {
+      id: crypto.randomBytes(8).toString("hex"),
+      kind: "group",
+      participants,
+      createdBy: user.email,
+      groupName,
+      subject: groupName,
+      updatedAt: new Date().toISOString(),
+      messages: [],
+    };
+    chat.threads = chat.threads || [];
+    chat.threads.push(th);
+    saveChat(chat);
+    sendJSON(req, res, 200, { ok: true, kind: "group", threadId: th.id, thread: th });
+    return;
+  }
+
+
   if (pathname === "/api/chat/send" && req.method === "POST") {
     const user = userFromToken(req);
     if (!user) {
@@ -1833,6 +2128,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       fileName?: string;
       fileData?: string;
       fileMime?: string;
+      replyToMessageId?: string;
     };
     if (isStillActive(user.mutedUntil) || (isStillActive(user.readOnlyUntil) && (user.readOnlyScope === "chat" || user.readOnlyScope === "all"))) {
       sendJSON(req, res, 403, {
@@ -1929,6 +2225,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       }
     }
 
+    const replyToId = body.replyToMessageId ? String(body.replyToMessageId) : "";
     const msg: ChatMessage = {
       id: crypto.randomBytes(6).toString("hex"),
       from: user.email,
@@ -1939,6 +2236,18 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       msg.fileName = fileName;
       msg.fileData = fileData;
       msg.fileMime = fileMime || "application/octet-stream";
+    }
+    if (replyToId) {
+      const ref = th.messages.find((m) => m.id === replyToId);
+      if (ref) {
+        const refUser = getUsers().find((u) => u.email === ref.from);
+        msg.replyTo = {
+          id: ref.id,
+          text: (ref.text || "").slice(0, 120),
+          from: ref.from,
+          fromDisplayName: displayNameOf(refUser, ref.from),
+        };
+      }
     }
     th.messages.push(msg);
     // limita histórico por thread
@@ -2062,36 +2371,121 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       sendJSON(req, res, 403, { error: block });
       return;
     }
-    const body = (await readBody(req)) as { threadId?: string; messageId?: string };
+    const body = (await readBody(req)) as {
+      threadId?: string;
+      messageId?: string;
+      messageIds?: string[];
+    };
     const threadId = String(body.threadId || "");
-    const messageId = String(body.messageId || "");
-    if (!threadId || !messageId) {
+    const ids = Array.isArray(body.messageIds)
+      ? body.messageIds.map(String)
+      : body.messageId
+        ? [String(body.messageId)]
+        : [];
+    if (!threadId || !ids.length) {
       sendJSON(req, res, 400, { error: "Dados incompletos." });
       return;
     }
     const chat = getChat();
-    const found = findMessage(chat, threadId, messageId);
-    if (!found) {
-      sendJSON(req, res, 404, { error: "Mensagem não encontrada." });
+    const th = (chat.threads || []).find((t) => t.id === threadId);
+    if (!th) {
+      sendJSON(req, res, 404, { error: "Conversa não encontrada." });
       return;
     }
-    if (!canAccessThread(user, found.th)) {
+    if (!canAccessThread(user, th)) {
       sendJSON(req, res, 403, { error: "Sem acesso." });
       return;
     }
-    if (!canDeleteMessage(user, found.msg)) {
-      sendJSON(req, res, 403, { error: "Você não pode apagar esta mensagem." });
-      return;
+    const idSet = new Set(ids);
+    const keep: ChatMessage[] = [];
+    let removed = 0;
+    for (const m of th.messages) {
+      if (idSet.has(m.id) && canDeleteMessage(user, m)) {
+        removed += 1;
+        continue;
+      }
+      keep.push(m);
     }
-    found.th.messages.splice(found.index, 1);
-    found.th.updatedAt = new Date().toISOString();
+    th.messages = keep;
+    th.updatedAt = new Date().toISOString();
     saveChat(chat);
     sendJSON(req, res, 200, {
       ok: true,
-      thread: { ...found.th, messages: enrichMessages(found.th.messages, getUsers()) },
+      removed,
+      thread: { ...th, messages: enrichMessages(th.messages, getUsers()) },
     });
     return;
   }
+
+  /** Encaminhar uma ou várias mensagens para outra conversa */
+  if (pathname === "/api/chat/forward" && req.method === "POST") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const block = assertUserActive(user);
+    if (block) {
+      sendJSON(req, res, 403, { error: block });
+      return;
+    }
+    const body = (await readBody(req)) as {
+      fromThreadId?: string;
+      toThreadId?: string;
+      messageIds?: string[];
+    };
+    const fromId = String(body.fromThreadId || "");
+    const toId = String(body.toThreadId || "");
+    const ids = Array.isArray(body.messageIds) ? body.messageIds.map(String) : [];
+    if (!fromId || !toId || !ids.length) {
+      sendJSON(req, res, 400, { error: "Dados incompletos." });
+      return;
+    }
+    const chat = getChat();
+    const from = (chat.threads || []).find((t) => t.id === fromId);
+    const to = (chat.threads || []).find((t) => t.id === toId);
+    if (!from || !to) {
+      sendJSON(req, res, 404, { error: "Conversa não encontrada." });
+      return;
+    }
+    if (!canAccessThread(user, from) || !canAccessThread(user, to)) {
+      sendJSON(req, res, 403, { error: "Sem acesso." });
+      return;
+    }
+    if (to.kind === "announce" && !isStaff(user)) {
+      sendJSON(req, res, 403, { error: "Não pode encaminhar para anúncios." });
+      return;
+    }
+    const idSet = new Set(ids);
+    const picked = from.messages.filter((m) => idSet.has(m.id));
+    if (!picked.length) {
+      sendJSON(req, res, 404, { error: "Mensagens não encontradas." });
+      return;
+    }
+    for (const m of picked) {
+      to.messages.push({
+        id: crypto.randomBytes(6).toString("hex"),
+        from: user.email,
+        text: m.text || (m.fileName ? `📎 ${m.fileName}` : ""),
+        at: new Date().toISOString(),
+        forwarded: true,
+        fileName: m.fileName,
+        fileData: m.fileData,
+        fileMime: m.fileMime,
+        replyTo: m.replyTo,
+      });
+    }
+    if (to.messages.length > 500) to.messages = to.messages.slice(-500);
+    to.updatedAt = new Date().toISOString();
+    saveChat(chat);
+    sendJSON(req, res, 200, {
+      ok: true,
+      threadId: to.id,
+      thread: { ...to, messages: enrichMessages(to.messages, getUsers()) },
+    });
+    return;
+  }
+
 
 
   /** Macros + banner públicos (staff vê macros) */

@@ -114,7 +114,6 @@ const USERS_FILE = path.join(DATA_DIR, "users.json");
 const SESSIONS_FILE = path.join(DATA_DIR, "sessions.json");
 const BANS_FILE = path.join(DATA_DIR, "bans.json");
 const CHAT_FILE = path.join(DATA_DIR, "chat.json");
-const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 const NODE_ENV = process.env.NODE_ENV || "development";
 const IS_PROD = NODE_ENV === "production";
 
@@ -155,8 +154,7 @@ function ensureData(): void {
   if (!fs.existsSync(USERS_FILE)) writeJSON(USERS_FILE, []);
   if (!fs.existsSync(SESSIONS_FILE)) writeJSON(SESSIONS_FILE, {});
   if (!fs.existsSync(BANS_FILE)) writeJSON(BANS_FILE, []);
-  if (!fs.existsSync(CHAT_FILE)) writeJSON(CHAT_FILE, { threads: [], announcements: [] });
-  if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  if (!fs.existsSync(CHAT_FILE)) writeJSON(CHAT_FILE, { threads: [] });
 }
 
 function readJSON<T>(file: string, fallback: T): T {
@@ -279,16 +277,11 @@ interface ChatMessage {
   from: string;
   text: string;
   at: string;
-  fileName?: string;
-  fileUrl?: string;
-  fileMime?: string;
 }
 
 interface ChatThread {
   id: string;
-  type: "support" | "dm" | "announce";
   memberEmail: string;
-  participants: string[];
   subject: string;
   updatedAt: string;
   messages: ChatMessage[];
@@ -346,7 +339,7 @@ function getPerms(user: UserRecord): ModPermissions {
 }
 
 function isStaff(user: UserRecord): boolean {
-  return user.role === "owner" || user.role === "admin" || user.role === "moderator" || user.email === ADMIN_EMAIL;
+  return user.role === "owner" || user.role === "moderator" || user.email === ADMIN_EMAIL;
 }
 
 function requireStaff(req: http.IncomingMessage): UserRecord | null {
@@ -784,7 +777,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       return;
     }
     const role =
-      user.email === ADMIN_EMAIL || user.role === "owner" || user.role === "admin"
+      user.email === ADMIN_EMAIL || user.role === "owner"
         ? "owner"
         : user.role === "moderator"
           ? "moderator"
@@ -1243,41 +1236,6 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
   }
 
 
-  
-  // —— Lookup username ——
-  if (pathname === "/api/users/lookup" && req.method === "GET") {
-    const user = userFromToken(req);
-    if (!user) {
-      sendJSON(req, res, 401, { error: "Faça login." });
-      return;
-    }
-    const host = req.headers.host || "localhost";
-    const url = new URL(req.url || "/", `http://${host}`);
-    const q = String(url.searchParams.get("q") || "").trim().toLowerCase();
-    if (q.length < 2) {
-      sendJSON(req, res, 200, { users: [] });
-      return;
-    }
-    const users = getUsers()
-      .filter((u) => {
-        const un = (u.username || "").toLowerCase();
-        const dn = (u.displayName || "").toLowerCase();
-        const em = (u.email || "").toLowerCase();
-        return un.includes(q) || dn.includes(q) || em.split("@")[0].includes(q);
-      })
-      .filter((u) => u.email !== user.email)
-      .slice(0, 12)
-      .map((u) => ({
-        email: u.email,
-        username: u.username || "",
-        displayName: u.displayName || u.username || u.email.split("@")[0],
-        avatarUrl: u.avatarUrl || "",
-        role: u.role || "user",
-      }));
-    sendJSON(req, res, 200, { users });
-    return;
-  }
-
   if (pathname === "/api/chat/threads" && req.method === "GET") {
     const user = userFromToken(req);
     if (!user) {
@@ -1293,35 +1251,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
     const staff = isStaff(user);
     const users = getUsers();
     const threads = (chat.threads || [])
-      .filter((th) => {
-        const type = th.type || "support";
-        if (type === "announce") return true;
-        if (staff) return true;
-        if (type === "support") return th.memberEmail === user.email || (th.participants || []).includes(user.email);
-        if (type === "dm") return (th.participants || []).includes(user.email);
-        return th.memberEmail === user.email;
-      })
+      .filter((th) => staff || th.memberEmail === user.email)
       .map((th) => {
-        const type = th.type || "support";
-        const other =
-          type === "dm"
-            ? (th.participants || []).find((e) => e !== user.email)
-            : th.memberEmail;
-        const u = users.find((x) => x.email === other);
-        const name =
-          type === "announce"
-            ? "Anúncios"
-            : type === "support"
-              ? staff
-                ? u?.displayName || u?.username || (other || "").split("@")[0]
-                : "Equipe DevPortal"
-              : u?.displayName || u?.username || (other || "").split("@")[0] || "DM";
+        const u = users.find((x) => x.email === th.memberEmail);
         return {
           id: th.id,
-          type,
           memberEmail: th.memberEmail,
-          participants: th.participants || [],
-          memberName: name,
+          memberName: (u?.displayName || u?.username || th.memberEmail.split("@")[0] || th.memberEmail),
           memberUsername: u?.username || "",
           memberAvatar: u?.avatarUrl || "",
           subject: th.subject,
@@ -1331,7 +1267,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
         };
       })
       .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
-    sendJSON(req, res, 200, { threads, staff, role: user.role });
+    sendJSON(req, res, 200, { threads, staff });
     return;
   }
 
@@ -1350,70 +1286,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       sendJSON(req, res, 404, { error: "Conversa não encontrada." });
       return;
     }
-    const type = th.type || "support";
-    const allowed =
-      type === "announce" ||
-      isStaff(user) ||
-      th.memberEmail === user.email ||
-      (th.participants || []).includes(user.email);
-    if (!allowed) {
+    if (!isStaff(user) && th.memberEmail !== user.email) {
       sendJSON(req, res, 403, { error: "Sem acesso a esta conversa." });
       return;
     }
     sendJSON(req, res, 200, { thread: th });
-    return;
-  }
-
-  if (pathname === "/api/chat/dm" && req.method === "POST") {
-    const user = userFromToken(req);
-    if (!user) {
-      sendJSON(req, res, 401, { error: "Faça login." });
-      return;
-    }
-    const block = assertUserActive(user);
-    if (block) {
-      sendJSON(req, res, 403, { error: block });
-      return;
-    }
-    const body = (await readBody(req)) as { username?: string; email?: string };
-    const users = getUsers();
-    let target = body.email
-      ? users.find((u) => u.email === normalizeEmail(body.email))
-      : users.find(
-          (u) =>
-            (u.username || "").toLowerCase() === String(body.username || "").toLowerCase().trim() ||
-            (u.email || "").split("@")[0].toLowerCase() === String(body.username || "").toLowerCase().trim()
-        );
-    if (!target) {
-      sendJSON(req, res, 404, { error: "Usuário não encontrado. Peça o @username." });
-      return;
-    }
-    if (target.email === user.email) {
-      sendJSON(req, res, 400, { error: "Não dá para conversar consigo mesmo." });
-      return;
-    }
-    const chat = getChat();
-    chat.threads = chat.threads || [];
-    let th = chat.threads.find(
-      (x) =>
-        (x.type || "") === "dm" &&
-        (x.participants || []).includes(user.email) &&
-        (x.participants || []).includes(target!.email)
-    );
-    if (!th) {
-      th = {
-        id: crypto.randomBytes(8).toString("hex"),
-        type: "dm",
-        memberEmail: target.email,
-        participants: [user.email, target.email].sort(),
-        subject: "DM",
-        updatedAt: new Date().toISOString(),
-        messages: [],
-      };
-      chat.threads.push(th);
-      saveChat(chat);
-    }
-    sendJSON(req, res, 200, { ok: true, threadId: th.id });
     return;
   }
 
@@ -1428,145 +1305,48 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       sendJSON(req, res, 403, { error: block });
       return;
     }
-    const body = (await readBody(req)) as {
-      text?: string;
-      threadId?: string;
-      type?: string;
-      fileName?: string;
-      fileData?: string;
-      fileMime?: string;
-    };
-    const text = String(body.text || "").trim().slice(0, 4000);
-    const hasFile = Boolean(body.fileData && body.fileName);
-    if (!text && !hasFile) {
+    const body = (await readBody(req)) as { text?: string; threadId?: string };
+    const text = String(body.text || "").trim().slice(0, 1000);
+    if (!text) {
       sendJSON(req, res, 400, { error: "Mensagem vazia." });
       return;
     }
     const chat = getChat();
-    chat.threads = chat.threads || [];
-    let th = body.threadId ? chat.threads.find((x) => x.id === body.threadId) : undefined;
+    let th = body.threadId
+      ? (chat.threads || []).find((x) => x.id === body.threadId)
+      : undefined;
 
     if (th) {
-      const type = th.type || "support";
-      if (type === "announce" && !isStaff(user)) {
-        sendJSON(req, res, 403, { error: "Só a equipe posta em Anúncios." });
-        return;
-      }
-      const allowed =
-        type === "announce" ||
-        isStaff(user) ||
-        th.memberEmail === user.email ||
-        (th.participants || []).includes(user.email);
-      if (!allowed) {
+      if (!isStaff(user) && th.memberEmail !== user.email) {
         sendJSON(req, res, 403, { error: "Sem acesso." });
         return;
       }
     } else {
-      const wantType = body.type === "announce" ? "announce" : "support";
-      if (wantType === "announce") {
-        if (!isStaff(user)) {
-          sendJSON(req, res, 403, { error: "Só equipe posta anúncios." });
-          return;
-        }
-        th = chat.threads.find((x) => (x.type || "") === "announce");
-        if (!th) {
-          th = {
-            id: "announce-global",
-            type: "announce",
-            memberEmail: "staff",
-            participants: [],
-            subject: "Anúncios",
-            updatedAt: new Date().toISOString(),
-            messages: [],
-          };
-          chat.threads.push(th);
-        }
-      } else {
-        if (isStaff(user) && !body.threadId) {
-          sendJSON(req, res, 400, { error: "Equipe: abra uma conversa existente para responder." });
-          return;
-        }
-        th = {
-          id: crypto.randomBytes(8).toString("hex"),
-          type: "support",
-          memberEmail: user.email,
-          participants: [user.email],
-          subject: (text || body.fileName || "Suporte").slice(0, 60),
-          updatedAt: new Date().toISOString(),
-          messages: [],
-        };
-        chat.threads.push(th);
-      }
-    }
-
-    let fileUrl: string | undefined;
-    let fileName: string | undefined;
-    let fileMime: string | undefined;
-    if (hasFile) {
-      const raw = String(body.fileData || "");
-      const b64 = raw.includes(",") ? raw.split(",")[1] : raw;
-      const buf = Buffer.from(b64, "base64");
-      if (buf.length > 2.5 * 1024 * 1024) {
-        sendJSON(req, res, 400, { error: "Arquivo máximo 2,5 MB." });
+      // membro abre nova thread com a equipe
+      if (isStaff(user) && !body.threadId) {
+        sendJSON(req, res, 400, { error: "Equipe deve responder em uma conversa existente." });
         return;
       }
-      const safeName = String(body.fileName || "file")
-        .replace(/[^a-zA-Z0-9._-]/g, "_")
-        .slice(0, 80);
-      const id = crypto.randomBytes(6).toString("hex");
-      const stored = `${id}-${safeName}`;
-      fs.writeFileSync(path.join(UPLOADS_DIR, stored), buf);
-      fileUrl = `/api/uploads/${stored}`;
-      fileName = safeName;
-      fileMime = String(body.fileMime || "application/octet-stream").slice(0, 80);
+      th = {
+        id: crypto.randomBytes(8).toString("hex"),
+        memberEmail: user.email,
+        subject: text.slice(0, 60),
+        updatedAt: new Date().toISOString(),
+        messages: [],
+      };
+      chat.threads = chat.threads || [];
+      chat.threads.push(th);
     }
 
-    const msg: ChatMessage = {
+    th.messages.push({
       id: crypto.randomBytes(6).toString("hex"),
       from: user.email,
-      text: text || (fileName ? `📎 ${fileName}` : ""),
+      text,
       at: new Date().toISOString(),
-      fileName,
-      fileUrl,
-      fileMime,
-    };
-    th!.messages.push(msg);
-    th!.updatedAt = new Date().toISOString();
-    saveChat(chat);
-    broadcastChat({ type: "chat", threadId: th!.id, message: msg });
-    sendJSON(req, res, 200, { ok: true, threadId: th!.id, thread: th, message: msg });
-    return;
-  }
-
-  if (pathname.startsWith("/api/uploads/") && req.method === "GET") {
-    const name = path.basename(pathname.slice("/api/uploads/".length));
-    const full = path.join(UPLOADS_DIR, name);
-    if (!full.startsWith(UPLOADS_DIR) || !fs.existsSync(full)) {
-      sendJSON(req, res, 404, { error: "Arquivo não encontrado." });
-      return;
-    }
-    const data = fs.readFileSync(full);
-    const ext = path.extname(name).toLowerCase();
-    const mime =
-      ext === ".png"
-        ? "image/png"
-        : ext === ".jpg" || ext === ".jpeg"
-          ? "image/jpeg"
-          : ext === ".gif"
-            ? "image/gif"
-            : ext === ".webp"
-              ? "image/webp"
-              : ext === ".pdf"
-                ? "application/pdf"
-                : ext === ".txt"
-                  ? "text/plain; charset=utf-8"
-                  : "application/octet-stream";
-    res.writeHead(200, {
-      "Content-Type": mime,
-      "Cache-Control": "private, max-age=3600",
-      "Access-Control-Allow-Origin": "*",
     });
-    res.end(data);
+    th.updatedAt = new Date().toISOString();
+    saveChat(chat);
+    sendJSON(req, res, 200, { ok: true, threadId: th.id, thread: th });
     return;
   }
 
@@ -1601,74 +1381,6 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse, pathna
   });
 }
 
-
-// —— WebSocket (sem dependência) ——
-type WsClient = { socket: import("net").Socket };
-const wsClients = new Set<WsClient>();
-
-function encodeWsFrame(str: string): Buffer {
-  const payload = Buffer.from(str, "utf8");
-  const len = payload.length;
-  let header: Buffer;
-  if (len < 126) {
-    header = Buffer.alloc(2);
-    header[0] = 0x81;
-    header[1] = len;
-  } else if (len < 65536) {
-    header = Buffer.alloc(4);
-    header[0] = 0x81;
-    header[1] = 126;
-    header.writeUInt16BE(len, 2);
-  } else {
-    header = Buffer.alloc(10);
-    header[0] = 0x81;
-    header[1] = 127;
-    header.writeUInt32BE(0, 2);
-    header.writeUInt32BE(len, 6);
-  }
-  return Buffer.concat([header, payload]);
-}
-
-function broadcastChat(payload: object): void {
-  const data = encodeWsFrame(JSON.stringify(payload));
-  for (const c of wsClients) {
-    try {
-      c.socket.write(data);
-    } catch {
-      /* ignore */
-    }
-  }
-}
-
-function acceptWs(req: http.IncomingMessage, socket: import("net").Socket): void {
-  const key = req.headers["sec-websocket-key"];
-  if (!key || typeof key !== "string") {
-    socket.destroy();
-    return;
-  }
-  const accept = crypto
-    .createHash("sha1")
-    .update(key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11")
-    .digest("base64");
-  socket.write(
-    "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: " +
-      accept +
-      "\r\n\r\n"
-  );
-  const client: WsClient = { socket };
-  wsClients.add(client);
-  socket.on("close", () => wsClients.delete(client));
-  socket.on("error", () => {
-    wsClients.delete(client);
-    try {
-      socket.destroy();
-    } catch {
-      /* */
-    }
-  });
-}
-
-
 // ---------- boot ----------
 ensureData();
 ensureAdminUser();
@@ -1693,20 +1405,6 @@ const server = http.createServer(async (req, res) => {
       res.end();
     }
   }
-});
-
-server.on("upgrade", (req, socket) => {
-  try {
-    const host = req.headers.host || "localhost";
-    const url = new URL(req.url || "/", `http://${host}`);
-    if (url.pathname === "/ws") {
-      acceptWs(req, socket as import("net").Socket);
-      return;
-    }
-  } catch {
-    /* */
-  }
-  socket.destroy();
 });
 
 server.listen(PORT, () => {

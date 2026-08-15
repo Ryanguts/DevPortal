@@ -3,10 +3,12 @@
     "id": "admin-1",
     "email": "r.guts",
     "passwordHash": "01ceb3e0d1cf42439d3f992a538048b9:8befb7bce431c01589b0a69bbe1c06677f51e7b29a6da2f6ed9988fb539e47099ebabc9ebbfeeb42a13df0bdb32b79e4b2ee63b437f42aa1b02e83c0508f8fa0",
-    "role": "admin",
+    "role": "owner",
     "createdAt": "2026-08-14T22:38:30.741Z",
     "favorites": [],
     "failedLogins": 0,
-    "lockedUntil": null
+    "lockedUntil": null,
+    "banned": false,
+    "timeoutUntil": null
   }
 ]

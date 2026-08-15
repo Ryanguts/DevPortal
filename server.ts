@@ -256,7 +256,22 @@ function rateLimit(key: string, max: number): boolean {
 }
 
 function getUsers(): UserRecord[] {
-  return readJSON<UserRecord[]>(USERS_FILE, []);
+  const list = readJSON<UserRecord[]>(USERS_FILE, []);
+  let dirty = false;
+  for (const u of list) {
+    const raw = String(u.role || "user").toLowerCase();
+    let n: Role = "user";
+    if (u.email === ADMIN_EMAIL || raw === "admin" || raw === "owner") n = "owner";
+    else if (raw === "moderator" || raw === "mod") n = "moderator";
+    if (u.role !== n) {
+      u.role = n;
+      dirty = true;
+    }
+  }
+  if (dirty) {
+    try { writeJSON(USERS_FILE, list); } catch { /* ignore */ }
+  }
+  return list;
 }
 
 function saveUsers(users: UserRecord[]): void {
@@ -338,8 +353,19 @@ function getPerms(user: UserRecord): ModPermissions {
   };
 }
 
+/** Converte legado "admin" → "owner". Nunca devolve "admin". */
+function normalizeRole(user: UserRecord | null | undefined): Role {
+  if (!user) return "user";
+  if (user.email === ADMIN_EMAIL) return "owner";
+  const r = String(user.role || "user").toLowerCase();
+  if (r === "admin" || r === "owner") return "owner";
+  if (r === "moderator" || r === "mod") return "moderator";
+  return "user";
+}
+
 function isStaff(user: UserRecord): boolean {
-  return user.role === "owner" || user.role === "moderator" || user.email === ADMIN_EMAIL;
+  const role = normalizeRole(user);
+  return role === "owner" || role === "moderator" || user.email === ADMIN_EMAIL;
 }
 
 function requireStaff(req: http.IncomingMessage): UserRecord | null {

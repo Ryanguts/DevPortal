@@ -4176,44 +4176,47 @@ async function sendChatMessage(text) {
 function initChatCompose() {
   const form = document.getElementById("chat-compose");
   const input = document.getElementById("chat-input");
+  // HTML usa type="button" id="chat-send-btn" — NÃO type="submit"
+  const sendBtn = document.getElementById("chat-send-btn");
   if (!form || form.dataset.bound === "1") return;
   form.dataset.bound = "1";
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  async function doSend() {
     const text = (input?.value || "").trim();
     if (!text) return;
-    const btn = form.querySelector('button[type="submit"]');
-    if (btn) btn.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
     try {
       await sendChatMessage(text);
       if (input) input.value = "";
     } catch (err) {
       showToast(err.message || "Não foi possível enviar");
     } finally {
-      if (btn) btn.disabled = false;
+      if (sendBtn) sendBtn.disabled = false;
     }
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await doSend();
     return false;
   });
 
-  // Botão explícito também (evita submit nativo em alguns browsers)
-  const sendBtn = form.querySelector('button[type="submit"]');
   if (sendBtn) {
     sendBtn.type = "button";
     sendBtn.addEventListener("click", async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const text = (input?.value || "").trim();
-      if (!text) return;
-      sendBtn.disabled = true;
-      try {
-        await sendChatMessage(text);
-        if (input) input.value = "";
-      } catch (err) {
-        showToast(err.message || "Não foi possível enviar");
-      } finally {
-        sendBtn.disabled = false;
+      await doSend();
+    });
+  }
+
+  // Enter no input também envia
+  if (input) {
+    input.addEventListener("keydown", async (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        await doSend();
       }
     });
   }
@@ -4528,6 +4531,7 @@ async function renderOwnerIntel() {
 
 document.addEventListener("DOMContentLoaded", () => {
   bindAllNavOnce();
+  try { initChatCompose(); } catch (e) { console.warn("initChatCompose", e); }
   // Restaura sessão visual se houver token
   if (localStorage.getItem(SESSION_TOKEN_KEY)) {
     updateAuthChipApi().then(() => {

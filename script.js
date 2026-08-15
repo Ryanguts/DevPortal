@@ -4042,7 +4042,7 @@ function goToPage(pageId) {
   if (pageId === "owner-equipe") renderOwnerEquipe();
   if (pageId === "owner-mod") renderOwnerMod();
   if (pageId === "owner-intel") renderOwnerIntel();
-  if (pageId === "chat") renderChatPage();
+  if (pageId === "chat") { document.getElementById("btn-chat")?.classList.remove("has-unread"); renderChatPage(); }
 }
 
 irParaPagina = goToPage;
@@ -4128,6 +4128,20 @@ function stopChatPoll() {
 
 let __chatLastMsgKey = "";
 let __chatNotifyReady = false;
+let __chatSeenKeys = new Set();
+
+function markChatSeenFromThreads(threads) {
+  let newestKey = "";
+  for (const th of threads || []) {
+    const key = String(th.lastAt || th.updatedAt || "") + "|" + String(th.id) + "|" + String(th.count || 0);
+    __chatSeenKeys.add(key);
+    if (!newestKey || String(th.lastAt || th.updatedAt || "") > newestKey.split("|")[0]) {
+      newestKey = key;
+    }
+  }
+  if (newestKey) __chatLastMsgKey = newestKey;
+  document.getElementById("btn-chat")?.classList.remove("has-unread");
+}
 
 function startChatPoll() {
   stopChatPoll();
@@ -4135,32 +4149,48 @@ function startChatPoll() {
     if (!localStorage.getItem(SESSION_TOKEN_KEY)) return;
     const page = document.getElementById("page-chat");
     const onChat = page && page.classList.contains("active");
+    const meEmail = window.__dpMe?.email || "";
     try {
-      // Notificação global: checa threads mesmo fora da página de chat
       const data = await apiFetch("/api/chat/threads?tab=all");
       const threads = data.threads || [];
-      let newestKey = "";
-      let newestPreview = "";
-      let newestTitle = "";
-      for (const th of threads) {
-        const key = String(th.updatedAt || "") + "|" + String(th.id) + "|" + String(th.count || 0);
-        if (!newestKey || String(th.updatedAt || "") > newestKey.split("|")[0]) {
-          newestKey = key;
-          newestPreview = th.preview || "Nova mensagem";
-          newestTitle = th.title || th.memberName || "Mensagens";
+
+      // primeira carga: só marca como visto, sem notificar
+      if (!__chatNotifyReady) {
+        markChatSeenFromThreads(threads);
+        __chatNotifyReady = true;
+      } else {
+        let newestForeign = null;
+        for (const th of threads) {
+          const key = String(th.lastAt || th.updatedAt || "") + "|" + String(th.id) + "|" + String(th.count || 0);
+          if (__chatSeenKeys.has(key)) continue;
+          // ignora mensagens enviadas por mim
+          if (meEmail && th.lastFrom && th.lastFrom === meEmail) {
+            __chatSeenKeys.add(key);
+            continue;
+          }
+          // se já estou na conversa aberta, só marca como visto
+          if (onChat && th.id === __chatThreadId) {
+            __chatSeenKeys.add(key);
+            continue;
+          }
+          if (!newestForeign || String(th.lastAt || th.updatedAt || "") > String(newestForeign.lastAt || newestForeign.updatedAt || "")) {
+            newestForeign = th;
+          }
+          __chatSeenKeys.add(key);
         }
+        if (newestForeign) {
+          siteNotify(
+            "💬 " + (newestForeign.title || newestForeign.memberName || "Mensagens"),
+            newestForeign.preview || "Nova mensagem",
+            { onClick: () => { try { goToPage("chat"); } catch (_) {} } }
+          );
+          if (!onChat) document.getElementById("btn-chat")?.classList.add("has-unread");
+        }
+        // atualiza chave global
+        markChatSeenFromThreads(threads);
+        // se está na página de chat, não fica com badge
+        if (onChat) document.getElementById("btn-chat")?.classList.remove("has-unread");
       }
-      if (__chatNotifyReady && newestKey && newestKey !== __chatLastMsgKey) {
-        // evita notificar a própria ação imediatamente demais
-        siteNotify("💬 " + newestTitle, newestPreview, {
-          onClick: () => { try { goToPage("chat"); } catch (_) {} },
-        });
-        // badge no botão de chat se existir
-        const btn = document.getElementById("btn-chat");
-        if (btn && !onChat) btn.classList.add("has-unread");
-      }
-      if (newestKey) __chatLastMsgKey = newestKey;
-      __chatNotifyReady = true;
     } catch (_) {}
     if (onChat) renderChatPage({ silent: true });
   }, 5000);
@@ -4283,7 +4313,14 @@ async function renderChatPage(opts = {}) {
 
 async function openChatThread(id, silent = false) {
   if (!id) return;
+  if (__chatThreadId !== id) {
+    __chatReplyTo = null;
+    updateReplyBar();
+  }
   __chatThreadId = id;
+  // ao abrir conversa, some badge de não lida
+  document.getElementById("btn-chat")?.classList.remove("has-unread");
+
   const messagesEl = document.getElementById("chat-messages");
   if (!messagesEl) return;
   if (!silent) messagesEl.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
@@ -4499,7 +4536,10 @@ async function sendChatMessage(text) {
   __chatThreadId = data.threadId;
   __chatPendingFile = null;
   __chatReplyTo = null;
-  updateReplyBar();
+  try { updateReplyBar(); } catch (_) {}
+  // própria mensagem não deve gerar notify
+  __chatNotifyReady = true;
+
   const label = document.getElementById("chat-file-label");
   if (label) { label.hidden = true; label.textContent = ""; }
   const fileInput = document.getElementById("chat-file");
@@ -4511,18 +4551,19 @@ async function sendChatMessage(text) {
 function updateReplyBar() {
   let bar = document.getElementById("chat-reply-bar");
   if (!__chatReplyTo) {
-    if (bar) bar.hidden = true;
+    if (bar) bar.remove();
     return;
   }
+  const compose = document.getElementById("chat-compose");
+  if (!compose) return;
   if (!bar) {
-    const compose = document.getElementById("chat-compose");
-    if (!compose) return;
     bar = document.createElement("div");
     bar.id = "chat-reply-bar";
     bar.className = "chat-reply-bar";
     compose.parentElement?.insertBefore(bar, compose);
   }
   bar.hidden = false;
+  bar.style.display = "flex";
   bar.innerHTML = `<span>Respondendo a <strong>${String(__chatReplyTo.fromDisplayName || "").replace(/</g, "&lt;")}</strong>: ${String(__chatReplyTo.text || "").replace(/</g, "&lt;").slice(0, 80)}</span>
     <button type="button" class="btn-ghost btn-tiny" id="chat-reply-cancel">✕</button>`;
   document.getElementById("chat-reply-cancel")?.addEventListener("click", () => {
@@ -4629,38 +4670,54 @@ async function renderFriendsPanel() {
     const data = await apiFetch("/api/friends");
     const incoming = data.incoming || [];
     const friends = data.friends || [];
-    let html = "";
+    const open = panel.dataset.open === "1";
+    const badge = incoming.length ? ` <span class="chat-fr-badge">${incoming.length}</span>` : "";
+
+    let body = "";
     if (incoming.length) {
-      html += `<div class="chat-friends-block"><strong>Pedidos recebidos</strong>`;
+      body += `<div class="chat-friends-block"><strong>Pedidos recebidos</strong>`;
       for (const r of incoming) {
-        html += `<div class="chat-friend-row">
+        body += `<div class="chat-friend-row">
           <span>${String(r.displayName || r.username || r.from).replace(/</g, "&lt;")}${r.username ? " · @" + r.username : ""}</span>
           <button type="button" class="btn-primary btn-tiny fr-accept" data-id="${r.id}">Aceitar</button>
           <button type="button" class="btn-ghost btn-tiny fr-reject" data-id="${r.id}">Recusar</button>
         </div>`;
       }
-      html += `</div>`;
+      body += `</div>`;
     }
-    html += `<div class="chat-friends-block"><strong>Amigos (${friends.length})</strong>`;
+    body += `<div class="chat-friends-block"><strong>Amigos (${friends.length})</strong>`;
     if (!friends.length) {
-      html += `<p class="text-xs text-muted">Nenhum amigo ainda. Busque um @username acima e envie pedido.</p>`;
+      body += `<p class="text-xs text-muted">Nenhum amigo ainda. Busque um @username acima e envie pedido.</p>`;
     } else {
-      html += `<div class="chat-friend-chips">`;
+      body += `<div class="chat-friend-chips">`;
       for (const f of friends) {
-        html += `<button type="button" class="chip fr-open-dm" data-email="${f.email}" data-username="${f.username || ""}">${String(f.displayName || f.username || f.email).replace(/</g, "&lt;")}</button>`;
+        body += `<button type="button" class="chip fr-open-dm" data-email="${f.email}" data-username="${f.username || ""}">${String(f.displayName || f.username || f.email).replace(/</g, "&lt;")}</button>`;
       }
-      html += `</div>
+      body += `</div>
         <div class="chat-group-create">
           <input type="text" id="chat-group-name" placeholder="Nome do grupo (opcional)" maxlength="40">
-          <p class="text-xs text-muted">Selecione 2+ amigos para grupo. Com 1 só, abre a DM.</p>
+          <p class="text-xs text-muted">Marque 2+ amigos para grupo. Com 1 só, abre a DM.</p>
           <div class="chat-group-pick" id="chat-group-pick">
             ${friends.map((f) => `<label class="chip"><input type="checkbox" data-gemail="${f.email}" data-guser="${f.username || ""}"> ${String(f.displayName || f.username || "").replace(/</g, "&lt;")}</label>`).join("")}
           </div>
           <button type="button" class="btn-primary btn-tiny" id="chat-group-btn">Criar grupo / abrir DM</button>
         </div>`;
     }
-    html += `</div>`;
-    panel.innerHTML = html;
+    body += `</div>`;
+
+    panel.innerHTML = `
+      <button type="button" class="chat-friends-toggle" id="chat-friends-toggle">
+        <span>👥 Amigos e grupos${badge}</span>
+        <span class="chat-friends-chevron">${open ? "▾" : "▸"}</span>
+      </button>
+      <div class="chat-friends-body" id="chat-friends-body" ${open ? "" : "hidden"}>${body}</div>
+    `;
+
+    document.getElementById("chat-friends-toggle")?.addEventListener("click", () => {
+      panel.dataset.open = panel.dataset.open === "1" ? "0" : "1";
+      renderFriendsPanel();
+    });
+
 
     panel.querySelectorAll(".fr-accept").forEach((b) => {
       b.addEventListener("click", async () => {

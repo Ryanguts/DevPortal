@@ -1748,6 +1748,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
             ? (last.fileName ? "📎 " + last.fileName : last.text).slice(0, 80)
             : "",
           count: th.messages.length,
+          lastFrom: last?.from || "",
+          lastAt: last?.at || th.updatedAt,
         };
       })
       .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));

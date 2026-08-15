@@ -3866,3 +3866,41 @@ body.owner-view .site-notify { border-left-color: #dc2626; }
   align-items: center;
   gap: 0.25rem;
 }
+
+.chat-friends-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.15rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+.chat-friends-body {
+  margin-top: 0.55rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--border);
+}
+.chat-friends-body[hidden] { display: none !important; }
+.chat-fr-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--danger, #ef4444);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  margin-left: 0.25rem;
+}
+.chat-friends-panel {
+  padding: 0.45rem 0.65rem;
+}

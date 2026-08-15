@@ -4052,70 +4052,85 @@ function showRestrictionWall(payload) {
 }
 
 
-// Chat UI (sem reload de página)
+// ========== Chat: suporte / DM / anúncios ==========
 let __chatThreadId = null;
 let __chatStaff = false;
+let __chatTab = "all";
+let __chatPollTimer = null;
+let __chatPendingFile = null; // { name, mime, dataUrl }
 
-async function renderChatPage() {
+function stopChatPoll() {
+  if (__chatPollTimer) {
+    clearInterval(__chatPollTimer);
+    __chatPollTimer = null;
+  }
+}
+
+function startChatPoll() {
+  stopChatPoll();
+  __chatPollTimer = setInterval(() => {
+    const page = document.getElementById("page-chat");
+    if (!page || !page.classList.contains("active")) return;
+    if (!localStorage.getItem(SESSION_TOKEN_KEY)) return;
+    renderChatPage({ silent: true });
+  }, 5000);
+}
+
+async function renderChatPage(opts = {}) {
+  const silent = !!opts.silent;
   const threadsEl = document.getElementById("chat-threads");
   const messagesEl = document.getElementById("chat-messages");
-  if (!threadsEl || !messagesEl) return;
-  threadsEl.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
-  try {
-    const data = await apiFetch("/api/chat/threads");
-    const threads = data.threads || [];
-    __chatStaff = !!data.staff;
-    const me = window.__dpMe || {};
+  if (!threadsEl) return;
 
-    if (!__chatStaff) {
-      // Membro: lista estilo Discord — conversa com a Equipe
-      threadsEl.innerHTML = `
-        <div class="chat-side-title">Conversas</div>
-        <button type="button" class="chat-person ${!__chatThreadId ? "active" : ""}" id="chat-team-btn" data-id="">
-          <span class="chat-person-avatar">E</span>
-          <span class="chat-person-info">
-            <strong>Equipe DevPortal</strong>
-            <small>Dúvidas e suporte</small>
-          </span>
-        </button>
-        ${threads.map((th) => {
-          const letter = "E";
-          return `<button type="button" class="chat-person ${th.id === __chatThreadId ? "active" : ""}" data-id="${th.id}">
-            <span class="chat-person-avatar">${letter}</span>
-            <span class="chat-person-info">
-              <strong>Equipe DevPortal</strong>
-              <small>${(th.preview || th.subject || "Conversa").replace(/</g, "&lt;")}</small>
-            </span>
-          </button>`;
-        }).join("")}
-      `;
-      document.getElementById("chat-team-btn")?.addEventListener("click", (e) => {
-        e.preventDefault();
-        __chatThreadId = null;
-        messagesEl.innerHTML = `<div class="chat-empty"><p>Envie uma mensagem para a equipe. Um moderador ou o dono responde por aqui.</p></div>`;
-        document.querySelectorAll(".chat-person").forEach((b) => b.classList.remove("active"));
-        document.getElementById("chat-team-btn")?.classList.add("active");
-      });
-    } else {
-      // Staff: cada membro com inicial (sem e-mail na cara)
-      threadsEl.innerHTML = `
-        <div class="chat-side-title">Membros</div>
-        ${threads.map((th) => {
-          const name = th.memberName || th.memberUsername || th.memberEmail.split("@")[0] || "Membro";
-          const letter = (name.charAt(0) || "?").toUpperCase();
-          const av = th.memberAvatar
-            ? `<img class="chat-person-avatar" src="${th.memberAvatar}" alt="" style="object-fit:cover;padding:0;border:none">`
-            : `<span class="chat-person-avatar">${letter}</span>`;
-          return `<button type="button" class="chat-person ${th.id === __chatThreadId ? "active" : ""}" data-id="${th.id}">
-            ${av}
-            <span class="chat-person-info">
-              <strong>${String(name).replace(/</g, "&lt;")}${th.memberUsername ? " · @" + String(th.memberUsername).replace(/</g, "&lt;") : ""}</strong>
-              <small>${(th.preview || "").replace(/</g, "&lt;")}</small>
-            </span>
-          </button>`;
-        }).join("") || `<p class="text-muted text-sm" style="padding:0.5rem">Nenhuma dúvida na fila.</p>`}
-      `;
+  if (!silent) {
+    threadsEl.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
+  }
+
+  try {
+    const data = await apiFetch("/api/chat/threads?tab=" + encodeURIComponent(__chatTab));
+    __chatStaff = !!data.staff;
+    const threads = data.threads || [];
+
+    // tabs active state
+    document.querySelectorAll("#chat-tabs .chip").forEach((c) => {
+      c.classList.toggle("active", c.dataset.chatTab === __chatTab);
+    });
+
+    if (!threads.length) {
+      threadsEl.innerHTML = `<p class="text-muted text-sm" style="padding:0.6rem">Nenhuma conversa nesta aba.</p>`;
+      if (!silent && messagesEl) {
+        messagesEl.innerHTML = `<div class="chat-empty"><p>${
+          __chatTab === "announce"
+            ? (__chatStaff ? "Publique o primeiro anúncio abaixo." : "Ainda não há anúncios.")
+            : __chatTab === "dm"
+              ? "Busque um @username acima e clique em Adicionar."
+              : (__chatStaff ? "Nenhum chamado de suporte ainda." : "Escreva abaixo para falar com a equipe.")
+        }</p></div>`;
+      }
+      // auto-select announce channel for staff on announce tab
+      if (__chatTab === "announce") {
+        __chatThreadId = "announce-global";
+        if (!silent) await openChatThread("announce-global");
+      }
+      return;
     }
+
+    threadsEl.innerHTML = threads.map((th) => {
+      const kindBadge =
+        th.kind === "announce" ? "📢" : th.kind === "dm" ? "💬" : "🆘";
+      const name = th.title || th.memberName || "Conversa";
+      const letter = (name.replace(/[^a-zA-ZÀ-ú0-9]/g, " ").trim().charAt(0) || "?").toUpperCase();
+      const av = th.memberAvatar
+        ? `<img class="chat-person-avatar" src="${th.memberAvatar}" alt="" style="object-fit:cover;padding:0;border:none">`
+        : `<span class="chat-person-avatar">${letter}</span>`;
+      return `<button type="button" class="chat-person ${th.id === __chatThreadId ? "active" : ""}" data-id="${th.id}" data-kind="${th.kind || ""}">
+        ${av}
+        <span class="chat-person-info">
+          <strong>${kindBadge} ${String(name).replace(/</g, "&lt;")}${th.memberUsername ? " · @" + String(th.memberUsername).replace(/</g, "&lt;") : ""}</strong>
+          <small>${(th.preview || "").replace(/</g, "&lt;")}</small>
+        </span>
+      </button>`;
+    }).join("");
 
     threadsEl.querySelectorAll(".chat-person[data-id]").forEach((btn) => {
       btn.addEventListener("click", (e) => {
@@ -4125,50 +4140,105 @@ async function renderChatPage() {
       });
     });
 
-    if (__chatThreadId) await openChatThread(__chatThreadId);
-    else if (threads[0] && __chatStaff) await openChatThread(threads[0].id);
-    else if (!__chatStaff && threads[0]) await openChatThread(threads[0].id);
-    else {
-      messagesEl.innerHTML = `<div class="chat-empty"><p>${__chatStaff ? "Selecione um membro à esquerda." : "Escreva abaixo para falar com a equipe."}</p></div>`;
+    // seleção automática
+    if (__chatThreadId && threads.some((t) => t.id === __chatThreadId)) {
+      await openChatThread(__chatThreadId, silent);
+    } else if (__chatTab === "announce") {
+      __chatThreadId = "announce-global";
+      await openChatThread("announce-global", silent);
+    } else if (threads[0]) {
+      await openChatThread(threads[0].id, silent);
+    } else if (messagesEl && !silent) {
+      messagesEl.innerHTML = `<div class="chat-empty"><p>Selecione uma conversa.</p></div>`;
     }
   } catch (e) {
-    threadsEl.innerHTML = `<div class="error-box"><p>${e.message || "Faça login para usar o chat."}</p></div>`;
+    if (!silent) {
+      threadsEl.innerHTML = `<div class="error-box"><p>${e.message || "Faça login para usar o chat."}</p></div>`;
+    }
   }
 }
 
-async function openChatThread(id) {
+async function openChatThread(id, silent = false) {
   if (!id) return;
   __chatThreadId = id;
   const messagesEl = document.getElementById("chat-messages");
   if (!messagesEl) return;
-  messagesEl.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
+  if (!silent) messagesEl.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
   try {
     const data = await apiFetch("/api/chat/thread?id=" + encodeURIComponent(id));
     const th = data.thread;
     const meEmail = window.__dpMe?.email;
+    const isAnnounce = th.kind === "announce" || th.id === "announce-global";
+
+    // placeholder do input
+    const input = document.getElementById("chat-input");
+    if (input) {
+      if (isAnnounce && !__chatStaff) {
+        input.placeholder = "Somente a equipe publica anúncios…";
+        input.disabled = true;
+      } else if (isAnnounce) {
+        input.placeholder = "Escreva um anúncio para todos…";
+        input.disabled = false;
+      } else {
+        input.placeholder = "Escreva sua mensagem…";
+        input.disabled = false;
+      }
+    }
+    const sendBtn = document.getElementById("chat-send-btn");
+    if (sendBtn) sendBtn.disabled = isAnnounce && !__chatStaff;
+
     messagesEl.innerHTML = (th.messages || []).map((m) => {
       const mine = m.from === meEmail;
-      const who = mine ? "Você" : (__chatStaff ? (m.from.split("@")[0] || m.from) : "Equipe");
+      let who = mine ? "Você" : (m.from.split("@")[0] || m.from);
+      if (isAnnounce && !mine) who = "Equipe";
+      if (!isAnnounce && !mine && !__chatStaff && th.kind === "support") who = "Equipe";
+      let body = String(m.text || "").replace(/</g, "&lt;");
+      if (m.fileData && m.fileName) {
+        const isImg = (m.fileMime || "").startsWith("image/");
+        if (isImg) {
+          body += `<div class="chat-file"><a href="${m.fileData}" target="_blank" rel="noopener"><img src="${m.fileData}" alt="${String(m.fileName).replace(/"/g, "")}" class="chat-file-img"></a></div>`;
+        } else {
+          body += `<div class="chat-file"><a class="chat-file-link" href="${m.fileData}" download="${String(m.fileName).replace(/"/g, "")}">📎 ${String(m.fileName).replace(/</g, "&lt;")}</a></div>`;
+        }
+      }
       return `<div class="chat-bubble ${mine ? "mine" : "theirs"}">
         <div class="chat-bubble-meta">${who} · ${new Date(m.at).toLocaleString("pt-BR")}</div>
-        <div>${String(m.text).replace(/</g, "&lt;")}</div>
+        <div>${body}</div>
       </div>`;
-    }).join("") || `<div class="chat-empty"><p>Sem mensagens ainda.</p></div>`;
+    }).join("") || `<div class="chat-empty"><p>Sem mensagens ainda. Seja o primeiro a escrever.</p></div>`;
     messagesEl.scrollTop = messagesEl.scrollHeight;
     document.querySelectorAll(".chat-person").forEach((b) => {
       b.classList.toggle("active", b.getAttribute("data-id") === id);
     });
   } catch (e) {
-    messagesEl.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;
+    if (!silent) messagesEl.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;
   }
 }
 
 async function sendChatMessage(text) {
+  const payload = {
+    text: text || "",
+    threadId: __chatThreadId || undefined,
+  };
+  if (__chatTab === "announce" || __chatThreadId === "announce-global") {
+    payload.kind = "announce";
+    payload.threadId = "announce-global";
+  }
+  if (__chatPendingFile) {
+    payload.fileName = __chatPendingFile.name;
+    payload.fileData = __chatPendingFile.dataUrl;
+    payload.fileMime = __chatPendingFile.mime;
+  }
   const data = await apiFetch("/api/chat/send", {
     method: "POST",
-    body: JSON.stringify({ text, threadId: __chatThreadId || undefined }),
+    body: JSON.stringify(payload),
   });
   __chatThreadId = data.threadId;
+  __chatPendingFile = null;
+  const label = document.getElementById("chat-file-label");
+  if (label) { label.hidden = true; label.textContent = ""; }
+  const fileInput = document.getElementById("chat-file");
+  if (fileInput) fileInput.value = "";
   await renderChatPage();
   if (__chatThreadId) await openChatThread(__chatThreadId);
 }
@@ -4176,18 +4246,18 @@ async function sendChatMessage(text) {
 function initChatCompose() {
   const form = document.getElementById("chat-compose");
   const input = document.getElementById("chat-input");
-  // HTML usa type="button" id="chat-send-btn" — NÃO type="submit"
   const sendBtn = document.getElementById("chat-send-btn");
   if (!form || form.dataset.bound === "1") return;
   form.dataset.bound = "1";
 
   async function doSend() {
     const text = (input?.value || "").trim();
-    if (!text) return;
+    if (!text && !__chatPendingFile) return;
     if (sendBtn) sendBtn.disabled = true;
     try {
       await sendChatMessage(text);
       if (input) input.value = "";
+      showToast("Mensagem enviada");
     } catch (err) {
       showToast(err.message || "Não foi possível enviar");
     } finally {
@@ -4211,7 +4281,6 @@ function initChatCompose() {
     });
   }
 
-  // Enter no input também envia
   if (input) {
     input.addEventListener("keydown", async (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
@@ -4221,10 +4290,133 @@ function initChatCompose() {
     });
   }
 
+  // Tabs
+  document.querySelectorAll("#chat-tabs .chip").forEach((chip) => {
+    chip.addEventListener("click", (e) => {
+      e.preventDefault();
+      __chatTab = chip.dataset.chatTab || "all";
+      __chatThreadId = __chatTab === "announce" ? "announce-global" : null;
+      renderChatPage();
+    });
+  });
+
+  // DM: buscar e adicionar
+  const addBtn = document.getElementById("chat-add-btn");
+  const addInput = document.getElementById("chat-add-user");
+  const lookupBox = document.getElementById("chat-lookup-results");
+
+  async function runLookup() {
+    const q = (addInput?.value || "").trim();
+    if (!lookupBox) return;
+    if (q.length < 2) {
+      lookupBox.hidden = true;
+      lookupBox.innerHTML = "";
+      return;
+    }
+    try {
+      const data = await apiFetch("/api/chat/lookup?q=" + encodeURIComponent(q));
+      const users = data.users || [];
+      if (!users.length) {
+        lookupBox.innerHTML = `<p class="text-muted text-sm">Ninguém encontrado. Username precisa estar no perfil.</p>`;
+        lookupBox.hidden = false;
+        return;
+      }
+      lookupBox.innerHTML = users.map((u) => {
+        const label = (u.displayName || u.username || u.email.split("@")[0]);
+        const un = u.username ? "@" + u.username : u.email;
+        return `<button type="button" class="chat-lookup-item" data-email="${u.email}" data-username="${u.username || ""}">
+          <strong>${String(label).replace(/</g, "&lt;")}</strong>
+          <span class="text-muted text-xs">${String(un).replace(/</g, "&lt;")}</span>
+        </button>`;
+      }).join("");
+      lookupBox.hidden = false;
+      lookupBox.querySelectorAll(".chat-lookup-item").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          try {
+            const body = btn.dataset.username
+              ? { username: btn.dataset.username }
+              : { email: btn.dataset.email };
+            const res = await apiFetch("/api/chat/dm", { method: "POST", body: JSON.stringify(body) });
+            __chatTab = "dm";
+            __chatThreadId = res.threadId;
+            if (addInput) addInput.value = "";
+            lookupBox.hidden = true;
+            showToast("Conversa iniciada");
+            await renderChatPage();
+          } catch (err) {
+            showToast(err.message || "Falha ao abrir DM");
+          }
+        });
+      });
+    } catch (err) {
+      lookupBox.innerHTML = `<p class="text-muted text-sm">${err.message}</p>`;
+      lookupBox.hidden = false;
+    }
+  }
+
+  addBtn?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const q = (addInput?.value || "").trim().replace(/^@/, "");
+    if (!q) {
+      showToast("Digite um @username");
+      return;
+    }
+    try {
+      const res = await apiFetch("/api/chat/dm", {
+        method: "POST",
+        body: JSON.stringify({ username: q }),
+      });
+      __chatTab = "dm";
+      __chatThreadId = res.threadId;
+      if (addInput) addInput.value = "";
+      if (lookupBox) lookupBox.hidden = true;
+      showToast("Conversa iniciada");
+      await renderChatPage();
+    } catch (err) {
+      // tenta lookup se username direto falhar
+      await runLookup();
+      showToast(err.message || "Usuário não encontrado");
+    }
+  });
+
+  let lookupTimer = null;
+  addInput?.addEventListener("input", () => {
+    clearTimeout(lookupTimer);
+    lookupTimer = setTimeout(runLookup, 280);
+  });
+
+  // Arquivo
+  const fileInput = document.getElementById("chat-file");
+  const fileLabel = document.getElementById("chat-file-label");
+  fileInput?.addEventListener("change", () => {
+    const f = fileInput.files && fileInput.files[0];
+    if (!f) {
+      __chatPendingFile = null;
+      if (fileLabel) fileLabel.hidden = true;
+      return;
+    }
+    if (f.size > 2_500_000) {
+      showToast("Arquivo máximo: 2,5 MB");
+      fileInput.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      __chatPendingFile = { name: f.name, mime: f.type || "application/octet-stream", dataUrl: reader.result };
+      if (fileLabel) {
+        fileLabel.hidden = false;
+        fileLabel.textContent = "📎 " + f.name + " (" + Math.round(f.size / 1024) + " KB) — será enviado com a próxima mensagem";
+      }
+    };
+    reader.readAsDataURL(f);
+  });
+
   document.getElementById("btn-chat")?.addEventListener("click", (e) => {
     e.preventDefault();
     goToPage("chat");
   });
+
+  startChatPoll();
 }
 
 async function renderPainelPage() {

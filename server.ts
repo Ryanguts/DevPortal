@@ -287,26 +287,70 @@ function saveSessions(sessions: SessionMap): void {
 }
 
 
+type ChatKind = "support" | "dm" | "announce";
+
 interface ChatMessage {
   id: string;
   from: string;
   text: string;
   at: string;
+  fileName?: string;
+  fileData?: string;
+  fileMime?: string;
 }
 
 interface ChatThread {
   id: string;
-  memberEmail: string;
+  kind: ChatKind;
+  /** support: e-mail do membro */
+  memberEmail?: string;
+  /** dm: e-mails dos dois participantes */
+  participants?: string[];
   subject: string;
   updatedAt: string;
   messages: ChatMessage[];
 }
 
+const ANNOUNCE_ID = "announce-global";
+const MAX_CHAT_FILE_BYTES = 2_500_000;
+
 function getChat(): { threads: ChatThread[] } {
-  return readJSON<{ threads: ChatThread[] }>(CHAT_FILE, { threads: [] });
+  const data = readJSON<{ threads: ChatThread[] }>(CHAT_FILE, { threads: [] });
+  if (!Array.isArray(data.threads)) data.threads = [];
+  // migra threads antigas sem kind
+  for (const th of data.threads) {
+    if (!th.kind) {
+      th.kind = th.id === ANNOUNCE_ID ? "announce" : "support";
+    }
+  }
+  // garante canal de anúncios
+  if (!data.threads.some((t) => t.id === ANNOUNCE_ID)) {
+    data.threads.unshift({
+      id: ANNOUNCE_ID,
+      kind: "announce",
+      subject: "Anúncios da equipe",
+      updatedAt: new Date().toISOString(),
+      messages: [],
+    });
+    try { writeJSON(CHAT_FILE, data); } catch { /* ignore */ }
+  }
+  return data;
 }
 function saveChat(data: { threads: ChatThread[] }): void {
   writeJSON(CHAT_FILE, data);
+}
+
+function displayNameOf(u: UserRecord | undefined, email: string): string {
+  if (!u) return email.split("@")[0] || email;
+  return (u.displayName || u.username || email.split("@")[0] || email).trim();
+}
+
+function canAccessThread(user: UserRecord, th: ChatThread): boolean {
+  if (isStaff(user)) return true;
+  if (th.kind === "announce") return true;
+  if (th.kind === "support") return th.memberEmail === user.email;
+  if (th.kind === "dm") return (th.participants || []).includes(user.email);
+  return false;
 }
 
 function getBans(): BanEntry[] {
@@ -1273,27 +1317,56 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       sendJSON(req, res, 403, { error: block });
       return;
     }
+    const host = req.headers.host || "localhost";
+    const url = new URL(req.url || "/", `http://${host}`);
+    const tab = (url.searchParams.get("tab") || "all").toLowerCase();
+
     const chat = getChat();
     const staff = isStaff(user);
     const users = getUsers();
-    const threads = (chat.threads || [])
-      .filter((th) => staff || th.memberEmail === user.email)
+
+    let list = (chat.threads || []).filter((th) => canAccessThread(user, th));
+    if (tab === "support") list = list.filter((t) => t.kind === "support");
+    else if (tab === "dm") list = list.filter((t) => t.kind === "dm");
+    else if (tab === "announce") list = list.filter((t) => t.kind === "announce");
+
+    const threads = list
       .map((th) => {
-        const u = users.find((x) => x.email === th.memberEmail);
+        const peerEmail =
+          th.kind === "support"
+            ? th.memberEmail || ""
+            : th.kind === "dm"
+              ? (th.participants || []).find((e) => e !== user.email) || ""
+              : "";
+        const peer = users.find((x) => x.email === peerEmail);
+        const title =
+          th.kind === "announce"
+            ? "📢 Anúncios"
+            : th.kind === "support"
+              ? staff
+                ? displayNameOf(peer, peerEmail)
+                : "Equipe DevPortal"
+              : displayNameOf(peer, peerEmail);
+        const last = th.messages.length ? th.messages[th.messages.length - 1] : null;
         return {
           id: th.id,
-          memberEmail: th.memberEmail,
-          memberName: (u?.displayName || u?.username || th.memberEmail.split("@")[0] || th.memberEmail),
-          memberUsername: u?.username || "",
-          memberAvatar: u?.avatarUrl || "",
+          kind: th.kind,
           subject: th.subject,
+          title,
+          memberEmail: th.memberEmail || peerEmail,
+          memberName: title,
+          memberUsername: peer?.username || "",
+          memberAvatar: peer?.avatarUrl || "",
           updatedAt: th.updatedAt,
-          preview: th.messages.length ? th.messages[th.messages.length - 1].text.slice(0, 80) : "",
+          preview: last
+            ? (last.fileName ? "📎 " + last.fileName : last.text).slice(0, 80)
+            : "",
           count: th.messages.length,
         };
       })
       .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
-    sendJSON(req, res, 200, { threads, staff });
+
+    sendJSON(req, res, 200, { threads, staff, tab });
     return;
   }
 
@@ -1312,11 +1385,102 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       sendJSON(req, res, 404, { error: "Conversa não encontrada." });
       return;
     }
-    if (!isStaff(user) && th.memberEmail !== user.email) {
+    if (!canAccessThread(user, th)) {
       sendJSON(req, res, 403, { error: "Sem acesso a esta conversa." });
       return;
     }
     sendJSON(req, res, 200, { thread: th });
+    return;
+  }
+
+  if (pathname === "/api/chat/lookup" && req.method === "GET") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const host = req.headers.host || "localhost";
+    const url = new URL(req.url || "/", `http://${host}`);
+    const q = (url.searchParams.get("q") || "").trim().replace(/^@/, "").toLowerCase();
+    if (q.length < 2) {
+      sendJSON(req, res, 200, { users: [] });
+      return;
+    }
+    const found = getUsers()
+      .filter((u) => {
+        if (u.email === user.email) return false;
+        if (u.banned) return false;
+        const un = (u.username || "").toLowerCase();
+        const dn = (u.displayName || "").toLowerCase();
+        return un.includes(q) || dn.includes(q) || u.email.toLowerCase().startsWith(q);
+      })
+      .slice(0, 8)
+      .map((u) => ({
+        email: u.email,
+        username: u.username || "",
+        displayName: u.displayName || "",
+        avatarUrl: u.avatarUrl || "",
+        role: normalizeRole(u),
+      }));
+    sendJSON(req, res, 200, { users: found });
+    return;
+  }
+
+  if (pathname === "/api/chat/dm" && req.method === "POST") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const block = assertUserActive(user);
+    if (block) {
+      sendJSON(req, res, 403, { error: block });
+      return;
+    }
+    const body = (await readBody(req)) as { username?: string; email?: string };
+    const users = getUsers();
+    let target: UserRecord | undefined;
+    if (body.email) {
+      target = users.find((u) => u.email === normalizeEmail(body.email));
+    } else {
+      const un = String(body.username || "").trim().replace(/^@/, "").toLowerCase();
+      if (!un) {
+        sendJSON(req, res, 400, { error: "Informe @username." });
+        return;
+      }
+      target = users.find((u) => (u.username || "").toLowerCase() === un);
+    }
+    if (!target) {
+      sendJSON(req, res, 404, { error: "Usuário não encontrado. Peça para a pessoa definir um username no perfil." });
+      return;
+    }
+    if (target.email === user.email) {
+      sendJSON(req, res, 400, { error: "Não dá para conversar consigo mesmo." });
+      return;
+    }
+    const chat = getChat();
+    const pair = [user.email, target.email].sort();
+    let th = (chat.threads || []).find(
+      (t) =>
+        t.kind === "dm" &&
+        t.participants &&
+        t.participants.length === 2 &&
+        [...t.participants].sort().join("|") === pair.join("|")
+    );
+    if (!th) {
+      th = {
+        id: crypto.randomBytes(8).toString("hex"),
+        kind: "dm",
+        participants: pair,
+        subject: `DM ${displayNameOf(user, user.email)} ↔ ${displayNameOf(target, target.email)}`,
+        updatedAt: new Date().toISOString(),
+        messages: [],
+      };
+      chat.threads = chat.threads || [];
+      chat.threads.push(th);
+      saveChat(chat);
+    }
+    sendJSON(req, res, 200, { ok: true, threadId: th.id, thread: th });
     return;
   }
 
@@ -1331,45 +1495,105 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       sendJSON(req, res, 403, { error: block });
       return;
     }
-    const body = (await readBody(req)) as { text?: string; threadId?: string };
-    const text = String(body.text || "").trim().slice(0, 1000);
-    if (!text) {
+    const body = (await readBody(req)) as {
+      text?: string;
+      threadId?: string;
+      kind?: string;
+      fileName?: string;
+      fileData?: string;
+      fileMime?: string;
+    };
+    const text = String(body.text || "").trim().slice(0, 4000);
+    const fileData = body.fileData ? String(body.fileData) : "";
+    const fileName = body.fileName ? String(body.fileName).slice(0, 120) : "";
+    const fileMime = body.fileMime ? String(body.fileMime).slice(0, 80) : "";
+
+    if (!text && !fileData) {
       sendJSON(req, res, 400, { error: "Mensagem vazia." });
       return;
     }
-    const chat = getChat();
-    let th = body.threadId
-      ? (chat.threads || []).find((x) => x.id === body.threadId)
-      : undefined;
+    if (fileData) {
+      // data URL size check (base64 expands ~4/3)
+      if (fileData.length > MAX_CHAT_FILE_BYTES * 1.4) {
+        sendJSON(req, res, 400, { error: "Arquivo muito grande (máx. ~2,5 MB)." });
+        return;
+      }
+    }
 
-    if (th) {
-      if (!isStaff(user) && th.memberEmail !== user.email) {
+    const chat = getChat();
+    let th: ChatThread | undefined;
+
+    // Canal de anúncios: só staff
+    if (body.kind === "announce" || body.threadId === ANNOUNCE_ID) {
+      if (!isStaff(user)) {
+        sendJSON(req, res, 403, { error: "Só a equipe pode postar anúncios." });
+        return;
+      }
+      th = (chat.threads || []).find((x) => x.id === ANNOUNCE_ID);
+      if (!th) {
+        th = {
+          id: ANNOUNCE_ID,
+          kind: "announce",
+          subject: "Anúncios da equipe",
+          updatedAt: new Date().toISOString(),
+          messages: [],
+        };
+        chat.threads = chat.threads || [];
+        chat.threads.unshift(th);
+      }
+    } else if (body.threadId) {
+      th = (chat.threads || []).find((x) => x.id === body.threadId);
+      if (!th) {
+        sendJSON(req, res, 404, { error: "Conversa não encontrada." });
+        return;
+      }
+      if (!canAccessThread(user, th)) {
         sendJSON(req, res, 403, { error: "Sem acesso." });
         return;
       }
-    } else {
-      // membro abre nova thread com a equipe
-      if (isStaff(user) && !body.threadId) {
-        sendJSON(req, res, 400, { error: "Equipe deve responder em uma conversa existente." });
+      if (th.kind === "announce" && !isStaff(user)) {
+        sendJSON(req, res, 403, { error: "Só a equipe posta anúncios." });
         return;
       }
-      th = {
-        id: crypto.randomBytes(8).toString("hex"),
-        memberEmail: user.email,
-        subject: text.slice(0, 60),
-        updatedAt: new Date().toISOString(),
-        messages: [],
-      };
-      chat.threads = chat.threads || [];
-      chat.threads.push(th);
+    } else {
+      // sem threadId: membro cria/usa suporte com a equipe
+      if (isStaff(user)) {
+        sendJSON(req, res, 400, {
+          error: "Selecione uma conversa à esquerda, ou a aba Anúncios para publicar.",
+        });
+        return;
+      }
+      th = (chat.threads || []).find(
+        (t) => t.kind === "support" && t.memberEmail === user.email
+      );
+      if (!th) {
+        th = {
+          id: crypto.randomBytes(8).toString("hex"),
+          kind: "support",
+          memberEmail: user.email,
+          subject: (text || fileName || "Suporte").slice(0, 60),
+          updatedAt: new Date().toISOString(),
+          messages: [],
+        };
+        chat.threads = chat.threads || [];
+        chat.threads.push(th);
+      }
     }
 
-    th.messages.push({
+    const msg: ChatMessage = {
       id: crypto.randomBytes(6).toString("hex"),
       from: user.email,
-      text,
+      text: text || (fileName ? `📎 ${fileName}` : ""),
       at: new Date().toISOString(),
-    });
+    };
+    if (fileData && fileName) {
+      msg.fileName = fileName;
+      msg.fileData = fileData;
+      msg.fileMime = fileMime || "application/octet-stream";
+    }
+    th.messages.push(msg);
+    // limita histórico por thread
+    if (th.messages.length > 500) th.messages = th.messages.slice(-500);
     th.updatedAt = new Date().toISOString();
     saveChat(chat);
     sendJSON(req, res, 200, { ok: true, threadId: th.id, thread: th });

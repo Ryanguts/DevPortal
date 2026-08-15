@@ -34,19 +34,32 @@
         <div class="header-top">
           <h1 class="brand-title"><span class="emoji-icon">🚀</span> DevPortal</h1>
           <div class="header-actions">
-            <button class="auth-chip" id="auth-chip" title="Conta">Entrar</button>
+            <button class="avatar-chip" id="auth-chip" title="Conta" type="button">
+              <span class="avatar-chip-fallback" id="avatar-chip-letter">?</span>
+              <img class="avatar-chip-img" id="avatar-chip-img" alt="" hidden>
+            </button>
             <button class="theme-btn" id="theme-btn" title="Alternar tema" aria-label="Alternar tema">☀️</button>
           </div>
         </div>
         <p class="brand-subtitle">Linguagens, carreiras, lógica e faculdades — um mapa claro para quem está começando (ou recomeçando) na tecnologia.</p>
 
-        <nav class="main-nav">
+        <nav class="main-nav" id="nav-public">
           <button class="nav-btn active" data-page="home">🏠 Início</button>
           <button class="nav-btn" data-page="linguagens">💻 Linguagens</button>
           <button class="nav-btn" data-page="areas">🎯 Áreas de TI</button>
           <button class="nav-btn" data-page="logica">🧠 Lógica</button>
           <button class="nav-btn" data-page="trilhas">🗺️ Trilhas</button>
           <button class="nav-btn" data-page="faculdades">🎓 Faculdades</button>
+          <button class="nav-btn nav-staff-only" data-page="painel" hidden>⚔️ Painel</button>
+        </nav>
+        <nav class="main-nav" id="nav-owner" hidden>
+          <button class="nav-btn active" data-page="owner-dash">🩸 Comando</button>
+          <button class="nav-btn" data-page="owner-perfis">👥 Perfis</button>
+          <button class="nav-btn" data-page="owner-equipe">🛡️ Equipe</button>
+          <button class="nav-btn" data-page="owner-mod">⚖️ Moderação</button>
+          <button class="nav-btn" data-page="owner-intel">📡 Inteligência</button>
+          <button class="nav-btn" data-page="painel">⚔️ Painel</button>
+          <button class="nav-btn" data-page="home" data-exit-owner="1">🌐 Site público</button>
         </nav>
       </div>
     </header>
@@ -408,6 +421,71 @@
   </div>
 
   
+  
+      <section id="page-painel" class="page-view">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">⚔️</span> Painel da equipe</h2>
+            <p class="section-desc">Contas, papéis, timeouts, bans e acesso assistido. Organizado para operação rápida.</p>
+          </div>
+        </header>
+        <div id="painel-page-root" class="painel-shell"></div>
+      </section>
+
+      <section id="page-owner-dash" class="page-view owner-only-page">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">🩸</span> Centro de comando</h2>
+            <p class="section-desc">Visão do dono — pulso do portal, alertas e atalhos. Só você vê este tema carmesim.</p>
+          </div>
+        </header>
+        <div id="owner-dash-root" class="owner-grid"></div>
+      </section>
+
+      <section id="page-owner-perfis" class="page-view owner-only-page">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">👥</span> Todos os perfis</h2>
+            <p class="section-desc">Membros, moderadores e metadados de cada conta.</p>
+          </div>
+          <div class="filter-box">
+            <input type="text" id="owner-search-perfis" placeholder="🔍 Buscar por e-mail, user ou nome..." autocomplete="off">
+          </div>
+        </header>
+        <div id="owner-perfis-root" class="owner-cards"></div>
+      </section>
+
+      <section id="page-owner-equipe" class="page-view owner-only-page">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">🛡️</span> Equipe e permissões</h2>
+            <p class="section-desc">Promova moderadores e defina o que cada um pode fazer.</p>
+          </div>
+        </header>
+        <div id="owner-equipe-root" class="owner-cards"></div>
+      </section>
+
+      <section id="page-owner-mod" class="page-view owner-only-page">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">⚖️</span> Moderação</h2>
+            <p class="section-desc">Timeouts ativos, bans e ações em massa.</p>
+          </div>
+        </header>
+        <div id="owner-mod-root" class="owner-cards"></div>
+      </section>
+
+      <section id="page-owner-intel" class="page-view owner-only-page">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">📡</span> Inteligência do portal</h2>
+            <p class="section-desc">Estatísticas, saúde da API e notas operacionais.</p>
+          </div>
+        </header>
+        <div id="owner-intel-root" class="owner-grid"></div>
+      </section>
+
+
   <div class="modal-overlay" id="profile-modal-overlay">
     <div class="modal-box">
       <button class="modal-close" id="close-profile-modal" aria-label="Fechar">✕</button>

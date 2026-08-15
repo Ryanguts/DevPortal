@@ -2925,3 +2925,195 @@ body:has(.impersonate-banner[style*="flex"]) .main-header {
   font-size: 0.9rem;
   resize: vertical;
 }
+
+/* ========== Avatar chip ========== */
+.avatar-chip {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--card);
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  position: relative;
+}
+.avatar-chip:hover {
+  border-color: var(--primary);
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+.avatar-chip-fallback {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--primary);
+  font-family: var(--font-display);
+}
+.avatar-chip-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.avatar-chip-img[hidden] { display: none !important; }
+.avatar-chip.auth-chip-on {
+  border-color: rgba(181, 108, 255, 0.55);
+}
+
+/* ========== Painel full page ========== */
+.painel-shell {
+  display: grid;
+  gap: 1.25rem;
+}
+.painel-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+.painel-stat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  text-align: center;
+}
+.painel-stat strong {
+  display: block;
+  font-size: 1.45rem;
+  font-family: var(--font-display);
+  color: var(--primary);
+}
+.painel-stat span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.painel-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+.painel-toolbar input {
+  flex: 1;
+  min-width: 180px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 0.55rem 0.75rem;
+  font-family: var(--font-body);
+}
+.painel-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+}
+.painel-table-wrap .admin-table {
+  margin: 0;
+}
+.painel-table-wrap .admin-table th {
+  position: sticky;
+  top: 0;
+}
+
+.owner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.owner-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.9rem;
+}
+.owner-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.owner-card h3 {
+  font-size: 1rem;
+  margin: 0;
+}
+.owner-card .meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.owner-card .card-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+.owner-kpi {
+  background: linear-gradient(145deg, var(--card), var(--input-bg));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+}
+.owner-kpi strong {
+  font-size: 1.8rem;
+  font-family: var(--font-display);
+  color: var(--primary);
+  display: block;
+}
+
+/* ========== Owner crimson theme (só com body.owner-view) ========== */
+body.owner-view {
+  --primary: #e11d48;
+  --primary-hover: #be123c;
+  --primary-light: rgba(225, 29, 72, 0.14);
+  --accent: #fb7185;
+  --bg: #0c0406;
+  --bg-navbar: rgba(12, 4, 6, 0.88);
+  --card: rgba(40, 10, 14, 0.72);
+  --card-hover: rgba(55, 14, 20, 0.85);
+  --border: rgba(225, 29, 72, 0.22);
+  --text: #ffe4e6;
+  --text-muted: #fda4af;
+  --input-bg: rgba(30, 8, 12, 0.9);
+  --success: #fb7185;
+  --success-light: rgba(251, 113, 133, 0.12);
+  --warning: #fecdd3;
+  --warning-light: rgba(254, 205, 211, 0.12);
+  --danger: #ff1d4e;
+  --danger-light: rgba(255, 29, 78, 0.15);
+}
+body.owner-view .avatar-chip.auth-chip-on {
+  border-color: rgba(225, 29, 72, 0.7);
+  box-shadow: 0 0 12px rgba(225, 29, 72, 0.35);
+}
+body.owner-view .brand-title span,
+body.owner-view .splash-title span {
+  background: linear-gradient(135deg, #e11d48, #fb7185);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+body.owner-view #matrix-bg {
+  opacity: 0.18;
+}
+body.owner-view .nav-btn.active {
+  background: var(--primary-light);
+  color: #fecdd3;
+  border-color: rgba(225, 29, 72, 0.45);
+}
+
+/* Profile form polish */
+#profile-content .profile-head {
+  margin-bottom: 1.25rem;
+}
+#profile-content .profile-avatar {
+  width: 96px;
+  height: 96px;
+  border-width: 3px;
+  border-color: var(--primary);
+}

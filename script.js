@@ -2721,11 +2721,18 @@ function initMatrixRain() {
   }
 
   function colorFor(hue, theme, isHead) {
+    const owner = document.body.classList.contains("owner-view");
+    if (owner) {
+      // carmesim / sangue
+      if (isHead) return "rgba(255, 70, 90, 0.7)";
+      return hue === "purple" || hue === "crimson"
+        ? "rgba(160, 20, 40, 0.28)"
+        : "rgba(110, 10, 25, 0.16)";
+    }
     if (theme === "light") {
       if (hue === "purple") return isHead ? "rgba(110, 50, 180, 0.28)" : "rgba(100, 50, 160, 0.1)";
       return isHead ? "rgba(30, 120, 80, 0.25)" : "rgba(20, 100, 70, 0.08)";
     }
-    // dark — roxo/verde bem mais discretos
     if (hue === "purple") {
       return isHead ? "rgba(170, 130, 220, 0.45)" : "rgba(90, 45, 150, 0.18)";
     }
@@ -3289,9 +3296,8 @@ function initAuth() {
     const token = localStorage.getItem(SESSION_TOKEN_KEY);
     if (token) {
       try {
-        const me = await apiFetch("/api/me");
-        renderAuthLoggedApi(me);
-        abrirModal("auth-modal-overlay");
+        await apiFetch("/api/me");
+        openProfilePanel();
         return;
       } catch {
         localStorage.removeItem(SESSION_TOKEN_KEY);
@@ -3307,24 +3313,56 @@ function initAuth() {
 async function updateAuthChipApi() {
   const chip = document.getElementById("auth-chip");
   if (!chip) return;
+  const letterEl = document.getElementById("avatar-chip-letter");
+  const imgEl = document.getElementById("avatar-chip-img");
   const token = localStorage.getItem(SESSION_TOKEN_KEY);
+
+  function setLoggedOut() {
+    chip.classList.remove("auth-chip-on", "is-logged");
+    chip.title = "Entrar";
+    if (letterEl) {
+      letterEl.hidden = false;
+      letterEl.textContent = "?";
+    }
+    if (imgEl) {
+      imgEl.hidden = true;
+      imgEl.removeAttribute("src");
+    }
+    applyOwnerView(null);
+    applyStaffNav(false);
+  }
+
   if (!token) {
-    chip.textContent = "Entrar";
-    chip.classList.remove("auth-chip-on");
+    setLoggedOut();
     return;
   }
   try {
     const me = await apiFetch("/api/me");
-    const short = (me.email || "").split("@")[0] || me.email;
-    const label = me.displayName || me.username || short;
-    const shown = label.length > 14 ? label.slice(0, 14) + "…" : label;
-    if (me.role === "owner") chip.textContent = "👑 " + shown;
-    else if (me.role === "moderator") chip.textContent = "🛡️ " + shown;
-    else chip.textContent = shown;
-    chip.classList.add("auth-chip-on");
+    window.__dpMe = me;
+    chip.classList.add("auth-chip-on", "is-logged");
+    const base = (me.displayName || me.username || (me.email || "?").split("@")[0] || "?").trim();
+    const letter = (base.charAt(0) || "?").toUpperCase();
+    chip.title = base + (me.role === "owner" ? " (dono)" : me.role === "moderator" ? " (moderador)" : "");
+    if (me.avatarUrl) {
+      if (imgEl) {
+        imgEl.src = me.avatarUrl;
+        imgEl.hidden = false;
+      }
+      if (letterEl) letterEl.hidden = true;
+    } else {
+      if (imgEl) {
+        imgEl.hidden = true;
+        imgEl.removeAttribute("src");
+      }
+      if (letterEl) {
+        letterEl.hidden = false;
+        letterEl.textContent = letter;
+      }
+    }
+    applyStaffNav(me.role === "owner" || me.role === "moderator");
+    applyOwnerView(me);
   } catch {
-    chip.textContent = "Entrar";
-    chip.classList.remove("auth-chip-on");
+    setLoggedOut();
   }
 }
 
@@ -3741,6 +3779,8 @@ function openProfilePanel(targetEmail) {
         </div>
         ${staffEdit ? "" : `<p class="auth-note">E-mail: <strong>${me.email}</strong></p>`}
         <button type="submit" class="btn-primary" style="width:100%">Salvar perfil</button>
+        ${staffEdit ? "" : `<button type="button" class="btn-ghost" id="pf-logout" style="width:100%;margin-top:0.5rem">Sair da conta</button>
+        ${me.role === "owner" || me.role === "moderator" ? `<button type="button" class="btn-ghost" id="pf-goto-painel" style="width:100%;margin-top:0.35rem">Abrir painel da equipe</button>` : ""}`}
       </form>
     `;
     document.getElementById("pf-file")?.addEventListener("change", (ev) => {
@@ -3773,6 +3813,21 @@ function openProfilePanel(targetEmail) {
       } catch (err) {
         showToast(err.message || "Falha ao salvar");
       }
+    });
+    document.getElementById("pf-logout")?.addEventListener("click", async () => {
+      try { await apiFetch("/api/logout", { method: "POST", body: "{}" }); } catch (_) {}
+      localStorage.removeItem(SESSION_TOKEN_KEY);
+      sessionStorage.removeItem("dp_force_public");
+      updateAuthChipApi();
+      fecharModal("profile-modal-overlay");
+      showToast("Sessão encerrada");
+      irParaPagina("home");
+    });
+    document.getElementById("pf-goto-painel")?.addEventListener("click", () => {
+      fecharModal("profile-modal-overlay");
+      sessionStorage.removeItem("dp_force_public");
+      applyOwnerView(window.__dpMe);
+      irParaPagina(window.__dpMe?.role === "owner" ? "owner-dash" : "painel");
     });
   }).catch(err => {
     box.innerHTML = `<div class="error-box"><p>${err.message || "Erro"}</p></div>`;
@@ -3816,3 +3871,392 @@ document.addEventListener("DOMContentLoaded", () => {
   const imp = localStorage.getItem("devportal_impersonating");
   if (imp) showImpersonationBanner(imp);
 });
+
+
+// ========== Visão dono / painel página ==========
+function applyStaffNav(isStaff) {
+  document.querySelectorAll(".nav-staff-only").forEach((b) => {
+    b.hidden = !isStaff;
+  });
+}
+
+function applyOwnerView(me) {
+  const isOwner = me && (me.role === "owner");
+  const forcePublic = sessionStorage.getItem("dp_force_public") === "1";
+  const ownerMode = isOwner && !forcePublic;
+  document.body.classList.toggle("owner-view", Boolean(ownerMode));
+  const navPub = document.getElementById("nav-public");
+  const navOwn = document.getElementById("nav-owner");
+  if (navPub && navOwn) {
+    if (ownerMode) {
+      navPub.hidden = true;
+      navOwn.hidden = false;
+    } else {
+      navPub.hidden = false;
+      navOwn.hidden = true;
+    }
+  }
+  // rebind owner nav clicks once
+  if (navOwn && !navOwn.dataset.bound) {
+    navOwn.dataset.bound = "1";
+    navOwn.querySelectorAll(".nav-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.dataset.exitOwner) {
+          sessionStorage.setItem("dp_force_public", "1");
+          applyOwnerView(window.__dpMe);
+          irParaPagina("home");
+          return;
+        }
+        sessionStorage.removeItem("dp_force_public");
+        irParaPagina(btn.dataset.page);
+      });
+    });
+  }
+}
+
+const _irParaPaginaOrig = typeof irParaPagina === "function" ? irParaPagina : null;
+irParaPagina = function (pageId) {
+  if (_irParaPaginaOrig) _irParaPaginaOrig(pageId);
+  else {
+    document.querySelectorAll(".page-view").forEach((p) => p.classList.remove("active"));
+    document.getElementById("page-" + pageId)?.classList.add("active");
+    document.querySelectorAll(".nav-btn").forEach((b) => {
+      b.classList.toggle("active", b.dataset.page === pageId);
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  if (pageId === "painel") renderPainelPage();
+  if (pageId === "owner-dash") renderOwnerDash();
+  if (pageId === "owner-perfis") renderOwnerPerfis();
+  if (pageId === "owner-equipe") renderOwnerEquipe();
+  if (pageId === "owner-mod") renderOwnerMod();
+  if (pageId === "owner-intel") renderOwnerIntel();
+};
+
+async function fetchStaffUsers() {
+  return apiFetch("/api/admin/users");
+}
+
+function roleLabel(r) {
+  if (r === "owner") return "dono";
+  if (r === "moderator") return "moderador";
+  return "membro";
+}
+
+async function renderPainelPage() {
+  const root = document.getElementById("painel-page-root");
+  if (!root) return;
+  root.innerHTML = `<div class="loading"><div class="spinner"></div><p>Carregando painel…</p></div>`;
+  try {
+    const data = await fetchStaffUsers();
+    const me = data.me || {};
+    const perms = me.permissions || {};
+    const users = data.users || [];
+    const banned = users.filter((u) => u.banned).length;
+    const mods = users.filter((u) => u.role === "moderator").length;
+    const timeouts = users.filter((u) => u.timeoutUntil && new Date(u.timeoutUntil) > new Date()).length;
+
+    root.innerHTML = `
+      <div class="painel-stats">
+        <div class="painel-stat"><strong>${users.length}</strong><span>contas</span></div>
+        <div class="painel-stat"><strong>${mods}</strong><span>moderadores</span></div>
+        <div class="painel-stat"><strong>${timeouts}</strong><span>em timeout</span></div>
+        <div class="painel-stat"><strong>${banned}</strong><span>banidos</span></div>
+      </div>
+      <div class="painel-toolbar">
+        <input type="search" id="painel-search" placeholder="Filtrar por e-mail, @user ou nome…">
+        <span class="text-muted text-sm">Logado como <strong>${roleLabel(me.role)}</strong></span>
+      </div>
+      <div class="painel-table-wrap" id="painel-table-host"></div>
+      <p class="auth-note">Use as ações conforme suas permissões. Senhas nunca são legíveis — só hash.</p>
+    `;
+    const host = document.getElementById("painel-table-host");
+    const paint = (list) => {
+      host.innerHTML = `
+        <table class="admin-table">
+          <thead><tr><th>Conta</th><th>Papel</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody>
+            ${list.map((u) => {
+              const timeout = u.timeoutUntil && new Date(u.timeoutUntil) > new Date();
+              let status = u.banned ? "banida" : timeout ? "timeout" : "ativa";
+              const name = (u.displayName || u.username || "").trim();
+              const canAct = u.role !== "owner";
+              return `<tr>
+                <td><strong>${name ? name + " · " : ""}${u.email}</strong>
+                  ${u.username ? `<div class="text-xs text-muted">@${u.username}</div>` : ""}
+                  ${u.bio ? `<div class="text-xs text-muted">${String(u.bio).slice(0, 60)}</div>` : ""}
+                </td>
+                <td><span class="admin-badge ${u.role === "user" ? "user" : ""}">${roleLabel(u.role)}</span></td>
+                <td>${status}</td>
+                <td class="admin-actions">${!canAct ? "—" : `
+                  ${perms.timeout ? `<button type="button" class="btn-ghost btn-tiny" data-act="timeout" data-email="${u.email}">Timeout</button>
+                  <button type="button" class="btn-ghost btn-tiny" data-act="untimeout" data-email="${u.email}">Tirar timeout</button>` : ""}
+                  ${perms.ban ? `<button type="button" class="btn-ghost btn-tiny" data-act="ban" data-email="${u.email}">Banir</button>
+                  <button type="button" class="btn-ghost btn-tiny" data-act="unban" data-email="${u.email}">Desbanir</button>` : ""}
+                  ${perms.impersonate ? `<button type="button" class="btn-ghost btn-tiny" data-act="impersonate" data-email="${u.email}">Entrar como</button>` : ""}
+                  ${perms.editProfiles ? `<button type="button" class="btn-ghost btn-tiny" data-act="edit-profile" data-email="${u.email}">Perfil</button>` : ""}
+                  ${me.role === "owner" && u.role !== "owner" ? `
+                    <button type="button" class="btn-ghost btn-tiny" data-act="make-mod" data-email="${u.email}">Tornar mod</button>
+                    <button type="button" class="btn-ghost btn-tiny" data-act="make-member" data-email="${u.email}">Membro</button>
+                    <button type="button" class="btn-ghost btn-tiny" data-act="edit-perms" data-email="${u.email}">Permissões</button>` : ""}
+                `}</td>
+              </tr>`;
+            }).join("")}
+          </tbody>
+        </table>`;
+      host.querySelectorAll("[data-act]").forEach((btn) => {
+        btn.addEventListener("click", () => handleStaffAction(btn.getAttribute("data-act"), btn.getAttribute("data-email"), renderPainelPage));
+      });
+    };
+    paint(users);
+    document.getElementById("painel-search")?.addEventListener("input", (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      paint(users.filter((u) =>
+        (u.email || "").includes(q) ||
+        (u.username || "").toLowerCase().includes(q) ||
+        (u.displayName || "").toLowerCase().includes(q)
+      ));
+    });
+  } catch (e) {
+    root.innerHTML = `<div class="error-box"><p>${e.message || "Sem acesso ao painel."}</p></div>`;
+  }
+}
+
+async function handleStaffAction(act, email, refresh) {
+  try {
+    if (act === "timeout") {
+      const raw = prompt("Timeout em minutos", "60");
+      if (raw == null) return;
+      await apiFetch("/api/admin/timeout", { method: "POST", body: JSON.stringify({ email, minutes: Math.max(1, parseInt(raw, 10) || 60) }) });
+      showToast("Timeout ok");
+    } else if (act === "untimeout") {
+      await apiFetch("/api/admin/untimeout", { method: "POST", body: JSON.stringify({ email }) });
+      showToast("Timeout removido");
+    } else if (act === "ban") {
+      const reason = prompt("Motivo", "Violação") || "";
+      if (!confirm("Banir " + email + "?")) return;
+      await apiFetch("/api/admin/ban", { method: "POST", body: JSON.stringify({ email, reason }) });
+      showToast("Banido");
+    } else if (act === "unban") {
+      await apiFetch("/api/admin/unban", { method: "POST", body: JSON.stringify({ email }) });
+      showToast("Desbanido");
+    } else if (act === "impersonate") {
+      if (!confirm("Entrar como " + email + "?")) return;
+      const data = await apiFetch("/api/admin/impersonate", { method: "POST", body: JSON.stringify({ email }) });
+      const staffTok = localStorage.getItem(SESSION_TOKEN_KEY);
+      if (staffTok) localStorage.setItem("devportal_staff_token", staffTok);
+      localStorage.setItem(SESSION_TOKEN_KEY, data.token);
+      localStorage.setItem("devportal_impersonating", email);
+      if (Array.isArray(data.favorites)) {
+        favoritos = new Set(data.favorites);
+        salvarFavoritos();
+      }
+      showImpersonationBanner(email);
+      showToast("Sessão: " + email);
+      updateAuthChipApi();
+    } else if (act === "edit-profile") {
+      openProfilePanel(email);
+      return;
+    } else if (act === "make-mod") {
+      await apiFetch("/api/admin/set-role", { method: "POST", body: JSON.stringify({ email, role: "moderator", permissions: { timeout: true, ban: false, impersonate: false, editProfiles: false } }) });
+      showToast("Moderador");
+    } else if (act === "make-member") {
+      await apiFetch("/api/admin/set-role", { method: "POST", body: JSON.stringify({ email, role: "user" }) });
+      showToast("Membro");
+    } else if (act === "edit-perms") {
+      const timeout = confirm("Timeout?");
+      const ban = confirm("Ban?");
+      const impersonate = confirm("Entrar como?");
+      const editProfiles = confirm("Editar perfis?");
+      await apiFetch("/api/admin/set-role", { method: "POST", body: JSON.stringify({ email, role: "moderator", permissions: { timeout, ban, impersonate, editProfiles } }) });
+      showToast("Permissões salvas");
+    }
+    if (typeof refresh === "function") refresh();
+  } catch (e) {
+    showToast(e.message || "Falha");
+  }
+}
+
+async function renderOwnerDash() {
+  const root = document.getElementById("owner-dash-root");
+  if (!root) return;
+  root.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
+  try {
+    const data = await fetchStaffUsers();
+    const users = data.users || [];
+    const mods = users.filter((u) => u.role === "moderator");
+    const banned = users.filter((u) => u.banned);
+    const withAvatar = users.filter((u) => u.avatarUrl).length;
+    root.innerHTML = `
+      <div class="owner-kpi"><strong>${users.length}</strong><span class="meta">contas registradas</span></div>
+      <div class="owner-kpi"><strong>${mods.length}</strong><span class="meta">moderadores ativos</span></div>
+      <div class="owner-kpi"><strong>${banned.length}</strong><span class="meta">banimentos</span></div>
+      <div class="owner-kpi"><strong>${withAvatar}</strong><span class="meta">perfis com foto</span></div>
+      <div class="owner-card" style="grid-column:1/-1">
+        <h3>Atalhos do trono</h3>
+        <p class="meta">Tema carmesim ativo só na sua sessão de dono. Membros continuam no roxo.</p>
+        <div class="card-actions-row">
+          <button type="button" class="btn-primary" id="od-perfis">Ver perfis</button>
+          <button type="button" class="btn-ghost" id="od-equipe">Equipe</button>
+          <button type="button" class="btn-ghost" id="od-mod">Moderação</button>
+          <button type="button" class="btn-ghost" id="od-painel">Painel completo</button>
+        </div>
+      </div>
+      <div class="owner-card" style="grid-column:1/-1">
+        <h3>Últimas contas</h3>
+        <ul class="text-sm text-muted" style="padding-left:1.1rem;line-height:1.7">
+          ${users.slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,8).map(u=>
+            `<li>${u.email} · ${roleLabel(u.role)} · ${u.createdAt ? new Date(u.createdAt).toLocaleString("pt-BR") : "—"}</li>`
+          ).join("")}
+        </ul>
+      </div>
+    `;
+    document.getElementById("od-perfis")?.addEventListener("click", () => irParaPagina("owner-perfis"));
+    document.getElementById("od-equipe")?.addEventListener("click", () => irParaPagina("owner-equipe"));
+    document.getElementById("od-mod")?.addEventListener("click", () => irParaPagina("owner-mod"));
+    document.getElementById("od-painel")?.addEventListener("click", () => irParaPagina("painel"));
+  } catch (e) {
+    root.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;
+  }
+}
+
+async function renderOwnerPerfis() {
+  const root = document.getElementById("owner-perfis-root");
+  if (!root) return;
+  root.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
+  try {
+    const data = await fetchStaffUsers();
+    let users = data.users || [];
+    const paint = (list) => {
+      root.innerHTML = list.map((u) => `
+        <article class="owner-card">
+          <div class="row" style="gap:0.75rem">
+            ${u.avatarUrl ? `<img class="profile-avatar" style="width:48px;height:48px" src="${u.avatarUrl}" alt="">` : `<div class="profile-avatar profile-avatar-empty" style="width:48px;height:48px;font-size:1rem">${(u.displayName||u.username||u.email||"?").charAt(0).toUpperCase()}</div>`}
+            <div>
+              <h3>${u.displayName || u.username || u.email}</h3>
+              <div class="meta">${u.email}${u.username ? " · @" + u.username : ""}</div>
+            </div>
+          </div>
+          <p class="meta">${u.bio || "Sem biografia."}</p>
+          <div class="meta">Papel: ${roleLabel(u.role)} · Favoritos: ${u.favoritesCount || 0}</div>
+          <div class="card-actions-row">
+            <button type="button" class="btn-ghost btn-tiny" data-email="${u.email}" data-act="edit-profile">Editar</button>
+            ${u.role !== "owner" ? `<button type="button" class="btn-ghost btn-tiny" data-email="${u.email}" data-act="impersonate">Entrar como</button>` : ""}
+          </div>
+        </article>
+      `).join("") || `<p class="no-results">Nenhum perfil.</p>`;
+      root.querySelectorAll("[data-act]").forEach((b) => {
+        b.addEventListener("click", () => handleStaffAction(b.dataset.act, b.dataset.email, () => renderOwnerPerfis()));
+      });
+    };
+    paint(users);
+    document.getElementById("owner-search-perfis")?.addEventListener("input", (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      paint(users.filter((u) =>
+        (u.email||"").includes(q) || (u.username||"").toLowerCase().includes(q) || (u.displayName||"").toLowerCase().includes(q)
+      ));
+    });
+  } catch (e) {
+    root.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;
+  }
+}
+
+async function renderOwnerEquipe() {
+  const root = document.getElementById("owner-equipe-root");
+  if (!root) return;
+  try {
+    const data = await fetchStaffUsers();
+    const mods = (data.users || []).filter((u) => u.role === "moderator" || u.role === "owner");
+    root.innerHTML = mods.map((u) => {
+      const p = u.permissions || {};
+      return `<article class="owner-card">
+        <h3>${u.displayName || u.username || u.email}</h3>
+        <div class="meta">${u.email} · ${roleLabel(u.role)}</div>
+        <div class="meta">timeout: ${p.timeout ? "sim" : "não"} · ban: ${p.ban ? "sim" : "não"} · entrar como: ${p.impersonate ? "sim" : "não"} · editar perfil: ${p.editProfiles ? "sim" : "não"}</div>
+        ${u.role === "moderator" ? `<div class="card-actions-row">
+          <button type="button" class="btn-ghost btn-tiny" data-act="edit-perms" data-email="${u.email}">Permissões</button>
+          <button type="button" class="btn-ghost btn-tiny" data-act="make-member" data-email="${u.email}">Rebaixar</button>
+        </div>` : ""}
+      </article>`;
+    }).join("") || `<p class="no-results">Sem equipe além do dono.</p>`;
+    root.querySelectorAll("[data-act]").forEach((b) => {
+      b.addEventListener("click", () => handleStaffAction(b.dataset.act, b.dataset.email, () => renderOwnerEquipe()));
+    });
+  } catch (e) {
+    root.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;
+  }
+}
+
+async function renderOwnerMod() {
+  const root = document.getElementById("owner-mod-root");
+  if (!root) return;
+  try {
+    const data = await fetchStaffUsers();
+    const users = data.users || [];
+    const flagged = users.filter((u) => u.banned || (u.timeoutUntil && new Date(u.timeoutUntil) > new Date()));
+    let bans = { bans: [] };
+    try { bans = await apiFetch("/api/admin/bans"); } catch (_) {}
+    root.innerHTML = `
+      <article class="owner-card" style="grid-column:1/-1">
+        <h3>Fila de moderação</h3>
+        <p class="meta">${flagged.length} contas com restrição · ${bans.bans?.length || 0} e-mails na lista de ban</p>
+      </article>
+      ${flagged.map((u) => `
+        <article class="owner-card">
+          <h3>${u.email}</h3>
+          <div class="meta">${u.banned ? "BANIDA" : ""} ${u.timeoutUntil ? "timeout até " + new Date(u.timeoutUntil).toLocaleString("pt-BR") : ""}</div>
+          <div class="card-actions-row">
+            <button type="button" class="btn-ghost btn-tiny" data-act="untimeout" data-email="${u.email}">Tirar timeout</button>
+            <button type="button" class="btn-ghost btn-tiny" data-act="unban" data-email="${u.email}">Desbanir</button>
+            <button type="button" class="btn-ghost btn-tiny" data-act="ban" data-email="${u.email}">Banir</button>
+          </div>
+        </article>
+      `).join("") || `<p class="no-results">Nada pendente. O portal está calmo.</p>`}
+      <article class="owner-card" style="grid-column:1/-1">
+        <h4>Banir e-mail</h4>
+        <div class="row" style="gap:0.5rem;margin-top:0.5rem">
+          <input type="email" id="om-ban-email" placeholder="email@" style="flex:1">
+          <button type="button" class="btn-primary" id="om-ban-go">Banir</button>
+        </div>
+      </article>
+    `;
+    root.querySelectorAll("[data-act]").forEach((b) => {
+      b.addEventListener("click", () => handleStaffAction(b.dataset.act, b.dataset.email, () => renderOwnerMod()));
+    });
+    document.getElementById("om-ban-go")?.addEventListener("click", async () => {
+      const email = document.getElementById("om-ban-email")?.value?.trim();
+      if (!email) return;
+      await handleStaffAction("ban", email, () => renderOwnerMod());
+    });
+  } catch (e) {
+    root.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;
+  }
+}
+
+async function renderOwnerIntel() {
+  const root = document.getElementById("owner-intel-root");
+  if (!root) return;
+  let health = { ok: false };
+  try { health = await apiFetch("/api/health"); } catch (_) {}
+  try {
+    const data = await fetchStaffUsers();
+    const users = data.users || [];
+    const weekAgo = Date.now() - 7 * 864e5;
+    const recent = users.filter((u) => u.createdAt && Date.parse(u.createdAt) > weekAgo).length;
+    root.innerHTML = `
+      <div class="owner-kpi"><strong>${health.ok ? "ON" : "OFF"}</strong><span class="meta">API ${health.service || ""}</span></div>
+      <div class="owner-kpi"><strong>${recent}</strong><span class="meta">contas nos últimos 7 dias</span></div>
+      <div class="owner-card" style="grid-column:1/-1">
+        <h3>Notas do sistema</h3>
+        <p class="meta">• Tema carmesim e navegação de comando são só do dono.<br>
+        • Moderadores usam a aba Painel no menu público.<br>
+        • Impersonação não revela senha — só a sessão no DevPortal.<br>
+        • Publique o app OAuth se quiser Google para todos os e-mails.</p>
+      </div>
+    `;
+  } catch (e) {
+    root.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;
+  }
+}
+
+// openProfilePanel: ensure works when called with no args from avatar

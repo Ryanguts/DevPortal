@@ -223,7 +223,16 @@ function securityHeaders(res: http.ServerResponse): void {
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   res.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline'; connect-src 'self' https://cdn.jsdelivr.net https://universities.hipolabs.com http://localhost:* https://*;"
+    [
+      "default-src 'self'",
+      "img-src 'self' data: https:",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com data:",
+      // Google Identity Services (botão Continuar com Google)
+      "script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com",
+      "frame-src 'self' https://accounts.google.com",
+      "connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://cdn.jsdelivr.net https://universities.hipolabs.com http://localhost:* https://*",
+    ].join("; ")
   );
   if (IS_PROD) {
     res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");

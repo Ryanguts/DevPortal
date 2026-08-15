@@ -3361,8 +3361,14 @@ async function updateAuthChipApi() {
     }
     applyStaffNav(me.role === "owner" || me.role === "moderator");
     applyOwnerView(me);
-  } catch {
-    setLoggedOut();
+  } catch (err) {
+    // Só desloga de verdade se a API disser que a sessão é inválida
+    if (err && err.status === 401) {
+      localStorage.removeItem(SESSION_TOKEN_KEY);
+    }
+    // Mantém chip "logado" se houver cache e erro de rede
+    if (err && err.status === 401) setLoggedOut();
+    else if (!window.__dpMe) setLoggedOut();
   }
 }
 
@@ -3420,9 +3426,10 @@ function renderAuthFormsApi(mode) {
           aplicarFiltrosLinguagens();
         }
         showToast(data.role === "owner" ? "Dono conectado" : data.role === "moderator" ? "Moderador conectado" : "Bem-vindo(a) de volta");
-        updateAuthChipApi();
+        await updateAuthChipApi();
         fecharModal("auth-modal-overlay");
-        if (data.role === "owner" || data.role === "moderator") openAdminPanel();
+        if (data.role === "owner") goToPage("owner-dash");
+        else if (data.role === "moderator") goToPage("painel");
       } else {
         const data = await apiFetch("/api/register", {
           method: "POST",
@@ -3873,7 +3880,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// ========== Visão dono / painel página ==========
+
+// ========== Visão dono / painel (corrigido) ==========
 function applyStaffNav(isStaff) {
   document.querySelectorAll(".nav-staff-only").forEach((b) => {
     b.hidden = !isStaff;
@@ -3881,66 +3889,68 @@ function applyStaffNav(isStaff) {
 }
 
 function applyOwnerView(me) {
-  const isOwner = me && (me.role === "owner");
-  const forcePublic = sessionStorage.getItem("dp_force_public") === "1";
-  const ownerMode = isOwner && !forcePublic;
-  document.body.classList.toggle("owner-view", Boolean(ownerMode));
+  const isOwner = !!(me && me.role === "owner");
+  document.body.classList.toggle("owner-view", isOwner);
+
   const navPub = document.getElementById("nav-public");
   const navOwn = document.getElementById("nav-owner");
-  if (navPub && navOwn) {
-    if (ownerMode) {
-      navPub.hidden = true;
-      navOwn.hidden = false;
-    } else {
-      navPub.hidden = false;
-      navOwn.hidden = true;
-    }
-  }
-  // rebind owner nav clicks once
-  if (navOwn && !navOwn.dataset.bound) {
-    navOwn.dataset.bound = "1";
-    navOwn.querySelectorAll(".nav-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        if (btn.dataset.exitOwner) {
-          sessionStorage.setItem("dp_force_public", "1");
-          applyOwnerView(window.__dpMe);
-          irParaPagina("home");
-          return;
-        }
-        sessionStorage.removeItem("dp_force_public");
-        irParaPagina(btn.dataset.page);
-      });
-    });
+  if (!navPub || !navOwn) return;
+
+  if (isOwner) {
+    navPub.hidden = true;
+    navPub.setAttribute("hidden", "");
+    navOwn.hidden = false;
+    navOwn.removeAttribute("hidden");
+  } else {
+    navPub.hidden = false;
+    navPub.removeAttribute("hidden");
+    navOwn.hidden = true;
+    navOwn.setAttribute("hidden", "");
   }
 }
 
-const _irParaPaginaOrig = typeof irParaPagina === "function" ? irParaPagina : null;
-irParaPagina = function (pageId) {
-  if (_irParaPaginaOrig) _irParaPaginaOrig(pageId);
-  else {
-    document.querySelectorAll(".page-view").forEach((p) => p.classList.remove("active"));
-    document.getElementById("page-" + pageId)?.classList.add("active");
-    document.querySelectorAll(".nav-btn").forEach((b) => {
-      b.classList.toggle("active", b.dataset.page === pageId);
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+function goToPage(pageId) {
+  if (!pageId) return;
+  document.querySelectorAll(".page-view").forEach((p) => p.classList.remove("active"));
+  const page = document.getElementById("page-" + pageId);
+  if (page) page.classList.add("active");
+
+  document.querySelectorAll(".nav-btn").forEach((b) => {
+    b.classList.toggle("active", b.dataset.page === pageId);
+  });
+
+  try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) {}
+
   if (pageId === "painel") renderPainelPage();
   if (pageId === "owner-dash") renderOwnerDash();
   if (pageId === "owner-perfis") renderOwnerPerfis();
   if (pageId === "owner-equipe") renderOwnerEquipe();
   if (pageId === "owner-mod") renderOwnerMod();
   if (pageId === "owner-intel") renderOwnerIntel();
-};
+}
+
+// Sobrescreve navegação global
+irParaPagina = goToPage;
+
+function bindAllNavOnce() {
+  if (window.__dpNavBound) return;
+  window.__dpNavBound = true;
+  document.querySelectorAll(".nav-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const page = btn.dataset.page;
+      if (!page) return;
+      // NUNCA sai da visão do dono automaticamente
+      goToPage(page);
+    });
+  });
+}
+
+const _roleLabel = (r) => (r === "owner" ? "dono" : r === "moderator" ? "moderador" : "membro");
+function roleLabel(r) { return _roleLabel(r); }
 
 async function fetchStaffUsers() {
   return apiFetch("/api/admin/users");
-}
-
-function roleLabel(r) {
-  if (r === "owner") return "dono";
-  if (r === "moderator") return "moderador";
-  return "membro";
 }
 
 async function renderPainelPage() {
@@ -3965,10 +3975,9 @@ async function renderPainelPage() {
       </div>
       <div class="painel-toolbar">
         <input type="search" id="painel-search" placeholder="Filtrar por e-mail, @user ou nome…">
-        <span class="text-muted text-sm">Logado como <strong>${roleLabel(me.role)}</strong></span>
+        <span class="text-muted text-sm">Você: <strong>${roleLabel(me.role)}</strong></span>
       </div>
       <div class="painel-table-wrap" id="painel-table-host"></div>
-      <p class="auth-note">Use as ações conforme suas permissões. Senhas nunca são legíveis — só hash.</p>
     `;
     const host = document.getElementById("painel-table-host");
     const paint = (list) => {
@@ -3978,13 +3987,12 @@ async function renderPainelPage() {
           <tbody>
             ${list.map((u) => {
               const timeout = u.timeoutUntil && new Date(u.timeoutUntil) > new Date();
-              let status = u.banned ? "banida" : timeout ? "timeout" : "ativa";
+              const status = u.banned ? "banida" : timeout ? "timeout" : "ativa";
               const name = (u.displayName || u.username || "").trim();
               const canAct = u.role !== "owner";
               return `<tr>
                 <td><strong>${name ? name + " · " : ""}${u.email}</strong>
                   ${u.username ? `<div class="text-xs text-muted">@${u.username}</div>` : ""}
-                  ${u.bio ? `<div class="text-xs text-muted">${String(u.bio).slice(0, 60)}</div>` : ""}
                 </td>
                 <td><span class="admin-badge ${u.role === "user" ? "user" : ""}">${roleLabel(u.role)}</span></td>
                 <td>${status}</td>
@@ -4086,35 +4094,23 @@ async function renderOwnerDash() {
     const users = data.users || [];
     const mods = users.filter((u) => u.role === "moderator");
     const banned = users.filter((u) => u.banned);
-    const withAvatar = users.filter((u) => u.avatarUrl).length;
     root.innerHTML = `
-      <div class="owner-kpi"><strong>${users.length}</strong><span class="meta">contas registradas</span></div>
-      <div class="owner-kpi"><strong>${mods.length}</strong><span class="meta">moderadores ativos</span></div>
-      <div class="owner-kpi"><strong>${banned.length}</strong><span class="meta">banimentos</span></div>
-      <div class="owner-kpi"><strong>${withAvatar}</strong><span class="meta">perfis com foto</span></div>
+      <div class="owner-kpi"><strong>${users.length}</strong><span class="meta">contas</span></div>
+      <div class="owner-kpi"><strong>${mods.length}</strong><span class="meta">moderadores</span></div>
+      <div class="owner-kpi"><strong>${banned.length}</strong><span class="meta">banidos</span></div>
+      <div class="owner-kpi"><strong>${users.filter(u=>u.avatarUrl).length}</strong><span class="meta">com foto</span></div>
       <div class="owner-card" style="grid-column:1/-1">
-        <h3>Atalhos do trono</h3>
-        <p class="meta">Tema carmesim ativo só na sua sessão de dono. Membros continuam no roxo.</p>
+        <h3>Centro de comando</h3>
+        <p class="meta">Visão carmesim exclusiva do dono. Membros jamais veem este menu.</p>
         <div class="card-actions-row">
-          <button type="button" class="btn-primary" id="od-perfis">Ver perfis</button>
-          <button type="button" class="btn-ghost" id="od-equipe">Equipe</button>
-          <button type="button" class="btn-ghost" id="od-mod">Moderação</button>
-          <button type="button" class="btn-ghost" id="od-painel">Painel completo</button>
+          <button type="button" class="btn-primary" data-go="owner-perfis">Perfis</button>
+          <button type="button" class="btn-ghost" data-go="owner-equipe">Equipe</button>
+          <button type="button" class="btn-ghost" data-go="owner-mod">Moderação</button>
+          <button type="button" class="btn-ghost" data-go="painel">Painel</button>
         </div>
       </div>
-      <div class="owner-card" style="grid-column:1/-1">
-        <h3>Últimas contas</h3>
-        <ul class="text-sm text-muted" style="padding-left:1.1rem;line-height:1.7">
-          ${users.slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,8).map(u=>
-            `<li>${u.email} · ${roleLabel(u.role)} · ${u.createdAt ? new Date(u.createdAt).toLocaleString("pt-BR") : "—"}</li>`
-          ).join("")}
-        </ul>
-      </div>
     `;
-    document.getElementById("od-perfis")?.addEventListener("click", () => irParaPagina("owner-perfis"));
-    document.getElementById("od-equipe")?.addEventListener("click", () => irParaPagina("owner-equipe"));
-    document.getElementById("od-mod")?.addEventListener("click", () => irParaPagina("owner-mod"));
-    document.getElementById("od-painel")?.addEventListener("click", () => irParaPagina("painel"));
+    root.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => goToPage(b.getAttribute("data-go"))));
   } catch (e) {
     root.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;
   }
@@ -4131,17 +4127,18 @@ async function renderOwnerPerfis() {
       root.innerHTML = list.map((u) => `
         <article class="owner-card">
           <div class="row" style="gap:0.75rem">
-            ${u.avatarUrl ? `<img class="profile-avatar" style="width:48px;height:48px" src="${u.avatarUrl}" alt="">` : `<div class="profile-avatar profile-avatar-empty" style="width:48px;height:48px;font-size:1rem">${(u.displayName||u.username||u.email||"?").charAt(0).toUpperCase()}</div>`}
+            ${u.avatarUrl ? `<img class="profile-avatar" style="width:48px;height:48px" src="${u.avatarUrl}" alt="">` :
+              `<div class="profile-avatar profile-avatar-empty" style="width:48px;height:48px;font-size:1rem">${(u.displayName||u.username||u.email||"?").charAt(0).toUpperCase()}</div>`}
             <div>
               <h3>${u.displayName || u.username || u.email}</h3>
               <div class="meta">${u.email}${u.username ? " · @" + u.username : ""}</div>
             </div>
           </div>
           <p class="meta">${u.bio || "Sem biografia."}</p>
-          <div class="meta">Papel: ${roleLabel(u.role)} · Favoritos: ${u.favoritesCount || 0}</div>
+          <div class="meta">${roleLabel(u.role)} · ${u.favoritesCount || 0} favoritos</div>
           <div class="card-actions-row">
-            <button type="button" class="btn-ghost btn-tiny" data-email="${u.email}" data-act="edit-profile">Editar</button>
-            ${u.role !== "owner" ? `<button type="button" class="btn-ghost btn-tiny" data-email="${u.email}" data-act="impersonate">Entrar como</button>` : ""}
+            <button type="button" class="btn-ghost btn-tiny" data-act="edit-profile" data-email="${u.email}">Editar</button>
+            ${u.role !== "owner" ? `<button type="button" class="btn-ghost btn-tiny" data-act="impersonate" data-email="${u.email}">Entrar como</button>` : ""}
           </div>
         </article>
       `).join("") || `<p class="no-results">Nenhum perfil.</p>`;
@@ -4150,12 +4147,16 @@ async function renderOwnerPerfis() {
       });
     };
     paint(users);
-    document.getElementById("owner-search-perfis")?.addEventListener("input", (e) => {
-      const q = e.target.value.toLowerCase().trim();
-      paint(users.filter((u) =>
-        (u.email||"").includes(q) || (u.username||"").toLowerCase().includes(q) || (u.displayName||"").toLowerCase().includes(q)
-      ));
-    });
+    const search = document.getElementById("owner-search-perfis");
+    if (search && !search.dataset.bound) {
+      search.dataset.bound = "1";
+      search.addEventListener("input", (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        paint(users.filter((u) =>
+          (u.email||"").includes(q) || (u.username||"").toLowerCase().includes(q) || (u.displayName||"").toLowerCase().includes(q)
+        ));
+      });
+    }
   } catch (e) {
     root.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;
   }
@@ -4194,12 +4195,10 @@ async function renderOwnerMod() {
     const data = await fetchStaffUsers();
     const users = data.users || [];
     const flagged = users.filter((u) => u.banned || (u.timeoutUntil && new Date(u.timeoutUntil) > new Date()));
-    let bans = { bans: [] };
-    try { bans = await apiFetch("/api/admin/bans"); } catch (_) {}
     root.innerHTML = `
       <article class="owner-card" style="grid-column:1/-1">
         <h3>Fila de moderação</h3>
-        <p class="meta">${flagged.length} contas com restrição · ${bans.bans?.length || 0} e-mails na lista de ban</p>
+        <p class="meta">${flagged.length} conta(s) com restrição</p>
       </article>
       ${flagged.map((u) => `
         <article class="owner-card">
@@ -4211,7 +4210,7 @@ async function renderOwnerMod() {
             <button type="button" class="btn-ghost btn-tiny" data-act="ban" data-email="${u.email}">Banir</button>
           </div>
         </article>
-      `).join("") || `<p class="no-results">Nada pendente. O portal está calmo.</p>`}
+      `).join("") || `<p class="no-results">Nada pendente.</p>`}
       <article class="owner-card" style="grid-column:1/-1">
         <h4>Banir e-mail</h4>
         <div class="row" style="gap:0.5rem;margin-top:0.5rem">
@@ -4244,19 +4243,26 @@ async function renderOwnerIntel() {
     const weekAgo = Date.now() - 7 * 864e5;
     const recent = users.filter((u) => u.createdAt && Date.parse(u.createdAt) > weekAgo).length;
     root.innerHTML = `
-      <div class="owner-kpi"><strong>${health.ok ? "ON" : "OFF"}</strong><span class="meta">API ${health.service || ""}</span></div>
-      <div class="owner-kpi"><strong>${recent}</strong><span class="meta">contas nos últimos 7 dias</span></div>
+      <div class="owner-kpi"><strong>${health.ok ? "ON" : "OFF"}</strong><span class="meta">API</span></div>
+      <div class="owner-kpi"><strong>${recent}</strong><span class="meta">contas (7 dias)</span></div>
       <div class="owner-card" style="grid-column:1/-1">
-        <h3>Notas do sistema</h3>
-        <p class="meta">• Tema carmesim e navegação de comando são só do dono.<br>
-        • Moderadores usam a aba Painel no menu público.<br>
-        • Impersonação não revela senha — só a sessão no DevPortal.<br>
-        • Publique o app OAuth se quiser Google para todos os e-mails.</p>
+        <h3>Status</h3>
+        <p class="meta">Sessões assinadas: permanecem após F5. Tema carmesim só para o dono.</p>
       </div>
     `;
   } catch (e) {
     root.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  bindAllNavOnce();
+  // Restaura sessão visual se houver token
+  if (localStorage.getItem(SESSION_TOKEN_KEY)) {
+    updateAuthChipApi().then(() => {
+      if (window.__dpMe?.role === "owner") goToPage("owner-dash");
+    });
+  }
+});
 
 // openProfilePanel: ensure works when called with no args from avatar

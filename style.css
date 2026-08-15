@@ -3117,3 +3117,8 @@ body.owner-view .nav-btn.active {
   border-width: 3px;
   border-color: var(--primary);
 }
+
+/* Membros NUNCA veem menu do dono */
+#nav-owner { display: none !important; }
+body.owner-view #nav-owner { display: flex !important; flex-wrap: wrap; }
+body.owner-view #nav-public { display: none !important; }

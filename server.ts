@@ -190,6 +190,48 @@ function newToken(): string {
   return crypto.randomBytes(32).toString("hex");
 }
 
+const TOKEN_SECRET = process.env.SESSION_SECRET || ("devportal-" + ADMIN_EMAIL + "-session-v1");
+
+function signSessionToken(email: string, extra?: { realEmail?: string }): string {
+  const payload = {
+    e: email,
+    r: extra?.realEmail || "",
+    exp: Date.now() + SESSION_TTL_MS,
+    n: crypto.randomBytes(8).toString("hex"),
+  };
+  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const sig = crypto.createHmac("sha256", TOKEN_SECRET).update(body).digest("base64url");
+  return `${body}.${sig}`;
+}
+
+function issueAuthToken(email: string, realEmail?: string): string {
+  const token = signSessionToken(email, realEmail ? { realEmail } : undefined);
+  const sessions = getSessions();
+  sessions[token] = { email, createdAt: Date.now(), realEmail };
+  saveSessions(sessions);
+  return token;
+}
+
+function verifySessionToken(token: string): { email: string; realEmail?: string } | null {
+  try {
+    const [body, sig] = String(token || "").split(".");
+    if (!body || !sig) return null;
+    const expect = crypto.createHmac("sha256", TOKEN_SECRET).update(body).digest("base64url");
+    const a = Buffer.from(sig);
+    const b = Buffer.from(expect);
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
+    const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as {
+      e?: string;
+      r?: string;
+      exp?: number;
+    };
+    if (!payload.e || !payload.exp || Date.now() > payload.exp) return null;
+    return { email: normalizeEmail(payload.e), realEmail: payload.r ? normalizeEmail(payload.r) : undefined };
+  } catch {
+    return null;
+  }
+}
+
 function normalizeEmail(email: unknown): string {
   return String(email || "").trim().toLowerCase();
 }
@@ -421,6 +463,12 @@ function readBody(req: http.IncomingMessage): Promise<unknown> {
 function userFromToken(req: http.IncomingMessage): UserRecord | null {
   const token = req.headers["x-session-token"];
   if (typeof token !== "string" || !token) return null;
+  // 1) Token assinado (sobrevive a F5 e reinício do servidor)
+  const signed = verifySessionToken(token);
+  if (signed?.email) {
+    return getUsers().find((u) => u.email === signed.email) || null;
+  }
+  // 2) Sessão legada em arquivo
   purgeExpiredSessions();
   const sessions = getSessions();
   const meta = sessions[token];
@@ -549,10 +597,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
     users.push(user);
     saveUsers(users);
 
-    const token = newToken();
-    const sessions = getSessions();
-    sessions[token] = { email, createdAt: Date.now() };
-    saveSessions(sessions);
+    const token = issueAuthToken(email);
 
     sendJSON(req, res, 201, {
       token,
@@ -596,10 +641,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       }
       saveUsers(users);
 
-      const token = newToken();
-      const sessions = getSessions();
-      sessions[token] = { email: ADMIN_EMAIL, createdAt: Date.now() };
-      saveSessions(sessions);
+      const token = issueAuthToken(ADMIN_EMAIL);
 
       sendJSON(req, res, 200, {
         token,
@@ -640,10 +682,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
     clearFails(user);
     saveUsers(users);
 
-    const token = newToken();
-    const sessions = getSessions();
-    sessions[token] = { email, createdAt: Date.now() };
-    saveSessions(sessions);
+    const token = issueAuthToken(email);
 
     sendJSON(req, res, 200, {
       token,
@@ -813,10 +852,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       }
       saveUsers(users);
 
-      const token = newToken();
-      const sessions = getSessions();
-      sessions[token] = { email, createdAt: Date.now() };
-      saveSessions(sessions);
+      const token = issueAuthToken(email);
 
       sendJSON(req, res, 200, {
         token,
@@ -1076,10 +1112,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       sendJSON(req, res, 403, { error: "Conta banida — não é possível acessar." });
       return;
     }
-    const token = newToken();
-    const sessions = getSessions();
-    sessions[token] = { email: target, createdAt: Date.now(), realEmail: staff.email };
-    saveSessions(sessions);
+    const token = issueAuthToken(target, staff.email);
     sendJSON(req, res, 200, {
       token,
       email: targetUser.email,

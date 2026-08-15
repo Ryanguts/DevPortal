@@ -3478,3 +3478,47 @@ body.owner-view .chat-person.active {
   .stats-grid, .features-grid { grid-template-columns: 1fr; }
   .nav-btn { font-size: 0.72rem; padding: 0.35rem 0.55rem; }
 }
+
+
+/* Ações de mensagem (editar / apagar) */
+.chat-bubble-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+.chat-bubble-name {
+  font-weight: 700;
+  color: var(--text);
+}
+.chat-bubble-actions {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 0.15rem;
+}
+.chat-msg-act {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 0.1rem 0.25rem;
+  line-height: 1;
+  opacity: 0.55;
+}
+.chat-bubble:hover .chat-msg-act { opacity: 1; }
+.chat-msg-act:hover {
+  border-color: var(--border);
+  background: var(--input-bg);
+}
+.chat-edited {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+#chat-open-support {
+  white-space: nowrap;
+}

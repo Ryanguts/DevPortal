@@ -4096,6 +4096,36 @@ async function renderChatPage(opts = {}) {
       c.classList.toggle("active", c.dataset.chatTab === __chatTab);
     });
 
+    // Botão "Falar com suporte" para membros
+    let supportBtn = document.getElementById("chat-open-support");
+    if (!supportBtn) {
+      const row = document.querySelector(".chat-add-row");
+      if (row) {
+        supportBtn = document.createElement("button");
+        supportBtn.type = "button";
+        supportBtn.id = "chat-open-support";
+        supportBtn.className = "btn-primary";
+        supportBtn.textContent = "🆘 Falar com o suporte";
+        row.appendChild(supportBtn);
+        supportBtn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          try {
+            const res = await apiFetch("/api/chat/support", { method: "POST", body: "{}" });
+            __chatTab = "support";
+            __chatThreadId = res.threadId;
+            showToast("Conversa com o suporte aberta");
+            await renderChatPage();
+            if (__chatThreadId) await openChatThread(__chatThreadId);
+          } catch (err) {
+            showToast(err.message || "Não foi possível abrir o suporte");
+          }
+        });
+      }
+    }
+    if (supportBtn) {
+      supportBtn.style.display = __chatStaff ? "none" : "";
+    }
+
     if (!threads.length) {
       threadsEl.innerHTML = `<p class="text-muted text-sm" style="padding:0.6rem">Nenhuma conversa nesta aba.</p>`;
       if (!silent && messagesEl) {
@@ -4168,12 +4198,13 @@ async function openChatThread(id, silent = false) {
     const data = await apiFetch("/api/chat/thread?id=" + encodeURIComponent(id));
     const th = data.thread;
     const meEmail = window.__dpMe?.email;
+    const meRole = window.__dpMe?.role;
     const isAnnounce = th.kind === "announce" || th.id === "announce-global";
+    const staff = __chatStaff || meRole === "owner" || meRole === "moderator";
 
-    // placeholder do input
     const input = document.getElementById("chat-input");
     if (input) {
-      if (isAnnounce && !__chatStaff) {
+      if (isAnnounce && !staff) {
         input.placeholder = "Somente a equipe publica anúncios…";
         input.disabled = true;
       } else if (isAnnounce) {
@@ -4185,30 +4216,112 @@ async function openChatThread(id, silent = false) {
       }
     }
     const sendBtn = document.getElementById("chat-send-btn");
-    if (sendBtn) sendBtn.disabled = isAnnounce && !__chatStaff;
+    if (sendBtn) sendBtn.disabled = isAnnounce && !staff;
 
+    const now = Date.now();
     messagesEl.innerHTML = (th.messages || []).map((m) => {
       const mine = m.from === meEmail;
-      let who = mine ? "Você" : (m.from.split("@")[0] || m.from);
-      if (isAnnounce && !mine) who = "Equipe";
-      if (!isAnnounce && !mine && !__chatStaff && th.kind === "support") who = "Equipe";
+      // SEMPRE nome de exibição (servidor manda fromDisplayName)
+      let who = m.fromDisplayName || (mine ? "Você" : "Usuário");
+      if (mine) who = "Você";
+      if (isAnnounce && !mine) who = m.fromDisplayName || "Equipe";
+      if (!isAnnounce && !mine && !staff && th.kind === "support") {
+        who = m.fromDisplayName || "Equipe";
+      }
+
+      const age = now - new Date(m.at).getTime();
+      const canEdit =
+        (mine && age <= 10 * 60 * 1000) ||
+        (staff && !mine && age <= 5 * 60 * 1000);
+      const canDel =
+        mine ||
+        (staff && !mine); // staff apaga de membros; backend valida staff↔staff
+
       let body = String(m.text || "").replace(/</g, "&lt;");
+      if (m.editedAt) {
+        body += ` <span class="chat-edited">(editada)</span>`;
+      }
       if (m.fileData && m.fileName) {
         const isImg = (m.fileMime || "").startsWith("image/");
         if (isImg) {
-          body += `<div class="chat-file"><a href="${m.fileData}" target="_blank" rel="noopener"><img src="${m.fileData}" alt="${String(m.fileName).replace(/"/g, "")}" class="chat-file-img"></a></div>`;
+          body += `<div class="chat-file"><a href="${m.fileData}" target="_blank" rel="noopener"><img src="${m.fileData}" alt="" class="chat-file-img"></a></div>`;
         } else {
           body += `<div class="chat-file"><a class="chat-file-link" href="${m.fileData}" download="${String(m.fileName).replace(/"/g, "")}">📎 ${String(m.fileName).replace(/</g, "&lt;")}</a></div>`;
         }
       }
-      return `<div class="chat-bubble ${mine ? "mine" : "theirs"}">
-        <div class="chat-bubble-meta">${who} · ${new Date(m.at).toLocaleString("pt-BR")}</div>
-        <div>${body}</div>
+
+      const actions = [];
+      if (canEdit) {
+        actions.push(`<button type="button" class="chat-msg-act" data-act="edit" data-mid="${m.id}" title="Editar">✏️</button>`);
+      }
+      if (canDel) {
+        actions.push(`<button type="button" class="chat-msg-act" data-act="del" data-mid="${m.id}" title="Apagar">🗑️</button>`);
+      }
+
+      return `<div class="chat-bubble ${mine ? "mine" : "theirs"}" data-mid="${m.id}">
+        <div class="chat-bubble-meta">
+          <span class="chat-bubble-name">${String(who).replace(/</g, "&lt;")}</span>
+          <span>· ${new Date(m.at).toLocaleString("pt-BR")}</span>
+          ${actions.length ? `<span class="chat-bubble-actions">${actions.join("")}</span>` : ""}
+        </div>
+        <div class="chat-bubble-text">${body}</div>
       </div>`;
     }).join("") || `<div class="chat-empty"><p>Sem mensagens ainda. Seja o primeiro a escrever.</p></div>`;
+
     messagesEl.scrollTop = messagesEl.scrollHeight;
     document.querySelectorAll(".chat-person").forEach((b) => {
       b.classList.toggle("active", b.getAttribute("data-id") === id);
+    });
+
+    messagesEl.querySelectorAll(".chat-msg-act").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const mid = btn.getAttribute("data-mid");
+        const act = btn.getAttribute("data-act");
+        if (!mid || !__chatThreadId) return;
+        if (act === "del") {
+          if (!confirm("Apagar esta mensagem?")) return;
+          try {
+            await apiFetch("/api/chat/delete", {
+              method: "POST",
+              body: JSON.stringify({ threadId: __chatThreadId, messageId: mid }),
+            });
+            showToast("Mensagem apagada");
+            await openChatThread(__chatThreadId);
+            await renderChatPage({ silent: true });
+          } catch (err) {
+            showToast(err.message || "Não foi possível apagar");
+          }
+        } else if (act === "edit") {
+          const bubble = btn.closest(".chat-bubble");
+          const textEl = bubble?.querySelector(".chat-bubble-text");
+          const current = (textEl?.childNodes[0]?.textContent || textEl?.textContent || "")
+            .replace(/\s*\(editada\)\s*$/, "")
+            .trim();
+          const next = prompt("Editar mensagem:", current);
+          if (next == null) return;
+          const trimmed = next.trim();
+          if (!trimmed) {
+            showToast("Texto vazio");
+            return;
+          }
+          try {
+            await apiFetch("/api/chat/edit", {
+              method: "POST",
+              body: JSON.stringify({
+                threadId: __chatThreadId,
+                messageId: mid,
+                text: trimmed,
+              }),
+            });
+            showToast("Mensagem editada");
+            await openChatThread(__chatThreadId);
+          } catch (err) {
+            showToast(err.message || "Não foi possível editar");
+          }
+        }
+      });
     });
   } catch (e) {
     if (!silent) messagesEl.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;

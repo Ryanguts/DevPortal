@@ -294,6 +294,7 @@ interface ChatMessage {
   from: string;
   text: string;
   at: string;
+  editedAt?: string;
   fileName?: string;
   fileData?: string;
   fileMime?: string;
@@ -350,6 +351,51 @@ function canAccessThread(user: UserRecord, th: ChatThread): boolean {
   if (th.kind === "announce") return true;
   if (th.kind === "support") return th.memberEmail === user.email;
   if (th.kind === "dm") return (th.participants || []).includes(user.email);
+  return false;
+}
+
+const EDIT_OWN_MS = 10 * 60 * 1000;
+const EDIT_STAFF_OTHER_MS = 5 * 60 * 1000;
+
+function findMessage(
+  chat: { threads: ChatThread[] },
+  threadId: string,
+  messageId: string
+): { th: ChatThread; msg: ChatMessage; index: number } | null {
+  const th = (chat.threads || []).find((t) => t.id === threadId);
+  if (!th) return null;
+  const index = th.messages.findIndex((m) => m.id === messageId);
+  if (index < 0) return null;
+  return { th, msg: th.messages[index], index };
+}
+
+function enrichMessages(messages: ChatMessage[], users: UserRecord[]) {
+  return messages.map((m) => {
+    const u = users.find((x) => x.email === m.from);
+    return {
+      ...m,
+      // nunca expor e-mail/username na UI — só nome de exibição
+      fromDisplayName: displayNameOf(u, m.from),
+    };
+  });
+}
+
+function canEditMessage(actor: UserRecord, msg: ChatMessage): boolean {
+  const age = Date.now() - Date.parse(msg.at);
+  if (Number.isNaN(age)) return false;
+  if (msg.from === actor.email) return age <= EDIT_OWN_MS;
+  if (isStaff(actor)) return age <= EDIT_STAFF_OTHER_MS;
+  return false;
+}
+
+function canDeleteMessage(actor: UserRecord, msg: ChatMessage): boolean {
+  if (msg.from === actor.email) return true;
+  if (isStaff(actor)) {
+    // staff apaga mensagens de membros sempre; de outros staff só a própria
+    const author = getUsers().find((u) => u.email === msg.from);
+    if (!author) return true;
+    return !isStaff(author);
+  }
   return false;
 }
 
@@ -1389,7 +1435,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       sendJSON(req, res, 403, { error: "Sem acesso a esta conversa." });
       return;
     }
-    sendJSON(req, res, 200, { thread: th });
+    const users = getUsers();
+    sendJSON(req, res, 200, {
+      thread: {
+        ...th,
+        messages: enrichMessages(th.messages || [], users),
+      },
+    });
     return;
   }
 
@@ -1596,7 +1648,151 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
     if (th.messages.length > 500) th.messages = th.messages.slice(-500);
     th.updatedAt = new Date().toISOString();
     saveChat(chat);
-    sendJSON(req, res, 200, { ok: true, threadId: th.id, thread: th });
+    sendJSON(req, res, 200, {
+      ok: true,
+      threadId: th.id,
+      thread: { ...th, messages: enrichMessages(th.messages, getUsers()) },
+    });
+    return;
+  }
+
+  /** Membro abre (ou reabre) ticket de suporte com a equipe */
+  if (pathname === "/api/chat/support" && req.method === "POST") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const block = assertUserActive(user);
+    if (block) {
+      sendJSON(req, res, 403, { error: block });
+      return;
+    }
+    if (isStaff(user)) {
+      sendJSON(req, res, 400, { error: "Staff usa a lista de chamados à esquerda." });
+      return;
+    }
+    const chat = getChat();
+    let th = (chat.threads || []).find(
+      (t) => t.kind === "support" && t.memberEmail === user.email
+    );
+    if (!th) {
+      th = {
+        id: crypto.randomBytes(8).toString("hex"),
+        kind: "support",
+        memberEmail: user.email,
+        subject: "Suporte",
+        updatedAt: new Date().toISOString(),
+        messages: [],
+      };
+      chat.threads = chat.threads || [];
+      chat.threads.push(th);
+      saveChat(chat);
+    }
+    sendJSON(req, res, 200, {
+      ok: true,
+      threadId: th.id,
+      thread: { ...th, messages: enrichMessages(th.messages, getUsers()) },
+    });
+    return;
+  }
+
+  if (pathname === "/api/chat/edit" && req.method === "POST") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const block = assertUserActive(user);
+    if (block) {
+      sendJSON(req, res, 403, { error: block });
+      return;
+    }
+    const body = (await readBody(req)) as {
+      threadId?: string;
+      messageId?: string;
+      text?: string;
+    };
+    const threadId = String(body.threadId || "");
+    const messageId = String(body.messageId || "");
+    const text = String(body.text || "").trim().slice(0, 4000);
+    if (!threadId || !messageId || !text) {
+      sendJSON(req, res, 400, { error: "Dados incompletos." });
+      return;
+    }
+    const chat = getChat();
+    const found = findMessage(chat, threadId, messageId);
+    if (!found) {
+      sendJSON(req, res, 404, { error: "Mensagem não encontrada." });
+      return;
+    }
+    if (!canAccessThread(user, found.th)) {
+      sendJSON(req, res, 403, { error: "Sem acesso." });
+      return;
+    }
+    if (found.th.kind === "announce" && !isStaff(user)) {
+      sendJSON(req, res, 403, { error: "Sem permissão." });
+      return;
+    }
+    if (!canEditMessage(user, found.msg)) {
+      const own = found.msg.from === user.email;
+      sendJSON(req, res, 403, {
+        error: own
+          ? "Só é possível editar nos primeiros 10 minutos."
+          : "Só é possível editar mensagem de outro nos primeiros 5 minutos.",
+      });
+      return;
+    }
+    found.msg.text = text;
+    found.msg.editedAt = new Date().toISOString();
+    found.th.updatedAt = new Date().toISOString();
+    saveChat(chat);
+    sendJSON(req, res, 200, {
+      ok: true,
+      thread: { ...found.th, messages: enrichMessages(found.th.messages, getUsers()) },
+    });
+    return;
+  }
+
+  if (pathname === "/api/chat/delete" && req.method === "POST") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const block = assertUserActive(user);
+    if (block) {
+      sendJSON(req, res, 403, { error: block });
+      return;
+    }
+    const body = (await readBody(req)) as { threadId?: string; messageId?: string };
+    const threadId = String(body.threadId || "");
+    const messageId = String(body.messageId || "");
+    if (!threadId || !messageId) {
+      sendJSON(req, res, 400, { error: "Dados incompletos." });
+      return;
+    }
+    const chat = getChat();
+    const found = findMessage(chat, threadId, messageId);
+    if (!found) {
+      sendJSON(req, res, 404, { error: "Mensagem não encontrada." });
+      return;
+    }
+    if (!canAccessThread(user, found.th)) {
+      sendJSON(req, res, 403, { error: "Sem acesso." });
+      return;
+    }
+    if (!canDeleteMessage(user, found.msg)) {
+      sendJSON(req, res, 403, { error: "Você não pode apagar esta mensagem." });
+      return;
+    }
+    found.th.messages.splice(found.index, 1);
+    found.th.updatedAt = new Date().toISOString();
+    saveChat(chat);
+    sendJSON(req, res, 200, {
+      ok: true,
+      thread: { ...found.th, messages: enrichMessages(found.th.messages, getUsers()) },
+    });
     return;
   }
 

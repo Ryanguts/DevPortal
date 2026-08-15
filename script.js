@@ -3347,8 +3347,10 @@ function renderAuthFormsApi(mode) {
         ? 'Não tem conta? <button type="button" class="linkish" id="auth-go-register">Criar uma</button>'
         : 'Já tem conta? <button type="button" class="linkish" id="auth-go-login">Entrar</button>'}
     </p>
-    <div class="auth-divider">ou</div>
-    <div class="google-btn-wrap" id="google-btn-wrap"></div>
+    <div id="google-auth-section" style="display:none;">
+      <div class="auth-divider">ou</div>
+      <div class="google-btn-wrap" id="google-btn-wrap"></div>
+    </div>
     <p class="auth-note" id="auth-api-status" style="margin-top:0.8rem;"></p>
   `;
   apiHealth().then(ok => {
@@ -3477,61 +3479,76 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ---------- Google Sign-In ----------
-async function mountGoogleButton() {
+async function mountGoogleButton(attempt) {
+  attempt = attempt || 0;
+  const section = document.getElementById("google-auth-section");
   const wrap = document.getElementById("google-btn-wrap");
   if (!wrap) return;
-  wrap.innerHTML = "";
+
   let clientId = null;
   try {
     const cfg = await apiFetch("/api/config");
-    clientId = cfg.googleClientId;
-  } catch {
-    const div = document.querySelector(".auth-divider");
-    if (div) div.style.display = "none";
-    wrap.style.display = "none";
+    clientId = cfg && cfg.googleClientId ? String(cfg.googleClientId).trim() : null;
+  } catch (e) {
+    if (section) section.style.display = "none";
     return;
   }
+
   if (!clientId) {
-    // Google não configurado: esconde a área inteira (não mostra texto técnico)
-    const div = document.querySelector(".auth-divider");
-    if (div) div.style.display = "none";
-    wrap.style.display = "none";
+    if (section) section.style.display = "none";
     return;
   }
-  if (!window.google?.accounts?.id) {
-    wrap.innerHTML = "";
-    setTimeout(mountGoogleButton, 800);
-    return;
-  }
-  window.google.accounts.id.initialize({
-    client_id: clientId,
-    callback: async (response) => {
-      try {
-        const data = await apiFetch("/api/auth/google", {
-          method: "POST",
-          body: JSON.stringify({ credential: response.credential })
-        });
-        localStorage.setItem(SESSION_TOKEN_KEY, data.token);
-        if (Array.isArray(data.favorites)) {
-          favoritos = new Set(data.favorites);
-          salvarFavoritos();
-          updateSidebarCounts();
-          aplicarFiltrosLinguagens();
-        }
-        showToast(data.role === "admin" ? "Moderador (Google)" : "Entrada com Google ok");
-        updateAuthChipApi();
-        fecharModal("auth-modal-overlay");
-        if (data.role === "admin") openAdminPanel();
-      } catch (e) {
-        showToast(e.message || "Falha no login Google");
-      }
+
+  // Client ID existe: mostra a seção
+  if (section) section.style.display = "block";
+  wrap.innerHTML = "";
+
+  if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+    if (attempt < 15) {
+      setTimeout(function () { mountGoogleButton(attempt + 1); }, 400);
+      return;
     }
-  });
-  window.google.accounts.id.renderButton(wrap, {
-    theme: "outline",
-    size: "large",
-    shape: "pill",
-    text: "continue_with",
-    width: 280
-  });
+    wrap.innerHTML = '<p class="auth-note">Não foi possível carregar o botão do Google. Use e-mail e senha, ou atualize a página.</p>';
+    return;
+  }
+
+  try {
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+      callback: async function (response) {
+        try {
+          const data = await apiFetch("/api/auth/google", {
+            method: "POST",
+            body: JSON.stringify({ credential: response.credential })
+          });
+          localStorage.setItem(SESSION_TOKEN_KEY, data.token);
+          if (Array.isArray(data.favorites)) {
+            favoritos = new Set(data.favorites);
+            salvarFavoritos();
+            updateSidebarCounts();
+            aplicarFiltrosLinguagens();
+          }
+          showToast(data.role === "admin" ? "Moderador conectado" : "Entrada com Google ok");
+          updateAuthChipApi();
+          fecharModal("auth-modal-overlay");
+          if (data.role === "admin") openAdminPanel();
+        } catch (err) {
+          showToast(err.message || "Falha no login Google");
+        }
+      },
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+    window.google.accounts.id.renderButton(wrap, {
+      theme: "outline",
+      size: "large",
+      shape: "pill",
+      text: "continue_with",
+      width: 280,
+      locale: "pt-BR"
+    });
+  } catch (err) {
+    console.warn("Google button error", err);
+    wrap.innerHTML = '<p class="auth-note">Não foi possível carregar o botão do Google. Use e-mail e senha.</p>';
+  }
 }

@@ -3775,11 +3775,14 @@ function openProfilePanel(targetEmail) {
       <form id="profile-form" class="auth-form">
         <div class="form-group">
           <label for="pf-display">Nome de exibição</label>
-          <input type="text" id="pf-display" maxlength="40" value="${String(me.displayName || "").replace(/"/g, "&quot;")}">
+          <input type="text" id="pf-display" maxlength="40" value="${String(me.displayName || "").replace(/"/g, "&quot;")}" autocomplete="nickname">
+          <p class="text-xs text-muted" id="pf-display-hint">Pode mudar com frequência (mín. 5 min entre alterações).</p>
         </div>
         <div class="form-group">
-          <label for="pf-user">Username</label>
-          <input type="text" id="pf-user" maxlength="24" value="${String(me.username || "").replace(/"/g, "&quot;")}" placeholder="sem espaços">
+          <label for="pf-user">Username (@)</label>
+          <input type="text" id="pf-user" maxlength="24" value="${String(me.username || "").replace(/"/g, "&quot;")}" placeholder="ex: guts_dev" autocomplete="off" spellcheck="false">
+          <p class="text-xs text-muted" id="pf-user-hint">Único no site. Só pode alterar 1x por hora. Não usa o nome de exibição.</p>
+          <p class="text-xs" id="pf-user-status"></p>
         </div>
         <div class="form-group">
           <label for="pf-bio">Biografia</label>
@@ -3787,10 +3790,10 @@ function openProfilePanel(targetEmail) {
         </div>
         <div class="form-group">
           <label for="pf-avatar">Foto (URL)</label>
-          <input type="url" id="pf-avatar" value="${String(me.avatarUrl || "").replace(/"/g, "&quot;")}">
+          <input type="url" id="pf-avatar" value="${String((me.avatarUrl || "").startsWith("data:") ? "" : (me.avatarUrl || "")).replace(/"/g, "&quot;")}">
         </div>
         <div class="form-group">
-          <label for="pf-file">Ou enviar imagem (máx. ~100 KB)</label>
+          <label for="pf-file">Ou enviar imagem (máx. ~1,5 MB)</label>
           <input type="file" id="pf-file" accept="image/*">
         </div>
         ${staffEdit ? "" : `<p class="auth-note">E-mail: <strong>${me.email}</strong></p>`}
@@ -3799,31 +3802,72 @@ function openProfilePanel(targetEmail) {
         ${me.role === "owner" || me.role === "moderator" ? `<button type="button" class="btn-ghost" id="pf-goto-painel" style="width:100%;margin-top:0.35rem">Abrir painel da equipe</button>` : ""}`}
       </form>
     `;
+    // Username nunca é pré-preenchido a partir do nome de exibição
+    const pfUser = document.getElementById("pf-user");
+    const pfStatus = document.getElementById("pf-user-status");
+    let userCheckTimer = null;
+    pfUser?.addEventListener("input", () => {
+      clearTimeout(userCheckTimer);
+      const v = (pfUser.value || "").trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+      pfUser.value = v;
+      if (pfStatus) pfStatus.textContent = "";
+      if (v.length < 3) {
+        if (pfStatus) pfStatus.textContent = v ? "Mínimo 3 caracteres." : "";
+        return;
+      }
+      userCheckTimer = setTimeout(async () => {
+        try {
+          const data = await apiFetch("/api/username-available?u=" + encodeURIComponent(v));
+          if (!pfStatus) return;
+          if (data.available) {
+            pfStatus.textContent = "@" + v + " está disponível ✓";
+            pfStatus.style.color = "var(--success, #22c55e)";
+          } else {
+            pfStatus.textContent = "@" + v + " já está em uso.";
+            pfStatus.style.color = "var(--danger, #ef4444)";
+          }
+        } catch (_) {}
+      }, 350);
+    });
+
     document.getElementById("pf-file")?.addEventListener("change", (ev) => {
       const f = ev.target.files && ev.target.files[0];
       if (!f) return;
-      if (f.size > 100000) {
-        showToast("Imagem maior que 100 KB");
+      const maxBytes = 1.5 * 1024 * 1024;
+      if (f.size > maxBytes) {
+        showToast("Imagem maior que 1,5 MB");
+        ev.target.value = "";
         return;
       }
       const reader = new FileReader();
       reader.onload = () => {
-        document.getElementById("pf-avatar").value = String(reader.result || "");
+        const dataUrl = String(reader.result || "");
+        // guarda no dataset pra não truncar no campo URL
+        const av = document.getElementById("pf-avatar");
+        if (av) {
+          av.dataset.dataUrl = dataUrl;
+          av.value = ""; // URL vazia; envio usa dataUrl
+          av.placeholder = "Imagem carregada (" + Math.round(f.size / 1024) + " KB)";
+        }
+        showToast("Foto pronta para salvar");
       };
       reader.readAsDataURL(f);
     });
     document.getElementById("profile-form")?.addEventListener("submit", async (e) => {
       e.preventDefault();
       try {
+        const av = document.getElementById("pf-avatar");
+        const avatarUrl = (av?.dataset?.dataUrl) || av?.value || "";
         const payload = {
           displayName: document.getElementById("pf-display").value,
           username: document.getElementById("pf-user").value,
           bio: document.getElementById("pf-bio").value,
-          avatarUrl: document.getElementById("pf-avatar").value
+          avatarUrl
         };
         if (staffEdit) payload.targetEmail = targetEmail;
         await apiFetch("/api/profile", { method: "POST", body: JSON.stringify(payload) });
         showToast("Perfil salvo");
+        siteNotify?.("Perfil atualizado", "Suas alterações foram salvas.");
         if (!staffEdit) updateAuthChipApi();
         fecharModal("profile-modal-overlay");
       } catch (err) {
@@ -5376,5 +5420,3 @@ function syncMacroBar(me) {
     });
   });
 }
-
-

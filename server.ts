@@ -78,7 +78,9 @@ interface UserRecord {
   bannedAt?: string | null;
   banReason?: string | null;
   username?: string;
+  usernameChangedAt?: string | null;
   displayName?: string;
+  displayNameChangedAt?: string | null;
   /** Nick temporário de resenha (sobrescreve display). */
   displayNameOverride?: string | null;
   displayNameOverrideUntil?: string | null;
@@ -1100,6 +1102,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       effects,
       siteBanner: meta.banner,
       macros: isStaff(user) ? meta.macros : [],
+      usernameChangedAt: user.usernameChangedAt || null,
+      displayNameChangedAt: user.displayNameChangedAt || null,
     });
     return;
   }
@@ -1413,44 +1417,103 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
         targetEmail = te;
       }
     }
-    let username = String(body.username || "").trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
-    if (username.length > 24) username = username.slice(0, 24);
-    const displayName = String(body.displayName || "").trim().slice(0, 40);
-    let avatarUrl = String(body.avatarUrl || "").trim().slice(0, 500);
-    if (avatarUrl && !/^https?:\/\//i.test(avatarUrl) && !avatarUrl.startsWith("data:image/")) {
-      sendJSON(req, res, 400, { error: "Avatar deve ser URL http(s) ou data:image." });
+    const usernameRaw =
+      body.username !== undefined
+        ? String(body.username || "").trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 24)
+        : null;
+    if (usernameRaw !== null && usernameRaw.length > 0 && usernameRaw.length < 3) {
+      sendJSON(req, res, 400, { error: "Username deve ter entre 3 e 24 caracteres (a-z, 0-9, _)." });
       return;
     }
-    // data URL size guard (~100KB)
-    if (avatarUrl.startsWith("data:") && avatarUrl.length > 140000) {
-      sendJSON(req, res, 400, { error: "Imagem muito grande. Use uma menor." });
-      return;
-    }
-    const users = getUsers();
-    if (username) {
-      const taken = users.some((u) => u.username === username && u.email !== user.email);
-      if (taken) {
-        sendJSON(req, res, 409, { error: "Username já em uso." });
+    const displayName =
+      body.displayName !== undefined ? String(body.displayName || "").trim().slice(0, 40) : null;
+    let avatarUrl = body.avatarUrl !== undefined ? String(body.avatarUrl || "").trim() : null;
+    if (avatarUrl !== null && avatarUrl) {
+      if (!/^https?:\/\//i.test(avatarUrl) && !avatarUrl.startsWith("data:image/")) {
+        sendJSON(req, res, 400, { error: "Avatar deve ser URL http(s) ou data:image." });
         return;
       }
+      if (avatarUrl.startsWith("data:") && avatarUrl.length > 2_100_000) {
+        sendJSON(req, res, 400, { error: "Imagem muito grande (máx. ~1,5 MB)." });
+        return;
+      }
+      if (!avatarUrl.startsWith("data:") && avatarUrl.length > 500) {
+        avatarUrl = avatarUrl.slice(0, 500);
+      }
     }
+
+    const users = getUsers();
     const idx = users.findIndex((u) => u.email === targetEmail);
     if (idx < 0) {
       sendJSON(req, res, 404, { error: "Usuário não encontrado." });
       return;
     }
-    if (username) users[idx].username = username;
-    if (body.displayName !== undefined) users[idx].displayName = displayName;
-    if (body.avatarUrl !== undefined) users[idx].avatarUrl = avatarUrl;
-    if (body.bio !== undefined) users[idx].bio = String(body.bio || "").trim().slice(0, 300);
+    const target = users[idx];
+    const now = Date.now();
+    const staffBypass = targetEmail !== user.email;
+
+    // Username independente do nome de exibição — nunca pré-preenche
+    if (usernameRaw !== null && usernameRaw.length > 0) {
+      const current = (target.username || "").toLowerCase();
+      if (usernameRaw !== current) {
+        const taken = users.some(
+          (u) => (u.username || "").toLowerCase() === usernameRaw && u.email !== targetEmail
+        );
+        if (taken) {
+          sendJSON(req, res, 409, { error: "Este @username já está em uso. Escolha outro." });
+          return;
+        }
+        if (!staffBypass && target.usernameChangedAt) {
+          const elapsed = now - Date.parse(target.usernameChangedAt);
+          const wait = 60 * 60 * 1000;
+          if (!Number.isNaN(elapsed) && elapsed < wait) {
+            const mins = Math.ceil((wait - elapsed) / 60000);
+            sendJSON(req, res, 429, {
+              error: `Username só pode ser alterado 1x por hora. Tente de novo em ~${mins} min.`,
+              code: "USERNAME_COOLDOWN",
+              retryMinutes: mins,
+            });
+            return;
+          }
+        }
+        target.username = usernameRaw;
+        target.usernameChangedAt = new Date().toISOString();
+      }
+    }
+
+    if (displayName !== null) {
+      const currentDn = target.displayName || "";
+      if (displayName !== currentDn) {
+        if (!staffBypass && target.displayNameChangedAt) {
+          const elapsed = now - Date.parse(target.displayNameChangedAt);
+          const wait = 5 * 60 * 1000;
+          if (!Number.isNaN(elapsed) && elapsed < wait) {
+            const secs = Math.ceil((wait - elapsed) / 1000);
+            sendJSON(req, res, 429, {
+              error: `Aguarde ${secs}s para alterar o nome de exibição de novo.`,
+              code: "DISPLAY_COOLDOWN",
+              retrySeconds: secs,
+            });
+            return;
+          }
+        }
+        target.displayName = displayName;
+        target.displayNameChangedAt = new Date().toISOString();
+      }
+    }
+
+    if (avatarUrl !== null) target.avatarUrl = avatarUrl;
+    if (body.bio !== undefined) target.bio = String(body.bio || "").trim().slice(0, 300);
     saveUsers(users);
     sendJSON(req, res, 200, {
       ok: true,
-      username: users[idx].username || "",
-      displayName: users[idx].displayName || "",
-      avatarUrl: users[idx].avatarUrl || "",
-      bio: users[idx].bio || "",
-      email: users[idx].email,
+      username: target.username || "",
+      displayName: target.displayName || "",
+      avatarUrl: target.avatarUrl || "",
+      bio: target.bio || "",
+      email: target.email,
+      usernameChangedAt: target.usernameChangedAt || null,
+      displayNameChangedAt: target.displayNameChangedAt || null,
     });
     return;
   }
@@ -2405,6 +2468,22 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
     return;
   }
 
+
+  if (pathname === "/api/username-available" && req.method === "GET") {
+    const host = req.headers.host || "localhost";
+    const url = new URL(req.url || "/", `http://${host}`);
+    const q = (url.searchParams.get("u") || "").trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+    if (q.length < 3) {
+      sendJSON(req, res, 200, { available: false, reason: "mínimo 3 caracteres" });
+      return;
+    }
+    const me = userFromToken(req);
+    const taken = getUsers().some(
+      (u) => (u.username || "").toLowerCase() === q && (!me || u.email !== me.email)
+    );
+    sendJSON(req, res, 200, { available: !taken, username: q });
+    return;
+  }
 
   sendJSON(req, res, 404, { error: "Rota não encontrada." });
 }

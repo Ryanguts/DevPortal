@@ -27,13 +27,24 @@
     </div>
   </div>
 
+  <div id="restriction-wall" class="restriction-wall" hidden>
+    <div class="restriction-card">
+      <div class="restriction-icon" id="restriction-icon">⛔</div>
+      <h2 id="restriction-title">Acesso restrito</h2>
+      <p id="restriction-msg"></p>
+      <p class="restriction-meta" id="restriction-meta"></p>
+      <button type="button" class="btn-primary" id="restriction-dismiss" hidden>Entendi</button>
+    </div>
+  </div>
+
   <div class="site-wrapper">
 
     <header class="main-header">
       <div class="header-container">
         <div class="header-top">
-          <h1 class="brand-title"><span class="emoji-icon">🚀</span> DevPortal</h1>
+          <h1 class="brand-title" id="brand-title"><span class="emoji-icon" id="brand-emoji">🚀</span> <span id="brand-text">DevPortal</span></h1>
           <div class="header-actions">
+            <button class="icon-nav-btn" id="btn-chat" type="button" title="Mensagens" hidden>💬</button>
             <button class="avatar-chip" id="auth-chip" title="Conta" type="button">
               <span class="avatar-chip-fallback" id="avatar-chip-letter">?</span>
               <img class="avatar-chip-img" id="avatar-chip-img" alt="" hidden>
@@ -41,24 +52,10 @@
             <button class="theme-btn" id="theme-btn" title="Alternar tema" aria-label="Alternar tema">☀️</button>
           </div>
         </div>
-        <p class="brand-subtitle">Linguagens, carreiras, lógica e faculdades — um mapa claro para quem está começando (ou recomeçando) na tecnologia.</p>
+        <p class="brand-subtitle" id="brand-subtitle">Linguagens, carreiras, lógica e faculdades — um mapa claro para quem está começando (ou recomeçando) na tecnologia.</p>
 
-        <nav class="main-nav" id="nav-public">
-          <button class="nav-btn active" data-page="home">🏠 Início</button>
-          <button class="nav-btn" data-page="linguagens">💻 Linguagens</button>
-          <button class="nav-btn" data-page="areas">🎯 Áreas de TI</button>
-          <button class="nav-btn" data-page="logica">🧠 Lógica</button>
-          <button class="nav-btn" data-page="trilhas">🗺️ Trilhas</button>
-          <button class="nav-btn" data-page="faculdades">🎓 Faculdades</button>
-          <button class="nav-btn nav-staff-only" data-page="painel" hidden>⚔️ Painel</button>
-        </nav>
-        <nav class="main-nav" id="nav-owner" hidden style="display:none">
-          <button class="nav-btn active" data-page="owner-dash">🩸 Comando</button>
-          <button class="nav-btn" data-page="owner-perfis">👥 Perfis</button>
-          <button class="nav-btn" data-page="owner-equipe">🛡️ Equipe</button>
-          <button class="nav-btn" data-page="owner-mod">⚖️ Moderação</button>
-          <button class="nav-btn" data-page="owner-intel">📡 Inteligência</button>
-          <button class="nav-btn" data-page="painel">⚔️ Painel</button>
+        <nav class="main-nav" id="main-nav" aria-label="Navegação principal">
+          <!-- preenchido pelo JS conforme papel (membro / mod / dono) -->
         </nav>
       </div>
     </header>
@@ -421,6 +418,25 @@
 
   
   
+      <section id="page-chat" class="page-view">
+        <header class="section-header">
+          <div>
+            <h2><span class="emoji-icon">💬</span> Mensagens</h2>
+            <p class="section-desc">Tire dúvidas com a equipe ou acompanhe conversas. Moderadores e o dono respondem por aqui.</p>
+          </div>
+        </header>
+        <div class="chat-layout" id="chat-root">
+          <aside class="chat-threads" id="chat-threads"></aside>
+          <div class="chat-main">
+            <div class="chat-messages" id="chat-messages"></div>
+            <form class="chat-compose" id="chat-compose">
+              <input type="text" id="chat-input" placeholder="Escreva sua mensagem…" maxlength="1000" autocomplete="off">
+              <button type="submit" class="btn-primary">Enviar</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
       <section id="page-painel" class="page-view">
         <header class="section-header">
           <div>

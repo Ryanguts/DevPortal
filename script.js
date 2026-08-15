@@ -3362,13 +3362,18 @@ async function updateAuthChipApi() {
     applyStaffNav(me.role === "owner" || me.role === "moderator");
     applyOwnerView(me);
   } catch (err) {
-    // Só desloga de verdade se a API disser que a sessão é inválida
+    if (err && (err.status === 403 || err.status === 423) && err.data) {
+      showRestrictionWall(err.data);
+      localStorage.removeItem(SESSION_TOKEN_KEY);
+      setLoggedOut();
+      return;
+    }
     if (err && err.status === 401) {
       localStorage.removeItem(SESSION_TOKEN_KEY);
+      setLoggedOut();
+    } else if (!window.__dpMe) {
+      setLoggedOut();
     }
-    // Mantém chip "logado" se houver cache e erro de rede
-    if (err && err.status === 401) setLoggedOut();
-    else if (!window.__dpMe) setLoggedOut();
   }
 }
 
@@ -3428,6 +3433,7 @@ function renderAuthFormsApi(mode) {
         showToast(data.role === "owner" ? "Dono conectado" : data.role === "moderator" ? "Moderador conectado" : "Bem-vindo(a) de volta");
         await updateAuthChipApi();
         fecharModal("auth-modal-overlay");
+        rebuildMainNav(window.__dpMe);
         if (data.role === "owner") goToPage("owner-dash");
         else if (data.role === "moderator") goToPage("painel");
       } else {
@@ -3441,7 +3447,8 @@ function renderAuthFormsApi(mode) {
         fecharModal("auth-modal-overlay");
       }
     } catch (err) {
-      showToast(err.message || "Erro de autenticação");
+      if (err.data && (err.data.code === "BANNED" || err.data.code === "TIMEOUT" || err.status === 403)) showRestrictionWall(err.data || { error: err.message, code: "BANNED" });
+      else showToast(err.message || "Erro de autenticação");
     }
   });
 }
@@ -3722,7 +3729,8 @@ async function mountGoogleButton(attempt) {
           fecharModal("auth-modal-overlay");
           if (data.role === "owner" || data.role === "moderator") openAdminPanel();
         } catch (err) {
-          showToast(err.message || "Falha no login Google");
+          if (err.data && (err.data.code === "BANNED" || err.data.code === "TIMEOUT")) showRestrictionWall(err.data);
+        else showToast(err.message || "Falha no login Google");
         }
       },
       auto_select: false,
@@ -3881,32 +3889,79 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-// ========== Visão dono / painel (corrigido) ==========
-function applyStaffNav(isStaff) {
-  document.querySelectorAll(".nav-staff-only").forEach((b) => {
-    b.hidden = !isStaff;
+
+// ========== Navegação unificada (topo) + papéis ==========
+function rebuildMainNav(me) {
+  const nav = document.getElementById("main-nav");
+  if (!nav) return;
+
+  const isOwner = !!(me && me.role === "owner");
+  const isMod = !!(me && me.role === "moderator");
+  const isStaff = isOwner || isMod;
+
+  document.body.classList.toggle("owner-view", isOwner);
+
+  const brandEmoji = document.getElementById("brand-emoji");
+  const brandText = document.getElementById("brand-text");
+  const brandSub = document.getElementById("brand-subtitle");
+  if (isOwner) {
+    if (brandEmoji) brandEmoji.textContent = "🩸";
+    if (brandText) brandText.textContent = "DevPortal · Comando";
+    if (brandSub) brandSub.textContent = "Centro de operação do dono — contas, equipe, moderação e inteligência.";
+  } else {
+    if (brandEmoji) brandEmoji.textContent = "🚀";
+    if (brandText) brandText.textContent = "DevPortal";
+    if (brandSub) brandSub.textContent = "Linguagens, carreiras, lógica e faculdades — um mapa claro para quem está começando (ou recomeçando) na tecnologia.";
+  }
+
+  const chatBtn = document.getElementById("btn-chat");
+  if (chatBtn) chatBtn.hidden = !me;
+
+  let items = [];
+  if (isOwner) {
+    items = [
+      ["owner-dash", "🩸", "Comando"],
+      ["owner-perfis", "👥", "Perfis"],
+      ["owner-equipe", "🛡️", "Equipe"],
+      ["owner-mod", "⚖️", "Moderação"],
+      ["owner-intel", "📡", "Inteligência"],
+      ["painel", "⚔️", "Painel"],
+      ["chat", "💬", "Mensagens"],
+    ];
+  } else {
+    items = [
+      ["home", "🏠", "Início"],
+      ["linguagens", "💻", "Linguagens"],
+      ["areas", "🎯", "Áreas de TI"],
+      ["logica", "🧠", "Lógica"],
+      ["trilhas", "🗺️", "Trilhas"],
+      ["faculdades", "🎓", "Faculdades"],
+      ["chat", "💬", "Mensagens"],
+    ];
+    if (isMod) items.push(["painel", "⚔️", "Painel"]);
+  }
+
+  const current = document.querySelector(".page-view.active")?.id?.replace(/^page-/, "") || (isOwner ? "owner-dash" : "home");
+  nav.innerHTML = items.map(([id, emoji, label]) => {
+    const active = id === current ? " active" : "";
+    return `<button type="button" class="nav-btn${active}" data-page="${id}">${emoji} ${label}</button>`;
+  }).join("");
+
+  nav.querySelectorAll(".nav-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      goToPage(btn.dataset.page);
+    });
   });
 }
 
+function applyStaffNav(isStaff) {
+  // legado — agora rebuildMainNav cuida de tudo
+  void isStaff;
+}
+
 function applyOwnerView(me) {
-  const isOwner = !!(me && me.role === "owner");
-  document.body.classList.toggle("owner-view", isOwner);
-
-  const navPub = document.getElementById("nav-public");
-  const navOwn = document.getElementById("nav-owner");
-  if (!navPub || !navOwn) return;
-
-  if (isOwner) {
-    navPub.hidden = true;
-    navPub.setAttribute("hidden", "");
-    navOwn.hidden = false;
-    navOwn.removeAttribute("hidden");
-  } else {
-    navPub.hidden = false;
-    navPub.removeAttribute("hidden");
-    navOwn.hidden = true;
-    navOwn.setAttribute("hidden", "");
-  }
+  rebuildMainNav(me);
 }
 
 function goToPage(pageId) {
@@ -3914,8 +3969,11 @@ function goToPage(pageId) {
   document.querySelectorAll(".page-view").forEach((p) => p.classList.remove("active"));
   const page = document.getElementById("page-" + pageId);
   if (page) page.classList.add("active");
+  else {
+    console.warn("Página não encontrada:", pageId);
+  }
 
-  document.querySelectorAll(".nav-btn").forEach((b) => {
+  document.querySelectorAll("#main-nav .nav-btn").forEach((b) => {
     b.classList.toggle("active", b.dataset.page === pageId);
   });
 
@@ -3927,30 +3985,155 @@ function goToPage(pageId) {
   if (pageId === "owner-equipe") renderOwnerEquipe();
   if (pageId === "owner-mod") renderOwnerMod();
   if (pageId === "owner-intel") renderOwnerIntel();
+  if (pageId === "chat") renderChatPage();
 }
 
-// Sobrescreve navegação global
 irParaPagina = goToPage;
 
 function bindAllNavOnce() {
-  if (window.__dpNavBound) return;
-  window.__dpNavBound = true;
-  document.querySelectorAll(".nav-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      const page = btn.dataset.page;
-      if (!page) return;
-      // NUNCA sai da visão do dono automaticamente
-      goToPage(page);
-    });
-  });
+  // no-op: rebuildMainNav recoloca listeners
+  rebuildMainNav(window.__dpMe || null);
 }
 
-const _roleLabel = (r) => (r === "owner" ? "dono" : r === "moderator" ? "moderador" : "membro");
-function roleLabel(r) { return _roleLabel(r); }
+function roleLabel(r) {
+  if (r === "owner") return "dono";
+  if (r === "moderator") return "moderador";
+  return "membro";
+}
 
 async function fetchStaffUsers() {
   return apiFetch("/api/admin/users");
+}
+
+function showRestrictionWall(payload) {
+  const wall = document.getElementById("restriction-wall");
+  if (!wall) return;
+  const code = payload.code || "";
+  const title = document.getElementById("restriction-title");
+  const msg = document.getElementById("restriction-msg");
+  const meta = document.getElementById("restriction-meta");
+  const icon = document.getElementById("restriction-icon");
+  const dismiss = document.getElementById("restriction-dismiss");
+
+  if (code === "BANNED") {
+    if (icon) icon.textContent = "🚫";
+    if (title) title.textContent = "Conta banida permanentemente";
+    if (msg) msg.textContent = payload.reason || payload.error || "Você perdeu o acesso a esta conta.";
+    if (meta) meta.textContent = payload.bannedAt
+      ? "Desde " + new Date(payload.bannedAt).toLocaleString("pt-BR")
+      : "Esta conta não pode mais ser usada neste site.";
+    if (dismiss) dismiss.hidden = true;
+  } else if (code === "TIMEOUT") {
+    if (icon) icon.textContent = "⏳";
+    if (title) title.textContent = "Conta em timeout";
+    if (msg) msg.textContent = payload.reason || "Um moderador suspendeu temporariamente sua conta.";
+    if (meta) meta.textContent = payload.timeoutUntil
+      ? "Liberação prevista: " + new Date(payload.timeoutUntil).toLocaleString("pt-BR")
+      : "Tente novamente mais tarde.";
+    if (dismiss) {
+      dismiss.hidden = false;
+      dismiss.onclick = () => {
+        wall.hidden = true;
+        localStorage.removeItem(SESSION_TOKEN_KEY);
+        updateAuthChipApi();
+      };
+    }
+  } else {
+    if (icon) icon.textContent = "⛔";
+    if (title) title.textContent = "Acesso restrito";
+    if (msg) msg.textContent = payload.error || "Não foi possível entrar.";
+    if (meta) meta.textContent = "";
+    if (dismiss) {
+      dismiss.hidden = false;
+      dismiss.onclick = () => { wall.hidden = true; };
+    }
+  }
+  wall.hidden = false;
+}
+
+// Chat UI
+let __chatThreadId = null;
+
+async function renderChatPage() {
+  const threadsEl = document.getElementById("chat-threads");
+  const messagesEl = document.getElementById("chat-messages");
+  if (!threadsEl || !messagesEl) return;
+  threadsEl.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
+  try {
+    const data = await apiFetch("/api/chat/threads");
+    const threads = data.threads || [];
+    const staff = data.staff;
+    threadsEl.innerHTML = `
+      ${!staff ? `<button type="button" class="btn-primary" id="chat-new" style="width:100%;margin-bottom:0.6rem">Nova dúvida</button>` : `<p class="text-muted text-sm" style="margin-bottom:0.5rem">Fila da equipe</p>`}
+      ${threads.map((th) => `
+        <button type="button" class="chat-thread-btn ${th.id === __chatThreadId ? "active" : ""}" data-id="${th.id}">
+          <strong>${staff ? th.memberEmail : (th.subject || "Conversa")}</strong>
+          <span>${th.preview || ""}</span>
+        </button>
+      `).join("") || `<p class="text-muted text-sm">Nenhuma conversa ainda.</p>`}
+    `;
+    document.getElementById("chat-new")?.addEventListener("click", () => {
+      __chatThreadId = null;
+      messagesEl.innerHTML = `<p class="text-muted">Escreva abaixo para abrir uma nova conversa com a equipe.</p>`;
+    });
+    threadsEl.querySelectorAll(".chat-thread-btn").forEach((btn) => {
+      btn.addEventListener("click", () => openChatThread(btn.dataset.id));
+    });
+    if (__chatThreadId) openChatThread(__chatThreadId);
+    else if (threads[0]) openChatThread(threads[0].id);
+    else messagesEl.innerHTML = `<p class="text-muted">Selecione ou inicie uma conversa.</p>`;
+  } catch (e) {
+    threadsEl.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;
+  }
+}
+
+async function openChatThread(id) {
+  __chatThreadId = id;
+  const messagesEl = document.getElementById("chat-messages");
+  if (!messagesEl) return;
+  messagesEl.innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
+  try {
+    const data = await apiFetch("/api/chat/thread?id=" + encodeURIComponent(id));
+    const th = data.thread;
+    const me = window.__dpMe?.email;
+    messagesEl.innerHTML = (th.messages || []).map((m) => `
+      <div class="chat-bubble ${m.from === me ? "mine" : "theirs"}">
+        <div class="chat-bubble-meta">${m.from === me ? "Você" : m.from} · ${new Date(m.at).toLocaleString("pt-BR")}</div>
+        <div>${String(m.text).replace(/</g, "&lt;")}</div>
+      </div>
+    `).join("") || `<p class="text-muted">Sem mensagens.</p>`;
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    document.querySelectorAll(".chat-thread-btn").forEach((b) => {
+      b.classList.toggle("active", b.dataset.id === id);
+    });
+  } catch (e) {
+    messagesEl.innerHTML = `<div class="error-box"><p>${e.message}</p></div>`;
+  }
+}
+
+function initChatCompose() {
+  const form = document.getElementById("chat-compose");
+  if (!form || form.dataset.bound) return;
+  form.dataset.bound = "1";
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const input = document.getElementById("chat-input");
+    const text = input?.value?.trim();
+    if (!text) return;
+    try {
+      const data = await apiFetch("/api/chat/send", {
+        method: "POST",
+        body: JSON.stringify({ text, threadId: __chatThreadId || undefined }),
+      });
+      input.value = "";
+      __chatThreadId = data.threadId;
+      await renderChatPage();
+      if (__chatThreadId) await openChatThread(__chatThreadId);
+    } catch (err) {
+      showToast(err.message || "Falha ao enviar");
+    }
+  });
+  document.getElementById("btn-chat")?.addEventListener("click", () => goToPage("chat"));
 }
 
 async function renderPainelPage() {

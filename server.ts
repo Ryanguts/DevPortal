@@ -113,6 +113,7 @@ const DATA_DIR = path.join(ROOT, "data");
 const USERS_FILE = path.join(DATA_DIR, "users.json");
 const SESSIONS_FILE = path.join(DATA_DIR, "sessions.json");
 const BANS_FILE = path.join(DATA_DIR, "bans.json");
+const CHAT_FILE = path.join(DATA_DIR, "chat.json");
 const NODE_ENV = process.env.NODE_ENV || "development";
 const IS_PROD = NODE_ENV === "production";
 
@@ -153,6 +154,7 @@ function ensureData(): void {
   if (!fs.existsSync(USERS_FILE)) writeJSON(USERS_FILE, []);
   if (!fs.existsSync(SESSIONS_FILE)) writeJSON(SESSIONS_FILE, {});
   if (!fs.existsSync(BANS_FILE)) writeJSON(BANS_FILE, []);
+  if (!fs.existsSync(CHAT_FILE)) writeJSON(CHAT_FILE, { threads: [] });
 }
 
 function readJSON<T>(file: string, fallback: T): T {
@@ -267,6 +269,29 @@ function getSessions(): SessionMap {
 
 function saveSessions(sessions: SessionMap): void {
   writeJSON(SESSIONS_FILE, sessions);
+}
+
+
+interface ChatMessage {
+  id: string;
+  from: string;
+  text: string;
+  at: string;
+}
+
+interface ChatThread {
+  id: string;
+  memberEmail: string;
+  subject: string;
+  updatedAt: string;
+  messages: ChatMessage[];
+}
+
+function getChat(): { threads: ChatThread[] } {
+  return readJSON<{ threads: ChatThread[] }>(CHAT_FILE, { threads: [] });
+}
+function saveChat(data: { threads: ChatThread[] }): void {
+  writeJSON(CHAT_FILE, data);
 }
 
 function getBans(): BanEntry[] {
@@ -672,10 +697,33 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       return;
     }
 
-    const blockMsg = assertUserActive(user);
-    if (blockMsg) {
+    if (user.banned) {
       saveUsers(users);
-      sendJSON(req, res, 403, { error: blockMsg });
+      sendJSON(req, res, 403, {
+        error: "Conta banida permanentemente.",
+        code: "BANNED",
+        reason: user.banReason || "Violação das regras do DevPortal",
+        bannedAt: user.bannedAt || null,
+      });
+      return;
+    }
+    if (isTimedOut(user)) {
+      saveUsers(users);
+      sendJSON(req, res, 403, {
+        error: "Conta em timeout.",
+        code: "TIMEOUT",
+        reason: "Um moderador suspendeu temporariamente sua conta.",
+        timeoutUntil: user.timeoutUntil || null,
+      });
+      return;
+    }
+    if (isLocked(user)) {
+      saveUsers(users);
+      sendJSON(req, res, 423, {
+        error: "Conta bloqueada por tentativas inválidas.",
+        code: "LOCKED",
+        lockedUntil: user.lockedUntil || null,
+      });
       return;
     }
 
@@ -702,9 +750,30 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       sendJSON(req, res, 401, { error: "Sessão inválida." });
       return;
     }
-    const blockMsg = assertUserActive(user);
-    if (blockMsg) {
-      sendJSON(req, res, 403, { error: blockMsg });
+    if (user.banned) {
+      sendJSON(req, res, 403, {
+        error: "Conta banida permanentemente.",
+        code: "BANNED",
+        reason: user.banReason || "Violação das regras do DevPortal",
+        bannedAt: user.bannedAt || null,
+      });
+      return;
+    }
+    if (isTimedOut(user)) {
+      sendJSON(req, res, 403, {
+        error: "Conta em timeout.",
+        code: "TIMEOUT",
+        reason: "Um moderador suspendeu temporariamente sua conta.",
+        timeoutUntil: user.timeoutUntil || null,
+      });
+      return;
+    }
+    if (isLocked(user)) {
+      sendJSON(req, res, 423, {
+        error: "Conta bloqueada por tentativas inválidas.",
+        code: "LOCKED",
+        lockedUntil: user.lockedUntil || null,
+      });
       return;
     }
     const role =
@@ -1163,6 +1232,114 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
     }
     saveUsers(users);
     sendJSON(req, res, 200, { ok: true, user: toPublic(users[idx]) });
+    return;
+  }
+
+
+  if (pathname === "/api/chat/threads" && req.method === "GET") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const block = assertUserActive(user);
+    if (block) {
+      sendJSON(req, res, 403, { error: block });
+      return;
+    }
+    const chat = getChat();
+    const staff = isStaff(user);
+    const threads = (chat.threads || [])
+      .filter((th) => staff || th.memberEmail === user.email)
+      .map((th) => ({
+        id: th.id,
+        memberEmail: th.memberEmail,
+        subject: th.subject,
+        updatedAt: th.updatedAt,
+        preview: th.messages.length ? th.messages[th.messages.length - 1].text.slice(0, 80) : "",
+        count: th.messages.length,
+      }))
+      .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+    sendJSON(req, res, 200, { threads, staff });
+    return;
+  }
+
+  if (pathname === "/api/chat/thread" && req.method === "GET") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const host = req.headers.host || "localhost";
+    const url = new URL(req.url || "/", `http://${host}`);
+    const id = url.searchParams.get("id") || "";
+    const chat = getChat();
+    const th = (chat.threads || []).find((x) => x.id === id);
+    if (!th) {
+      sendJSON(req, res, 404, { error: "Conversa não encontrada." });
+      return;
+    }
+    if (!isStaff(user) && th.memberEmail !== user.email) {
+      sendJSON(req, res, 403, { error: "Sem acesso a esta conversa." });
+      return;
+    }
+    sendJSON(req, res, 200, { thread: th });
+    return;
+  }
+
+  if (pathname === "/api/chat/send" && req.method === "POST") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Faça login." });
+      return;
+    }
+    const block = assertUserActive(user);
+    if (block) {
+      sendJSON(req, res, 403, { error: block });
+      return;
+    }
+    const body = (await readBody(req)) as { text?: string; threadId?: string };
+    const text = String(body.text || "").trim().slice(0, 1000);
+    if (!text) {
+      sendJSON(req, res, 400, { error: "Mensagem vazia." });
+      return;
+    }
+    const chat = getChat();
+    let th = body.threadId
+      ? (chat.threads || []).find((x) => x.id === body.threadId)
+      : undefined;
+
+    if (th) {
+      if (!isStaff(user) && th.memberEmail !== user.email) {
+        sendJSON(req, res, 403, { error: "Sem acesso." });
+        return;
+      }
+    } else {
+      // membro abre nova thread com a equipe
+      if (isStaff(user) && !body.threadId) {
+        sendJSON(req, res, 400, { error: "Equipe deve responder em uma conversa existente." });
+        return;
+      }
+      th = {
+        id: crypto.randomBytes(8).toString("hex"),
+        memberEmail: user.email,
+        subject: text.slice(0, 60),
+        updatedAt: new Date().toISOString(),
+        messages: [],
+      };
+      chat.threads = chat.threads || [];
+      chat.threads.push(th);
+    }
+
+    th.messages.push({
+      id: crypto.randomBytes(6).toString("hex"),
+      from: user.email,
+      text,
+      at: new Date().toISOString(),
+    });
+    th.updatedAt = new Date().toISOString();
+    saveChat(chat);
+    sendJSON(req, res, 200, { ok: true, threadId: th.id, thread: th });
     return;
   }
 

@@ -3316,7 +3316,11 @@ async function updateAuthChipApi() {
   try {
     const me = await apiFetch("/api/me");
     const short = (me.email || "").split("@")[0] || me.email;
-    chip.textContent = me.role === "admin" ? `🛡️ ${short}` : (short.length > 12 ? short.slice(0, 12) + "…" : short);
+    const label = me.displayName || me.username || short;
+    const shown = label.length > 14 ? label.slice(0, 14) + "…" : label;
+    if (me.role === "owner") chip.textContent = "👑 " + shown;
+    else if (me.role === "moderator") chip.textContent = "🛡️ " + shown;
+    else chip.textContent = shown;
     chip.classList.add("auth-chip-on");
   } catch {
     chip.textContent = "Entrar";
@@ -3377,10 +3381,10 @@ function renderAuthFormsApi(mode) {
           updateSidebarCounts();
           aplicarFiltrosLinguagens();
         }
-        showToast(data.role === "admin" ? "Moderador conectado" : "Bem-vindo(a) de volta");
+        showToast(data.role === "owner" ? "Dono conectado" : data.role === "moderator" ? "Moderador conectado" : "Bem-vindo(a) de volta");
         updateAuthChipApi();
         fecharModal("auth-modal-overlay");
-        if (data.role === "admin") openAdminPanel();
+        if (data.role === "owner" || data.role === "moderator") openAdminPanel();
       } else {
         const data = await apiFetch("/api/register", {
           method: "POST",
@@ -3402,13 +3406,14 @@ function renderAuthLoggedApi(me) {
   if (!el) return;
   el.innerHTML = `
     <h3>Sua conta</h3>
-    <p class="auth-note">Conectado como <strong>${me.email}</strong>${me.role === "admin" ? " · <span class=\"admin-badge\">moderador</span>" : ""}</p>
+    <p class="auth-note">Conectado como <strong>${me.email}</strong>${me.role === "owner" ? " · <span class=\"admin-badge\">dono</span>" : me.role === "moderator" ? " · <span class=\"admin-badge\">moderador</span>" : ""}</p>
     <ul class="auth-meta">
       <li>Favoritos salvos: <strong>${(me.favorites || []).length}</strong></li>
     </ul>
     <div class="hero-actions" style="margin-top:1rem;">
-      <button class="btn-primary" id="auth-sync-favs">Salvar favoritos no servidor</button>
-      ${me.role === "admin" ? '<button class="btn-ghost" id="auth-open-admin">Painel moderador</button>' : ""}
+      <button class="btn-primary" id="auth-open-profile">Meu perfil</button>
+      <button class="btn-ghost" id="auth-sync-favs">Salvar favoritos</button>
+      ${me.role === "owner" || me.role === "moderator" ? '<button class="btn-ghost" id="auth-open-admin">Painel da equipe</button>' : ""}
       <button class="btn-ghost" id="auth-logout">Sair</button>
     </div>
   `;
@@ -3431,42 +3436,181 @@ function renderAuthLoggedApi(me) {
     fecharModal("auth-modal-overlay");
     openAdminPanel();
   });
+  el.querySelector("#auth-open-profile")?.addEventListener("click", () => {
+    fecharModal("auth-modal-overlay");
+    openProfilePanel();
+  });
 }
+
 
 async function openAdminPanel() {
   const box = document.getElementById("admin-content");
   if (!box) return;
-  box.innerHTML = `<div class="loading"><div class="spinner"></div><p>Carregando contas…</p></div>`;
+  box.innerHTML = `<div class="loading"><div class="spinner"></div><p>Carregando…</p></div>`;
   abrirModal("admin-modal-overlay");
   try {
     const data = await apiFetch("/api/admin/users");
+    const me = data.me || {};
+    const perms = me.permissions || {};
+    const isOwner = me.role === "owner";
+    let bans = { bans: [] };
+    try {
+      if (perms.ban) bans = await apiFetch("/api/admin/bans");
+    } catch (_) {}
+    const banSet = new Set((bans.bans || []).map(b => b.email));
+
     box.innerHTML = `
-      <p class="result-count">${data.total} conta(s) · armazenamento: <code>${data.storage || "data/users.json"}</code></p>
+      <p class="result-count">${data.total} conta(s) · você: <strong>${isOwner ? "dono" : "moderador"}</strong></p>
       <div style="overflow-x:auto;">
         <table class="admin-table">
           <thead>
             <tr>
-              <th>E-mail</th>
+              <th>Conta</th>
               <th>Papel</th>
-              <th>Criada em</th>
-              <th>Favoritos</th>
+              <th>Status</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
-            ${(data.users || []).map(u => `
-              <tr>
-                <td>${u.email}</td>
-                <td><span class="admin-badge ${u.role === "admin" ? "" : "user"}">${u.role}</span></td>
-                <td>${u.createdAt ? new Date(u.createdAt).toLocaleString("pt-BR") : "—"}</td>
-                <td>${u.favoritesCount}${u.favorites?.length ? `<div class="text-xs text-muted">${u.favorites.slice(0, 6).join(", ")}</div>` : ""}</td>
-              </tr>
-            `).join("")}
+            ${(data.users || []).map(u => {
+              const roleLabel = u.role === "owner" ? "dono" : u.role === "moderator" ? "moderador" : "membro";
+              const banned = u.banned || banSet.has(u.email);
+              const timeout = u.timeoutUntil && new Date(u.timeoutUntil) > new Date();
+              let status = "ativa";
+              if (banned) status = "banida";
+              else if (timeout) status = "timeout";
+              const name = (u.displayName || u.username || "").trim();
+              const canAct = u.role !== "owner";
+              return `<tr>
+                <td>
+                  <strong>${name ? name + " · " : ""}${u.email}</strong>
+                  ${u.username ? `<div class="text-xs text-muted">@${u.username}</div>` : ""}
+                  ${u.bio ? `<div class="text-xs text-muted">${u.bio.slice(0, 80)}</div>` : ""}
+                </td>
+                <td><span class="admin-badge ${u.role === "user" ? "user" : ""}">${roleLabel}</span></td>
+                <td>${status}${timeout ? " · " + new Date(u.timeoutUntil).toLocaleString("pt-BR") : ""}</td>
+                <td class="admin-actions">
+                  ${!canAct ? "—" : `
+                    ${perms.timeout ? `<button type="button" class="btn-ghost btn-tiny" data-act="timeout" data-email="${u.email}">Timeout</button>
+                    <button type="button" class="btn-ghost btn-tiny" data-act="untimeout" data-email="${u.email}">Tirar timeout</button>` : ""}
+                    ${perms.ban ? `<button type="button" class="btn-ghost btn-tiny" data-act="ban" data-email="${u.email}">Banir</button>
+                    <button type="button" class="btn-ghost btn-tiny" data-act="unban" data-email="${u.email}">Desbanir</button>` : ""}
+                    ${perms.impersonate ? `<button type="button" class="btn-ghost btn-tiny" data-act="impersonate" data-email="${u.email}">Entrar como</button>` : ""}
+                    ${perms.editProfiles ? `<button type="button" class="btn-ghost btn-tiny" data-act="edit-profile" data-email="${u.email}">Editar perfil</button>` : ""}
+                    ${isOwner && u.role !== "owner" ? `<button type="button" class="btn-ghost btn-tiny" data-act="make-mod" data-email="${u.email}">Tornar mod</button>
+                    <button type="button" class="btn-ghost btn-tiny" data-act="make-member" data-email="${u.email}">Tornar membro</button>
+                    <button type="button" class="btn-ghost btn-tiny" data-act="edit-perms" data-email="${u.email}">Permissões</button>` : ""}
+                  `}
+                </td>
+              </tr>`;
+            }).join("")}
           </tbody>
         </table>
       </div>
+      ${perms.ban ? `<div class="admin-ban-box">
+        <h4>Banir e-mail</h4>
+        <div class="row" style="gap:0.5rem;margin-top:0.5rem;">
+          <input type="email" id="admin-ban-email" placeholder="email@exemplo.com" style="flex:1;min-width:140px;">
+          <input type="text" id="admin-ban-reason" placeholder="Motivo" style="flex:1;min-width:120px;">
+          <button type="button" class="btn-primary" id="admin-ban-submit">Banir</button>
+        </div>
+      </div>` : ""}
+      <p class="auth-note" style="margin-top:0.75rem;">Senhas não são visíveis (só hash). “Entrar como” usa a conta da pessoa no site, sem a senha dela.</p>
     `;
+
+    box.querySelectorAll("[data-act]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const act = btn.getAttribute("data-act");
+        const email = btn.getAttribute("data-email");
+        try {
+          if (act === "timeout") {
+            const raw = prompt("Timeout em minutos (60 = 1h, 1440 = 1 dia)", "60");
+            if (raw == null) return;
+            const minutes = Math.max(1, parseInt(raw, 10) || 60);
+            await apiFetch("/api/admin/timeout", { method: "POST", body: JSON.stringify({ email, minutes }) });
+            showToast("Timeout aplicado");
+          } else if (act === "untimeout") {
+            await apiFetch("/api/admin/untimeout", { method: "POST", body: JSON.stringify({ email }) });
+            showToast("Timeout removido");
+          } else if (act === "ban") {
+            const reason = prompt("Motivo do ban", "Violação") || "";
+            if (!confirm("Banir " + email + "?")) return;
+            await apiFetch("/api/admin/ban", { method: "POST", body: JSON.stringify({ email, reason }) });
+            showToast("Banido");
+          } else if (act === "unban") {
+            await apiFetch("/api/admin/unban", { method: "POST", body: JSON.stringify({ email }) });
+            showToast("Desbanido");
+          } else if (act === "impersonate") {
+            if (!confirm("Entrar no site como " + email + "? Suas ações serão nessa conta.")) return;
+            const data = await apiFetch("/api/admin/impersonate", { method: "POST", body: JSON.stringify({ email }) });
+            const staffTok = localStorage.getItem(SESSION_TOKEN_KEY);
+            if (staffTok) localStorage.setItem("devportal_staff_token", staffTok);
+            localStorage.setItem(SESSION_TOKEN_KEY, data.token);
+            localStorage.setItem("devportal_impersonating", email);
+            if (Array.isArray(data.favorites)) {
+              favoritos = new Set(data.favorites);
+              salvarFavoritos();
+            }
+            showImpersonationBanner(email);
+            showToast("Agora você está como " + email);
+            fecharModal("admin-modal-overlay");
+            updateAuthChipApi();
+            aplicarFiltrosLinguagens();
+          } else if (act === "edit-profile") {
+            fecharModal("admin-modal-overlay");
+            openProfilePanel(email);
+          } else if (act === "make-mod") {
+            await apiFetch("/api/admin/set-role", {
+              method: "POST",
+              body: JSON.stringify({
+                email,
+                role: "moderator",
+                permissions: { timeout: true, ban: false, impersonate: false, editProfiles: false }
+              })
+            });
+            showToast("Agora é moderador");
+          } else if (act === "make-member") {
+            await apiFetch("/api/admin/set-role", {
+              method: "POST",
+              body: JSON.stringify({ email, role: "user" })
+            });
+            showToast("Agora é membro");
+          } else if (act === "edit-perms") {
+            const timeout = confirm("Pode dar timeout? OK = sim, Cancelar = não");
+            const ban = confirm("Pode banir? OK = sim, Cancelar = não");
+            const imp = confirm("Pode entrar como usuário? OK = sim, Cancelar = não");
+            const edit = confirm("Pode editar perfis? OK = sim, Cancelar = não");
+            await apiFetch("/api/admin/set-role", {
+              method: "POST",
+              body: JSON.stringify({
+                email,
+                role: "moderator",
+                permissions: { timeout, ban, impersonate: imp, editProfiles: edit }
+              })
+            });
+            showToast("Permissões atualizadas");
+          }
+          if (act !== "impersonate" && act !== "edit-profile") openAdminPanel();
+        } catch (e) {
+          showToast(e.message || "Falha");
+        }
+      });
+    });
+
+    document.getElementById("admin-ban-submit")?.addEventListener("click", async () => {
+      const email = document.getElementById("admin-ban-email")?.value?.trim();
+      const reason = document.getElementById("admin-ban-reason")?.value?.trim() || "";
+      if (!email) return showToast("Informe o e-mail");
+      try {
+        await apiFetch("/api/admin/ban", { method: "POST", body: JSON.stringify({ email, reason }) });
+        showToast("E-mail banido");
+        openAdminPanel();
+      } catch (e) {
+        showToast(e.message || "Falha");
+      }
+    });
   } catch (e) {
-    box.innerHTML = `<div class="error-box"><p>${e.message || "Não foi possível carregar o painel."}</p></div>`;
+    box.innerHTML = `<div class="error-box"><p>${e.message || "Erro ao carregar painel."}</p></div>`;
   }
 }
 
@@ -3528,10 +3672,10 @@ async function mountGoogleButton(attempt) {
             updateSidebarCounts();
             aplicarFiltrosLinguagens();
           }
-          showToast(data.role === "admin" ? "Moderador conectado" : "Entrada com Google ok");
+          showToast(data.role === "owner" ? "Dono conectado" : data.role === "moderator" ? "Moderador conectado" : "Entrada com Google ok");
           updateAuthChipApi();
           fecharModal("auth-modal-overlay");
-          if (data.role === "admin") openAdminPanel();
+          if (data.role === "owner" || data.role === "moderator") openAdminPanel();
         } catch (err) {
           showToast(err.message || "Falha no login Google");
         }
@@ -3552,3 +3696,123 @@ async function mountGoogleButton(attempt) {
     wrap.innerHTML = '<p class="auth-note">Não foi possível carregar o botão do Google. Use e-mail e senha.</p>';
   }
 }
+
+
+function openProfilePanel(targetEmail) {
+  const box = document.getElementById("profile-content");
+  if (!box) return;
+  box.innerHTML = `<div class="loading"><div class="spinner"></div><p>Carregando perfil…</p></div>`;
+  abrirModal("profile-modal-overlay");
+  const staffEdit = Boolean(targetEmail);
+  const load = staffEdit
+    ? apiFetch("/api/admin/users").then(data => {
+        const u = (data.users || []).find(x => x.email === targetEmail);
+        if (!u) throw new Error("Usuário não encontrado");
+        return u;
+      })
+    : apiFetch("/api/me");
+  load.then(me => {
+    const avatar = me.avatarUrl
+      ? `<img class="profile-avatar" src="${me.avatarUrl}" alt="Avatar">`
+      : `<div class="profile-avatar profile-avatar-empty">👤</div>`;
+    box.innerHTML = `
+      <div class="profile-head">${avatar}</div>
+      ${staffEdit ? `<p class="auth-note">Editando perfil de <strong>${me.email}</strong></p>` : ""}
+      <form id="profile-form" class="auth-form">
+        <div class="form-group">
+          <label for="pf-display">Nome de exibição</label>
+          <input type="text" id="pf-display" maxlength="40" value="${String(me.displayName || "").replace(/"/g, "&quot;")}">
+        </div>
+        <div class="form-group">
+          <label for="pf-user">Username</label>
+          <input type="text" id="pf-user" maxlength="24" value="${String(me.username || "").replace(/"/g, "&quot;")}" placeholder="sem espaços">
+        </div>
+        <div class="form-group">
+          <label for="pf-bio">Biografia</label>
+          <textarea id="pf-bio" maxlength="300" rows="3" placeholder="Uma frase sobre você">${String(me.bio || "").replace(/</g, "&lt;")}</textarea>
+        </div>
+        <div class="form-group">
+          <label for="pf-avatar">Foto (URL)</label>
+          <input type="url" id="pf-avatar" value="${String(me.avatarUrl || "").replace(/"/g, "&quot;")}">
+        </div>
+        <div class="form-group">
+          <label for="pf-file">Ou enviar imagem (máx. ~100 KB)</label>
+          <input type="file" id="pf-file" accept="image/*">
+        </div>
+        ${staffEdit ? "" : `<p class="auth-note">E-mail: <strong>${me.email}</strong></p>`}
+        <button type="submit" class="btn-primary" style="width:100%">Salvar perfil</button>
+      </form>
+    `;
+    document.getElementById("pf-file")?.addEventListener("change", (ev) => {
+      const f = ev.target.files && ev.target.files[0];
+      if (!f) return;
+      if (f.size > 100000) {
+        showToast("Imagem maior que 100 KB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        document.getElementById("pf-avatar").value = String(reader.result || "");
+      };
+      reader.readAsDataURL(f);
+    });
+    document.getElementById("profile-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        const payload = {
+          displayName: document.getElementById("pf-display").value,
+          username: document.getElementById("pf-user").value,
+          bio: document.getElementById("pf-bio").value,
+          avatarUrl: document.getElementById("pf-avatar").value
+        };
+        if (staffEdit) payload.targetEmail = targetEmail;
+        await apiFetch("/api/profile", { method: "POST", body: JSON.stringify(payload) });
+        showToast("Perfil salvo");
+        if (!staffEdit) updateAuthChipApi();
+        fecharModal("profile-modal-overlay");
+      } catch (err) {
+        showToast(err.message || "Falha ao salvar");
+      }
+    });
+  }).catch(err => {
+    box.innerHTML = `<div class="error-box"><p>${err.message || "Erro"}</p></div>`;
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("close-profile-modal")?.addEventListener("click", () => fecharModal("profile-modal-overlay"));
+});
+
+
+function showImpersonationBanner(email) {
+  let bar = document.getElementById("impersonate-banner");
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "impersonate-banner";
+    bar.className = "impersonate-banner";
+    document.body.appendChild(bar);
+  }
+  bar.style.display = "flex";
+  bar.innerHTML = `<span>Você está usando o site como <strong>${email}</strong></span>
+    <button type="button" class="btn-primary btn-tiny" id="stop-impersonate">Voltar à minha conta</button>`;
+  document.getElementById("stop-impersonate")?.addEventListener("click", stopImpersonation);
+}
+
+function stopImpersonation() {
+  const staff = localStorage.getItem("devportal_staff_token");
+  if (staff) {
+    localStorage.setItem(SESSION_TOKEN_KEY, staff);
+    localStorage.removeItem("devportal_staff_token");
+  }
+  localStorage.removeItem("devportal_impersonating");
+  const bar = document.getElementById("impersonate-banner");
+  if (bar) bar.style.display = "none";
+  showToast("Voltou à sua conta");
+  updateAuthChipApi();
+  location.reload();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const imp = localStorage.getItem("devportal_impersonating");
+  if (imp) showImpersonationBanner(imp);
+});

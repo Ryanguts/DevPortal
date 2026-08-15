@@ -21,7 +21,31 @@ import crypto from "crypto";
 import { URL } from "url";
 
 // ---------- tipos ----------
-type Role = "admin" | "user";
+type Role = "owner" | "moderator" | "user";
+
+interface ModPermissions {
+  timeout: boolean;
+  ban: boolean;
+  impersonate: boolean;
+  editProfiles: boolean;
+  manageMods: boolean; // só owner usa de verdade
+}
+
+const DEFAULT_MOD_PERMS: ModPermissions = {
+  timeout: true,
+  ban: false,
+  impersonate: false,
+  editProfiles: false,
+  manageMods: false,
+};
+
+const OWNER_PERMS: ModPermissions = {
+  timeout: true,
+  ban: true,
+  impersonate: true,
+  editProfiles: true,
+  manageMods: true,
+};
 
 interface UserRecord {
   id: string;
@@ -33,6 +57,17 @@ interface UserRecord {
   lastLoginAt?: string;
   failedLogins?: number;
   lockedUntil?: string | null;
+  /** Timeout manual do moderador (ISO date). */
+  timeoutUntil?: string | null;
+  /** Ban permanente. */
+  banned?: boolean;
+  bannedAt?: string | null;
+  banReason?: string | null;
+  username?: string;
+  displayName?: string;
+  avatarUrl?: string;
+  bio?: string;
+  permissions?: ModPermissions;
 }
 
 interface PublicUser {
@@ -43,10 +78,27 @@ interface PublicUser {
   favoritesCount: number;
   favorites: string[];
   lastLoginAt?: string;
+  timeoutUntil?: string | null;
+  banned?: boolean;
+  bannedAt?: string | null;
+  banReason?: string | null;
+  username?: string;
+  displayName?: string;
+  avatarUrl?: string;
+  bio?: string;
+  permissions?: ModPermissions;
+  hasPassword: boolean;
+}
+
+interface BanEntry {
+  email: string;
+  reason?: string;
+  bannedAt: string;
+  by: string;
 }
 
 interface SessionMap {
-  [token: string]: { email: string; createdAt: number };
+  [token: string]: { email: string; createdAt: number; realEmail?: string };
 }
 
 interface RateBucket {
@@ -60,6 +112,7 @@ const ROOT = process.cwd();
 const DATA_DIR = path.join(ROOT, "data");
 const USERS_FILE = path.join(DATA_DIR, "users.json");
 const SESSIONS_FILE = path.join(DATA_DIR, "sessions.json");
+const BANS_FILE = path.join(DATA_DIR, "bans.json");
 const NODE_ENV = process.env.NODE_ENV || "development";
 const IS_PROD = NODE_ENV === "production";
 
@@ -99,6 +152,7 @@ function ensureData(): void {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(USERS_FILE)) writeJSON(USERS_FILE, []);
   if (!fs.existsSync(SESSIONS_FILE)) writeJSON(SESSIONS_FILE, {});
+  if (!fs.existsSync(BANS_FILE)) writeJSON(BANS_FILE, []);
 }
 
 function readJSON<T>(file: string, fallback: T): T {
@@ -173,6 +227,79 @@ function saveSessions(sessions: SessionMap): void {
   writeJSON(SESSIONS_FILE, sessions);
 }
 
+function getBans(): BanEntry[] {
+  return readJSON<BanEntry[]>(BANS_FILE, []);
+}
+function saveBans(bans: BanEntry[]): void {
+  writeJSON(BANS_FILE, bans);
+}
+function isEmailBanned(email: string): BanEntry | null {
+  const e = normalizeEmail(email);
+  return getBans().find((b) => b.email === e) || null;
+}
+function revokeUserSessions(email: string): void {
+  const sessions = getSessions();
+  let changed = false;
+  for (const [token, meta] of Object.entries(sessions)) {
+    if (meta?.email === email) {
+      delete sessions[token];
+      changed = true;
+    }
+  }
+  if (changed) saveSessions(sessions);
+}
+function isTimedOut(user: UserRecord): boolean {
+  if (!user.timeoutUntil) return false;
+  const until = Date.parse(user.timeoutUntil);
+  if (Number.isNaN(until)) return false;
+  if (Date.now() < until) return true;
+  user.timeoutUntil = null;
+  return false;
+}
+
+function getPerms(user: UserRecord): ModPermissions {
+  if (user.role === "owner" || user.email === ADMIN_EMAIL) return { ...OWNER_PERMS };
+  if (user.role === "moderator") {
+    return { ...DEFAULT_MOD_PERMS, ...(user.permissions || {}) };
+  }
+  return {
+    timeout: false,
+    ban: false,
+    impersonate: false,
+    editProfiles: false,
+    manageMods: false,
+  };
+}
+
+function isStaff(user: UserRecord): boolean {
+  return user.role === "owner" || user.role === "moderator" || user.email === ADMIN_EMAIL;
+}
+
+function requireStaff(req: http.IncomingMessage): UserRecord | null {
+  const u = userFromToken(req);
+  if (!u || !isStaff(u)) return null;
+  const block = assertUserActive(u);
+  if (block) return null;
+  return u;
+}
+
+function requirePerm(user: UserRecord, key: keyof ModPermissions): boolean {
+  return Boolean(getPerms(user)[key]);
+}
+
+function assertUserActive(user: UserRecord): string | null {
+  if (user.banned) return "Esta conta foi banida permanentemente.";
+  if (isTimedOut(user)) {
+    const until = user.timeoutUntil ? new Date(user.timeoutUntil).toLocaleString("pt-BR") : "";
+    return until
+      ? `Conta em timeout até ${until}.`
+      : "Conta temporariamente suspensa.";
+  }
+  if (isLocked(user)) return "Conta temporariamente bloqueada por tentativas inválidas.";
+  return null;
+}
+
+
 function purgeExpiredSessions(): void {
   const sessions = getSessions();
   const now = Date.now();
@@ -194,7 +321,7 @@ function ensureAdminUser(): void {
       id: "admin-1",
       email: ADMIN_EMAIL,
       passwordHash: hashPassword(ADMIN_PASSWORD),
-      role: "admin",
+      role: "owner",
       createdAt: new Date().toISOString(),
       favorites: [],
       failedLogins: 0,
@@ -205,8 +332,8 @@ function ensureAdminUser(): void {
   }
   // Garante papel admin e senha alinhada ao env (útil após troca de ADMIN_PASSWORD)
   let dirty = false;
-  if (existing.role !== "admin") {
-    existing.role = "admin";
+  if (existing.role !== "owner") {
+    existing.role = "owner";
     dirty = true;
   }
   if (!verifyPassword(ADMIN_PASSWORD, existing.passwordHash)) {
@@ -338,6 +465,16 @@ function toPublic(u: UserRecord): PublicUser {
     favoritesCount: (u.favorites || []).length,
     favorites: u.favorites || [],
     lastLoginAt: u.lastLoginAt,
+    timeoutUntil: u.timeoutUntil || null,
+    banned: Boolean(u.banned),
+    bannedAt: u.bannedAt || null,
+    banReason: u.banReason || null,
+    username: u.username || "",
+    displayName: u.displayName || "",
+    avatarUrl: u.avatarUrl || "",
+    bio: u.bio || "",
+    permissions: u.role === "moderator" ? getPerms(u) : u.role === "owner" ? OWNER_PERMS : undefined,
+    hasPassword: Boolean(u.passwordHash),
   };
 }
 
@@ -382,6 +519,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
     // bloqueia registrar o e-mail admin por visitantes
     if (email === ADMIN_EMAIL) {
       sendJSON(req, res, 403, { error: "Este e-mail é reservado." });
+      return;
+    }
+    if (isEmailBanned(email)) {
+      sendJSON(req, res, 403, { error: "Este e-mail não pode criar conta." });
       return;
     }
     if (password.length < 6 || password.length > 128) {
@@ -439,7 +580,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
           id: "admin-1",
           email: ADMIN_EMAIL,
           passwordHash: hashPassword(ADMIN_PASSWORD),
-          role: "admin",
+          role: "owner",
           createdAt: new Date().toISOString(),
           favorites: [],
           failedLogins: 0,
@@ -447,7 +588,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
         };
         users.push(admin);
       } else {
-        admin.role = "admin";
+        admin.role = "owner";
         admin.passwordHash = hashPassword(ADMIN_PASSWORD);
         admin.lockedUntil = null;
         admin.failedLogins = 0;
@@ -463,7 +604,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       sendJSON(req, res, 200, {
         token,
         email: ADMIN_EMAIL,
-        role: "admin",
+        role: "owner",
         favorites: admin.favorites || [],
       });
       return;
@@ -489,6 +630,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       return;
     }
 
+    const blockMsg = assertUserActive(user);
+    if (blockMsg) {
+      saveUsers(users);
+      sendJSON(req, res, 403, { error: blockMsg });
+      return;
+    }
+
     clearFails(user);
     saveUsers(users);
 
@@ -502,6 +650,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       email: user.email,
       role: user.role,
       favorites: user.favorites || [],
+      username: user.username || "",
+      displayName: user.displayName || "",
+      avatarUrl: user.avatarUrl || "",
     });
     return;
   }
@@ -512,12 +663,28 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       sendJSON(req, res, 401, { error: "Sessão inválida." });
       return;
     }
+    const blockMsg = assertUserActive(user);
+    if (blockMsg) {
+      sendJSON(req, res, 403, { error: blockMsg });
+      return;
+    }
+    const role =
+      user.email === ADMIN_EMAIL || user.role === "owner"
+        ? "owner"
+        : user.role === "moderator"
+          ? "moderator"
+          : "user";
     sendJSON(req, res, 200, {
       email: user.email,
-      role: user.role,
+      role,
       favorites: user.favorites || [],
       createdAt: user.createdAt,
       lastLoginAt: user.lastLoginAt,
+      username: user.username || "",
+      displayName: user.displayName || "",
+      avatarUrl: user.avatarUrl || "",
+      bio: user.bio || "",
+      permissions: getPerms(user),
     });
     return;
   }
@@ -543,9 +710,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
   }
 
   if (pathname === "/api/admin/users" && req.method === "GET") {
-    const user = userFromToken(req);
-    if (!user || user.role !== "admin" || user.email !== ADMIN_EMAIL) {
-      sendJSON(req, res, 403, { error: "Acesso restrito ao moderador." });
+    const staff = requireStaff(req);
+    if (!staff) {
+      sendJSON(req, res, 403, { error: "Acesso restrito à equipe." });
       return;
     }
     const users = getUsers().map(toPublic);
@@ -553,6 +720,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       total: users.length,
       users,
       storage: IS_PROD ? "[protegido]" : USERS_FILE,
+      me: { email: staff.email, role: staff.role === "owner" || staff.email === ADMIN_EMAIL ? "owner" : staff.role, permissions: getPerms(staff) },
     });
     return;
   }
@@ -619,6 +787,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
         sendJSON(req, res, 400, { error: "Google não retornou e-mail." });
         return;
       }
+      if (isEmailBanned(email)) {
+        sendJSON(req, res, 403, { error: "Este e-mail não pode entrar." });
+        return;
+      }
 
       ensureAdminUser();
       const users = getUsers();
@@ -628,7 +800,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
           id: crypto.randomBytes(8).toString("hex"),
           email,
           passwordHash: hashPassword(crypto.randomBytes(24).toString("hex")),
-          role: email === ADMIN_EMAIL ? "admin" : "user",
+          role: email === ADMIN_EMAIL ? "owner" : "user",
           createdAt: new Date().toISOString(),
           favorites: [],
           failedLogins: 0,
@@ -637,7 +809,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
         users.push(user);
       } else {
         clearFails(user);
-        if (email === ADMIN_EMAIL) user.role = "admin";
+        if (email === ADMIN_EMAIL) user.role = "owner";
       }
       saveUsers(users);
 
@@ -656,6 +828,308 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       console.error(e);
       sendJSON(req, res, 500, { error: "Falha ao validar Google." });
     }
+    return;
+  }
+
+
+  if (pathname === "/api/admin/timeout" && req.method === "POST") {
+    const admin = requireStaff(req);
+    if (!admin || !requirePerm(admin, "timeout")) {
+      sendJSON(req, res, 403, { error: "Sem permissão para timeout." });
+      return;
+    }
+    const body = (await readBody(req)) as { email?: string; minutes?: number; hours?: number; days?: number };
+    const target = normalizeEmail(body.email);
+    if (!target || target === ADMIN_EMAIL) {
+      sendJSON(req, res, 400, { error: "E-mail inválido." });
+      return;
+    }
+    const targetUser = getUsers().find((u) => u.email === target);
+    if (targetUser && (targetUser.role === "owner" || targetUser.email === ADMIN_EMAIL)) {
+      sendJSON(req, res, 403, { error: "Não é possível aplicar timeout no dono." });
+      return;
+    }
+    if (targetUser && targetUser.role === "moderator" && admin.role !== "owner" && admin.email !== ADMIN_EMAIL) {
+      sendJSON(req, res, 403, { error: "Só o dono pode aplicar timeout em moderadores." });
+      return;
+    }
+    const minutes =
+      Math.max(0, Number(body.minutes) || 0) +
+      Math.max(0, Number(body.hours) || 0) * 60 +
+      Math.max(0, Number(body.days) || 0) * 60 * 24;
+    if (minutes < 1) {
+      sendJSON(req, res, 400, { error: "Informe um tempo (minutos, horas ou dias)." });
+      return;
+    }
+    const users = getUsers();
+    const idx = users.findIndex((u) => u.email === target);
+    if (idx < 0) {
+      sendJSON(req, res, 404, { error: "Conta não encontrada." });
+      return;
+    }
+    users[idx].timeoutUntil = new Date(Date.now() + minutes * 60_000).toISOString();
+    saveUsers(users);
+    revokeUserSessions(target);
+    sendJSON(req, res, 200, {
+      ok: true,
+      email: target,
+      timeoutUntil: users[idx].timeoutUntil,
+    });
+    return;
+  }
+
+  if (pathname === "/api/admin/untimeout" && req.method === "POST") {
+    const admin = requireStaff(req);
+    if (!admin || !requirePerm(admin, "timeout")) {
+      sendJSON(req, res, 403, { error: "Sem permissão para timeout." });
+      return;
+    }
+    const body = (await readBody(req)) as { email?: string };
+    const target = normalizeEmail(body.email);
+    const users = getUsers();
+    const idx = users.findIndex((u) => u.email === target);
+    if (idx < 0) {
+      sendJSON(req, res, 404, { error: "Conta não encontrada." });
+      return;
+    }
+    users[idx].timeoutUntil = null;
+    users[idx].lockedUntil = null;
+    users[idx].failedLogins = 0;
+    saveUsers(users);
+    sendJSON(req, res, 200, { ok: true, email: target });
+    return;
+  }
+
+  if (pathname === "/api/admin/ban" && req.method === "POST") {
+    const admin = requireStaff(req);
+    if (!admin || !requirePerm(admin, "ban")) {
+      sendJSON(req, res, 403, { error: "Sem permissão para banir." });
+      return;
+    }
+    const body = (await readBody(req)) as { email?: string; reason?: string };
+    const target = normalizeEmail(body.email);
+    if (!target || target === ADMIN_EMAIL) {
+      sendJSON(req, res, 400, { error: "E-mail inválido." });
+      return;
+    }
+    const targetUser = getUsers().find((u) => u.email === target);
+    if (targetUser && (targetUser.role === "owner" || targetUser.role === "moderator")) {
+      if (admin.role !== "owner" && admin.email !== ADMIN_EMAIL) {
+        sendJSON(req, res, 403, { error: "Só o dono pode banir moderadores." });
+        return;
+      }
+      if (targetUser.role === "owner" || targetUser.email === ADMIN_EMAIL) {
+        sendJSON(req, res, 403, { error: "Não é possível banir o dono." });
+        return;
+      }
+    }
+    const reason = String(body.reason || "Banido pelo moderador").slice(0, 200);
+    const users = getUsers();
+    const idx = users.findIndex((u) => u.email === target);
+    if (idx >= 0) {
+      users[idx].banned = true;
+      users[idx].bannedAt = new Date().toISOString();
+      users[idx].banReason = reason;
+      saveUsers(users);
+    }
+    const bans = getBans().filter((b) => b.email !== target);
+    bans.push({ email: target, reason, bannedAt: new Date().toISOString(), by: ADMIN_EMAIL });
+    saveBans(bans);
+    revokeUserSessions(target);
+    sendJSON(req, res, 200, { ok: true, email: target, banned: true });
+    return;
+  }
+
+  if (pathname === "/api/admin/unban" && req.method === "POST") {
+    const admin = requireStaff(req);
+    if (!admin || !requirePerm(admin, "ban")) {
+      sendJSON(req, res, 403, { error: "Sem permissão para desbanir." });
+      return;
+    }
+    const body = (await readBody(req)) as { email?: string };
+    const target = normalizeEmail(body.email);
+    const users = getUsers();
+    const idx = users.findIndex((u) => u.email === target);
+    if (idx >= 0) {
+      users[idx].banned = false;
+      users[idx].bannedAt = null;
+      users[idx].banReason = null;
+      saveUsers(users);
+    }
+    saveBans(getBans().filter((b) => b.email !== target));
+    sendJSON(req, res, 200, { ok: true, email: target, banned: false });
+    return;
+  }
+
+  if (pathname === "/api/admin/bans" && req.method === "GET") {
+    const admin = requireStaff(req);
+    if (!admin || !requirePerm(admin, "ban")) {
+      sendJSON(req, res, 403, { error: "Sem permissão." });
+      return;
+    }
+    sendJSON(req, res, 200, { bans: getBans() });
+    return;
+  }
+
+  // Perfil do usuário logado
+  if (pathname === "/api/profile" && req.method === "POST") {
+    const user = userFromToken(req);
+    if (!user) {
+      sendJSON(req, res, 401, { error: "Sessão inválida." });
+      return;
+    }
+    const blockMsg = assertUserActive(user);
+    if (blockMsg) {
+      sendJSON(req, res, 403, { error: blockMsg });
+      return;
+    }
+    const body = (await readBody(req)) as {
+      username?: string;
+      displayName?: string;
+      avatarUrl?: string;
+      bio?: string;
+      targetEmail?: string; // staff edita outro perfil
+    };
+    let targetEmail = user.email;
+    if (body.targetEmail) {
+      const te = normalizeEmail(body.targetEmail);
+      if (te !== user.email) {
+        if (!requirePerm(user, "editProfiles")) {
+          sendJSON(req, res, 403, { error: "Sem permissão para editar outros perfis." });
+          return;
+        }
+        targetEmail = te;
+      }
+    }
+    let username = String(body.username || "").trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+    if (username.length > 24) username = username.slice(0, 24);
+    const displayName = String(body.displayName || "").trim().slice(0, 40);
+    let avatarUrl = String(body.avatarUrl || "").trim().slice(0, 500);
+    if (avatarUrl && !/^https?:\/\//i.test(avatarUrl) && !avatarUrl.startsWith("data:image/")) {
+      sendJSON(req, res, 400, { error: "Avatar deve ser URL http(s) ou data:image." });
+      return;
+    }
+    // data URL size guard (~100KB)
+    if (avatarUrl.startsWith("data:") && avatarUrl.length > 140000) {
+      sendJSON(req, res, 400, { error: "Imagem muito grande. Use uma menor." });
+      return;
+    }
+    const users = getUsers();
+    if (username) {
+      const taken = users.some((u) => u.username === username && u.email !== user.email);
+      if (taken) {
+        sendJSON(req, res, 409, { error: "Username já em uso." });
+        return;
+      }
+    }
+    const idx = users.findIndex((u) => u.email === targetEmail);
+    if (idx < 0) {
+      sendJSON(req, res, 404, { error: "Usuário não encontrado." });
+      return;
+    }
+    if (username) users[idx].username = username;
+    if (body.displayName !== undefined) users[idx].displayName = displayName;
+    if (body.avatarUrl !== undefined) users[idx].avatarUrl = avatarUrl;
+    if (body.bio !== undefined) users[idx].bio = String(body.bio || "").trim().slice(0, 300);
+    saveUsers(users);
+    sendJSON(req, res, 200, {
+      ok: true,
+      username: users[idx].username || "",
+      displayName: users[idx].displayName || "",
+      avatarUrl: users[idx].avatarUrl || "",
+      bio: users[idx].bio || "",
+      email: users[idx].email,
+    });
+    return;
+  }
+
+
+  if (pathname === "/api/admin/impersonate" && req.method === "POST") {
+    const staff = requireStaff(req);
+    if (!staff || !requirePerm(staff, "impersonate")) {
+      sendJSON(req, res, 403, { error: "Sem permissão para acessar como outro usuário." });
+      return;
+    }
+    const body = (await readBody(req)) as { email?: string };
+    const target = normalizeEmail(body.email);
+    if (!target || target === staff.email) {
+      sendJSON(req, res, 400, { error: "E-mail inválido." });
+      return;
+    }
+    const users = getUsers();
+    const targetUser = users.find((u) => u.email === target);
+    if (!targetUser) {
+      sendJSON(req, res, 404, { error: "Conta não encontrada." });
+      return;
+    }
+    if (targetUser.role === "owner" || targetUser.email === ADMIN_EMAIL) {
+      sendJSON(req, res, 403, { error: "Não é possível acessar como o dono." });
+      return;
+    }
+    if (targetUser.role === "moderator" && staff.role !== "owner" && staff.email !== ADMIN_EMAIL) {
+      sendJSON(req, res, 403, { error: "Só o dono pode acessar como moderador." });
+      return;
+    }
+    const blockMsg = assertUserActive(targetUser);
+    // allow impersonating timed-out users? for mod purposes yes, skip ban
+    if (targetUser.banned) {
+      sendJSON(req, res, 403, { error: "Conta banida — não é possível acessar." });
+      return;
+    }
+    const token = newToken();
+    const sessions = getSessions();
+    sessions[token] = { email: target, createdAt: Date.now(), realEmail: staff.email };
+    saveSessions(sessions);
+    sendJSON(req, res, 200, {
+      token,
+      email: targetUser.email,
+      role: targetUser.role,
+      favorites: targetUser.favorites || [],
+      username: targetUser.username || "",
+      displayName: targetUser.displayName || "",
+      avatarUrl: targetUser.avatarUrl || "",
+      bio: targetUser.bio || "",
+      impersonating: true,
+      staffEmail: staff.email,
+    });
+    return;
+  }
+
+  if (pathname === "/api/admin/set-role" && req.method === "POST") {
+    const staff = requireStaff(req);
+    if (!staff || (staff.role !== "owner" && staff.email !== ADMIN_EMAIL)) {
+      sendJSON(req, res, 403, { error: "Só o dono pode gerenciar moderadores." });
+      return;
+    }
+    const body = (await readBody(req)) as {
+      email?: string;
+      role?: string;
+      permissions?: Partial<ModPermissions>;
+    };
+    const target = normalizeEmail(body.email);
+    if (!target || target === ADMIN_EMAIL) {
+      sendJSON(req, res, 400, { error: "E-mail inválido." });
+      return;
+    }
+    const role = body.role === "moderator" ? "moderator" : "user";
+    const users = getUsers();
+    const idx = users.findIndex((u) => u.email === target);
+    if (idx < 0) {
+      sendJSON(req, res, 404, { error: "Conta não encontrada. A pessoa precisa ter se cadastrado antes." });
+      return;
+    }
+    users[idx].role = role;
+    if (role === "moderator") {
+      users[idx].permissions = {
+        ...DEFAULT_MOD_PERMS,
+        ...(body.permissions || {}),
+        manageMods: false,
+      };
+    } else {
+      users[idx].permissions = undefined;
+    }
+    saveUsers(users);
+    sendJSON(req, res, 200, { ok: true, user: toPublic(users[idx]) });
     return;
   }
 
@@ -719,7 +1193,7 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(`DevPortal (TypeScript) em http://localhost:${PORT}`);
   console.log(`Ambiente: ${IS_PROD ? "production" : "development"}`);
-  console.log(`Moderador: ${ADMIN_EMAIL} (senha via ADMIN_PASSWORD / padrão local)`);
+  console.log(`Dono: ${ADMIN_EMAIL} (senha via ADMIN_PASSWORD)`);
   if (IS_PROD && ADMIN_PASSWORD === "02022010") {
     console.warn("[segurança] Em produção, defina ADMIN_PASSWORD forte nas variáveis de ambiente.");
   }

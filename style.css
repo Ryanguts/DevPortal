@@ -2848,3 +2848,80 @@ body:not(.splash-active) .site-wrapper {
     height: 1px;
     background: var(--border);
 }
+
+.btn-tiny {
+  font-size: 0.72rem !important;
+  padding: 0.25rem 0.45rem !important;
+  margin: 0.1rem;
+}
+
+.admin-actions {
+  white-space: normal;
+  min-width: 140px;
+}
+
+.admin-ban-box {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.profile-head {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+.profile-avatar-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--input-bg);
+  font-size: 1.8rem;
+}
+
+.impersonate-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.55rem 1rem;
+  background: #5b21b6;
+  color: #fff;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+}
+
+.impersonate-banner strong {
+  color: #fde68a;
+}
+
+body:has(.impersonate-banner[style*="flex"]) .main-header {
+  top: 2.5rem;
+}
+
+#pf-bio {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 0.6rem 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  resize: vertical;
+}

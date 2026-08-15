@@ -3780,8 +3780,8 @@ function openProfilePanel(targetEmail) {
         </div>
         <div class="form-group">
           <label for="pf-user">Username (@)</label>
-          <input type="text" id="pf-user" maxlength="24" value="${String(me.username || "").replace(/"/g, "&quot;")}" placeholder="ex: guts_dev" autocomplete="off" spellcheck="false">
-          <p class="text-xs text-muted" id="pf-user-hint">Único no site. Só pode alterar 1x por hora. Não usa o nome de exibição.</p>
+          <input type="text" id="pf-user" maxlength="24" value="${String(me.username || (me.displayName || "").toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 24) || "").replace(/"/g, "&quot;")}" placeholder="ex: guts_dev" autocomplete="off" spellcheck="false">
+          <p class="text-xs text-muted" id="pf-user-hint">Único no site. Só pode alterar 1x por hora. Enquanto o nome de exibição estiver vazio, o site mostra o @username.</p>
           <p class="text-xs" id="pf-user-status"></p>
         </div>
         <div class="form-group">
@@ -3802,8 +3802,20 @@ function openProfilePanel(targetEmail) {
         ${me.role === "owner" || me.role === "moderator" ? `<button type="button" class="btn-ghost" id="pf-goto-painel" style="width:100%;margin-top:0.35rem">Abrir painel da equipe</button>` : ""}`}
       </form>
     `;
-    // Username nunca é pré-preenchido a partir do nome de exibição
+    // Se username vazio, sugere a partir do nome de exibição (editável)
     const pfUser = document.getElementById("pf-user");
+    const pfDisplay = document.getElementById("pf-display");
+    const suggestUser = () => {
+      if (!pfUser || !pfDisplay) return;
+      // só auto-sugere se o campo username ainda não foi "travado" por valor salvo no servidor
+      const serverUser = String(me.username || "");
+      if (serverUser) return;
+      const sug = String(pfDisplay.value || "").toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 24);
+      pfUser.value = sug;
+      pfUser.dispatchEvent(new Event("input"));
+    };
+    pfDisplay?.addEventListener("input", suggestUser);
+
     const pfStatus = document.getElementById("pf-user-status");
     let userCheckTimer = null;
     pfUser?.addEventListener("input", () => {
@@ -5420,3 +5432,5 @@ function syncMacroBar(me) {
     });
   });
 }
+
+

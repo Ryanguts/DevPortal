@@ -1502,6 +1502,31 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, pa
       }
     }
 
+    // Se ainda não tem username e tem nome de exibição, deriva um @ uma vez (sem apagar contas)
+    if (!(target.username || "").trim()) {
+      const base = (target.displayName || displayName || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, "")
+        .slice(0, 24);
+      if (base.length >= 3) {
+        let candidate = base;
+        let n = 0;
+        while (
+          users.some(
+            (u) => (u.username || "").toLowerCase() === candidate && u.email !== targetEmail
+          )
+        ) {
+          n += 1;
+          candidate = (base.slice(0, 20) + String(n)).slice(0, 24);
+          if (n > 99) break;
+        }
+        if (candidate.length >= 3) {
+          target.username = candidate;
+          target.usernameChangedAt = new Date().toISOString();
+        }
+      }
+    }
+
     if (avatarUrl !== null) target.avatarUrl = avatarUrl;
     if (body.bio !== undefined) target.bio = String(body.bio || "").trim().slice(0, 300);
     saveUsers(users);

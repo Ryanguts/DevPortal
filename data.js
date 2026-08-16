@@ -1,4 +1,4 @@
-// DevPortal data.js — conteúdo expandido e corrigido
+// DevPortal data.js — ordenacao, mercados unicos, conteudo
 const DP_LINGUAGENS = [
   {
     "nome": "JavaScript",
@@ -17,7 +17,9 @@ const DP_LINGUAGENS = [
       "TypeScript",
       "HTML",
       "CSS"
-    ]
+    ],
+    "popularidade": 98,
+    "dificuldade": 4
   },
   {
     "nome": "TypeScript",
@@ -36,7 +38,9 @@ const DP_LINGUAGENS = [
       "JavaScript",
       "C#",
       "Java"
-    ]
+    ],
+    "popularidade": 94,
+    "dificuldade": 5
   },
   {
     "nome": "Python",
@@ -54,7 +58,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Go (Golang)"
-    ]
+    ],
+    "popularidade": 97,
+    "dificuldade": 3
   },
   {
     "nome": "Java",
@@ -70,7 +76,9 @@ const DP_LINGUAGENS = [
       "Kotlin",
       "C#"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 90,
+    "dificuldade": 6
   },
   {
     "nome": "C#",
@@ -87,7 +95,9 @@ const DP_LINGUAGENS = [
       "Java",
       "TypeScript"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 88,
+    "dificuldade": 5
   },
   {
     "nome": "C",
@@ -104,7 +114,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "C++",
       "Rust"
-    ]
+    ],
+    "popularidade": 84,
+    "dificuldade": 7
   },
   {
     "nome": "C++",
@@ -121,7 +133,9 @@ const DP_LINGUAGENS = [
       "C",
       "Rust"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 85,
+    "dificuldade": 8
   },
   {
     "nome": "Go (Golang)",
@@ -138,7 +152,9 @@ const DP_LINGUAGENS = [
       "Rust",
       "Python"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 82,
+    "dificuldade": 5
   },
   {
     "nome": "Rust",
@@ -155,7 +171,9 @@ const DP_LINGUAGENS = [
       "C",
       "C++"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 76,
+    "dificuldade": 9
   },
   {
     "nome": "Kotlin",
@@ -172,7 +190,9 @@ const DP_LINGUAGENS = [
       "Java",
       "Swift"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 80,
+    "dificuldade": 5
   },
   {
     "nome": "Swift",
@@ -188,7 +208,9 @@ const DP_LINGUAGENS = [
       "Kotlin",
       "Objective-C"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 78,
+    "dificuldade": 5
   },
   {
     "nome": "Dart",
@@ -204,7 +226,9 @@ const DP_LINGUAGENS = [
       "Kotlin",
       "Swift"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 71,
+    "dificuldade": 5
   },
   {
     "nome": "PHP",
@@ -220,7 +244,9 @@ const DP_LINGUAGENS = [
       "JavaScript",
       "SQL"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 79,
+    "dificuldade": 4
   },
   {
     "nome": "Ruby",
@@ -236,7 +262,9 @@ const DP_LINGUAGENS = [
       "Python",
       "Elixir"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 72,
+    "dificuldade": 4
   },
   {
     "nome": "SQL",
@@ -254,7 +282,9 @@ const DP_LINGUAGENS = [
       "Python",
       "PostgreSQL"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 96,
+    "dificuldade": 4
   },
   {
     "nome": "HTML",
@@ -272,7 +302,9 @@ const DP_LINGUAGENS = [
       "CSS",
       "JavaScript"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 93,
+    "dificuldade": 2
   },
   {
     "nome": "CSS",
@@ -289,7 +321,9 @@ const DP_LINGUAGENS = [
       "HTML",
       "Sass / SCSS"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 92,
+    "dificuldade": 3
   },
   {
     "nome": "Sass / SCSS",
@@ -306,7 +340,9 @@ const DP_LINGUAGENS = [
       "CSS",
       "Tailwind CSS"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 66,
+    "dificuldade": 4
   },
   {
     "nome": "Tailwind CSS",
@@ -322,7 +358,9 @@ const DP_LINGUAGENS = [
       "CSS",
       "JavaScript"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 75,
+    "dificuldade": 4
   },
   {
     "nome": "GraphQL",
@@ -338,7 +376,9 @@ const DP_LINGUAGENS = [
       "TypeScript",
       "SQL"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 68,
+    "dificuldade": 4
   },
   {
     "nome": "Bash / Shell",
@@ -355,7 +395,9 @@ const DP_LINGUAGENS = [
       "PowerShell",
       "Python"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 70,
+    "dificuldade": 5
   },
   {
     "nome": "PowerShell",
@@ -371,7 +413,9 @@ const DP_LINGUAGENS = [
       "Bash / Shell",
       "C#"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 65,
+    "dificuldade": 4
   },
   {
     "nome": "Assembly",
@@ -387,7 +431,9 @@ const DP_LINGUAGENS = [
       "C",
       "Rust"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 35,
+    "dificuldade": 10
   },
   {
     "nome": "R",
@@ -403,7 +449,9 @@ const DP_LINGUAGENS = [
       "Python",
       "SQL"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 64,
+    "dificuldade": 6
   },
   {
     "nome": "Julia",
@@ -419,7 +467,9 @@ const DP_LINGUAGENS = [
       "Python",
       "MATLAB"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 45,
+    "dificuldade": 4
   },
   {
     "nome": "Scala",
@@ -435,7 +485,9 @@ const DP_LINGUAGENS = [
       "Java",
       "Kotlin"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 62,
+    "dificuldade": 7
   },
   {
     "nome": "Elixir",
@@ -451,7 +503,9 @@ const DP_LINGUAGENS = [
       "Ruby",
       "Erlang"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 52,
+    "dificuldade": 4
   },
   {
     "nome": "Haskell",
@@ -467,7 +521,9 @@ const DP_LINGUAGENS = [
       "Scala",
       "F#"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 42,
+    "dificuldade": 9
   },
   {
     "nome": "Lua",
@@ -484,7 +540,9 @@ const DP_LINGUAGENS = [
       "Python",
       "C"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "Solidity",
@@ -500,7 +558,9 @@ const DP_LINGUAGENS = [
       "JavaScript",
       "Rust"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 48,
+    "dificuldade": 7
   },
   {
     "nome": "Zig",
@@ -516,7 +576,9 @@ const DP_LINGUAGENS = [
       "C",
       "Rust"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 30,
+    "dificuldade": 7
   },
   {
     "nome": "V",
@@ -532,7 +594,9 @@ const DP_LINGUAGENS = [
       "Go (Golang)",
       "C"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 20,
+    "dificuldade": 4
   },
   {
     "nome": "Nim",
@@ -548,7 +612,9 @@ const DP_LINGUAGENS = [
       "Python",
       "Rust"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 22,
+    "dificuldade": 4
   },
   {
     "nome": "Perl",
@@ -564,7 +630,9 @@ const DP_LINGUAGENS = [
       "Python",
       "Bash / Shell"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Objective-C",
@@ -580,7 +648,9 @@ const DP_LINGUAGENS = [
       "Swift",
       "C"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 45,
+    "dificuldade": 4
   },
   {
     "nome": "Groovy",
@@ -596,7 +666,9 @@ const DP_LINGUAGENS = [
       "Java",
       "Kotlin"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 48,
+    "dificuldade": 4
   },
   {
     "nome": "Clojure",
@@ -612,7 +684,9 @@ const DP_LINGUAGENS = [
       "Scala",
       "Haskell"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 38,
+    "dificuldade": 8
   },
   {
     "nome": "F#",
@@ -628,7 +702,9 @@ const DP_LINGUAGENS = [
       "C#",
       "Haskell"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 35,
+    "dificuldade": 4
   },
   {
     "nome": "Crystal",
@@ -644,7 +720,9 @@ const DP_LINGUAGENS = [
       "Ruby",
       "Go (Golang)"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 25,
+    "dificuldade": 4
   },
   {
     "nome": "COBOL",
@@ -660,7 +738,9 @@ const DP_LINGUAGENS = [
       "Java",
       "SQL"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 38,
+    "dificuldade": 4
   },
   {
     "nome": "MATLAB",
@@ -676,7 +756,9 @@ const DP_LINGUAGENS = [
       "Python",
       "Julia"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "WebAssembly (WASM)",
@@ -692,7 +774,9 @@ const DP_LINGUAGENS = [
       "Rust",
       "JavaScript"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 55,
+    "dificuldade": 8
   },
   {
     "nome": "NoSQL Query (MongoDB)",
@@ -708,7 +792,9 @@ const DP_LINGUAGENS = [
       "SQL",
       "JavaScript"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 67,
+    "dificuldade": 4
   },
   {
     "nome": "Cypher",
@@ -723,7 +809,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 35,
+    "dificuldade": 4
   },
   {
     "nome": "SPARQL",
@@ -739,7 +827,9 @@ const DP_LINGUAGENS = [
       "SQL",
       "Cypher"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 28,
+    "dificuldade": 8
   },
   {
     "nome": "Markdown",
@@ -754,7 +844,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "HTML"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 88,
+    "dificuldade": 2
   },
   {
     "nome": "JSON / YAML",
@@ -770,7 +862,9 @@ const DP_LINGUAGENS = [
       "SQL",
       "Bash / Shell"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 85,
+    "dificuldade": 4
   },
   {
     "nome": "PromQL",
@@ -786,7 +880,9 @@ const DP_LINGUAGENS = [
       "SQL",
       "Go (Golang)"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "Terraform (HCL)",
@@ -802,7 +898,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "YAML",
       "Bash / Shell"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Unity (C#)",
@@ -822,7 +920,9 @@ const DP_LINGUAGENS = [
       "C#",
       "GDScript",
       "C++"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "GDScript",
@@ -838,7 +938,9 @@ const DP_LINGUAGENS = [
       "C#",
       "Python"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Unreal Blueprints / C++",
@@ -855,7 +957,9 @@ const DP_LINGUAGENS = [
       "C++",
       "C#",
       "Unity (C#)"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "Erlang",
@@ -871,7 +975,9 @@ const DP_LINGUAGENS = [
       "Elixir",
       "Go (Golang)"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "OCaml",
@@ -887,7 +993,9 @@ const DP_LINGUAGENS = [
       "Haskell",
       "F#"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 32,
+    "dificuldade": 8
   },
   {
     "nome": "Fortran",
@@ -903,7 +1011,9 @@ const DP_LINGUAGENS = [
       "C",
       "Python"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 35,
+    "dificuldade": 4
   },
   {
     "nome": "Ada",
@@ -919,7 +1029,9 @@ const DP_LINGUAGENS = [
       "C",
       "Rust"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 25,
+    "dificuldade": 8
   },
   {
     "nome": "Scratch",
@@ -935,7 +1047,9 @@ const DP_LINGUAGENS = [
       "Python",
       "Lua"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 30,
+    "dificuldade": 1
   },
   {
     "nome": "Processing / p5.js",
@@ -950,7 +1064,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "Java"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "T-SQL / PL/pgSQL",
@@ -965,7 +1081,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Python"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 6
   },
   {
     "nome": "HTML5 & CSS3",
@@ -981,7 +1099,9 @@ const DP_LINGUAGENS = [
       "HTML",
       "CSS",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "Vue.js",
@@ -998,7 +1118,9 @@ const DP_LINGUAGENS = [
       "JavaScript",
       "TypeScript",
       "React"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "React",
@@ -1016,7 +1138,9 @@ const DP_LINGUAGENS = [
       "JavaScript",
       "TypeScript",
       "Vue.js"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Angular",
@@ -1034,7 +1158,9 @@ const DP_LINGUAGENS = [
       "TypeScript",
       "Java",
       "C#"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Svelte",
@@ -1050,7 +1176,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "Vue.js"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Next.js",
@@ -1066,7 +1194,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "React",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Node.js",
@@ -1083,7 +1213,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Deno",
@@ -1099,7 +1231,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "TypeScript",
       "Node.js"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Bun",
@@ -1115,7 +1249,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Node.js",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Spring Boot",
@@ -1131,7 +1267,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Java",
       "Kotlin"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Django",
@@ -1148,7 +1286,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "SQL"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "FastAPI",
@@ -1164,7 +1304,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Laravel",
@@ -1181,7 +1323,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "PHP",
       "SQL"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Flutter",
@@ -1198,7 +1342,9 @@ const DP_LINGUAGENS = [
       "Dart",
       "Kotlin",
       "Swift"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "React Native",
@@ -1215,7 +1361,9 @@ const DP_LINGUAGENS = [
       "React",
       "TypeScript",
       "Kotlin"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Docker",
@@ -1233,7 +1381,9 @@ const DP_LINGUAGENS = [
       "Linux",
       "YAML",
       "Kubernetes"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Kubernetes",
@@ -1250,7 +1400,9 @@ const DP_LINGUAGENS = [
       "Docker",
       "Go (Golang)",
       "YAML"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "Git",
@@ -1266,7 +1418,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "GitHub",
       "Bash / Shell"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "GitHub",
@@ -1282,7 +1436,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Git",
       "YAML"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "PostgreSQL",
@@ -1298,7 +1454,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Python"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "MySQL / MariaDB",
@@ -1314,7 +1472,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "PHP"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "Redis",
@@ -1329,7 +1489,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Go (Golang)"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 6
   },
   {
     "nome": "MongoDB",
@@ -1345,7 +1507,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "NoSQL Query (MongoDB)",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "SQLite",
@@ -1361,7 +1525,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Python"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "Kafka",
@@ -1378,7 +1544,9 @@ const DP_LINGUAGENS = [
       "Java",
       "Scala",
       "Go (Golang)"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "RabbitMQ",
@@ -1394,7 +1562,9 @@ const DP_LINGUAGENS = [
       "Python",
       "Java",
       "Go (Golang)"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Nginx",
@@ -1410,7 +1580,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Bash / Shell",
       "Linux"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Linux",
@@ -1426,7 +1598,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Bash / Shell",
       "Docker"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "AWS",
@@ -1443,7 +1617,9 @@ const DP_LINGUAGENS = [
       "Terraform (HCL)",
       "Python",
       "Linux"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "GCP",
@@ -1459,7 +1635,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Kubernetes",
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Azure",
@@ -1475,7 +1653,9 @@ const DP_LINGUAGENS = [
       "C#",
       "PowerShell",
       "Terraform (HCL)"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Pandas",
@@ -1491,7 +1671,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "SQL"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "NumPy",
@@ -1506,7 +1688,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "MATLAB"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "PyTorch",
@@ -1522,7 +1706,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "NumPy"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "TensorFlow",
@@ -1538,7 +1724,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "PyTorch"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "scikit-learn",
@@ -1553,7 +1741,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "Pandas"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Spark",
@@ -1570,7 +1760,9 @@ const DP_LINGUAGENS = [
       "Scala",
       "Python",
       "SQL"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "dbt",
@@ -1585,7 +1777,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Airflow",
@@ -1601,7 +1795,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "SQL"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "Power BI",
@@ -1618,7 +1814,9 @@ const DP_LINGUAGENS = [
       "SQL",
       "Excel",
       "DAX"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Tableau",
@@ -1634,7 +1832,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Looker / Looker Studio",
@@ -1650,7 +1850,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "GCP"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Metabase",
@@ -1665,7 +1867,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "PostgreSQL"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Superset",
@@ -1680,7 +1884,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Excel / Google Sheets",
@@ -1696,7 +1902,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Power BI"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "DAX",
@@ -1712,7 +1920,9 @@ const DP_LINGUAGENS = [
       "SQL",
       "Power BI"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "M (Power Query)",
@@ -1728,7 +1938,9 @@ const DP_LINGUAGENS = [
       "DAX",
       "SQL"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "Qlik Sense",
@@ -1743,7 +1955,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Tableau"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "MicroStrategy",
@@ -1758,7 +1972,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Power BI"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Apache Flink",
@@ -1774,7 +1990,9 @@ const DP_LINGUAGENS = [
       "Kafka",
       "Java",
       "Scala"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "Elasticsearch",
@@ -1789,7 +2007,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JSON / YAML",
       "Java"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Grafana",
@@ -1804,7 +2024,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "PromQL",
       "Docker"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Prometheus",
@@ -1820,7 +2042,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "PromQL",
       "Grafana"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Jenkins",
@@ -1835,7 +2059,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Groovy",
       "Docker"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "GitHub Actions",
@@ -1850,7 +2076,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Git",
       "YAML"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "GitLab CI",
@@ -1865,7 +2093,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Git",
       "Docker"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Ansible",
@@ -1881,7 +2111,9 @@ const DP_LINGUAGENS = [
       "YAML",
       "Bash / Shell",
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Pulumi",
@@ -1897,7 +2129,9 @@ const DP_LINGUAGENS = [
       "TypeScript",
       "Python",
       "Terraform (HCL)"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Godot",
@@ -1913,7 +2147,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "GDScript",
       "C#"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Blender (scripting)",
@@ -1928,7 +2164,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "C++"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "OpenCV",
@@ -1943,7 +2181,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "C++"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Hadoop",
@@ -1958,7 +2198,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Java",
       "Spark"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "Cassandra",
@@ -1973,7 +2215,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Kafka"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 8
   },
   {
     "nome": "Neo4j",
@@ -1988,7 +2232,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Cypher",
       "SQL"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 6
   },
   {
     "nome": "Protobuf",
@@ -2004,7 +2250,9 @@ const DP_LINGUAGENS = [
       "Go (Golang)",
       "Java",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 6
   },
   {
     "nome": "gRPC",
@@ -2019,7 +2267,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Protobuf",
       "Go (Golang)"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "OpenAPI / Swagger",
@@ -2034,7 +2284,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JSON / YAML",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Jest / Vitest",
@@ -2049,7 +2301,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Playwright",
@@ -2065,7 +2319,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "TypeScript",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Cypress",
@@ -2079,7 +2335,9 @@ const DP_LINGUAGENS = [
     "mercado": "QA",
     "relacionados": [
       "JavaScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Selenium",
@@ -2094,7 +2352,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Java",
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "JUnit",
@@ -2109,7 +2369,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Java",
       "Spring Boot"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "pytest",
@@ -2123,7 +2385,9 @@ const DP_LINGUAGENS = [
     "mercado": "Python",
     "relacionados": [
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Regex",
@@ -2139,7 +2403,9 @@ const DP_LINGUAGENS = [
       "Python",
       "JavaScript"
     ],
-    "quandoAprender": "Quando alinhar à sua meta"
+    "quandoAprender": "Quando alinhar à sua meta",
+    "popularidade": 80,
+    "dificuldade": 4
   },
   {
     "nome": "LaTeX",
@@ -2153,7 +2419,9 @@ const DP_LINGUAGENS = [
     "mercado": "Academia",
     "relacionados": [
       "Markdown"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "VHDL / Verilog",
@@ -2168,7 +2436,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "C",
       "Assembly"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "CUDA",
@@ -2183,7 +2453,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "C++",
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "OpenCL",
@@ -2198,7 +2470,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "C",
       "CUDA"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "SAS",
@@ -2213,7 +2487,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "R"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "SPSS",
@@ -2228,7 +2504,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "R",
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Snowflake",
@@ -2243,7 +2521,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "dbt"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "BigQuery",
@@ -2259,7 +2539,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "GCP"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Redshift",
@@ -2274,7 +2556,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "AWS"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Airbyte",
@@ -2289,7 +2573,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Airflow"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Great Expectations",
@@ -2304,7 +2590,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "SQL"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "MLFlow",
@@ -2319,7 +2607,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "PyTorch"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Hugging Face",
@@ -2334,7 +2624,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "PyTorch"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "LangChain / LlamaIndex",
@@ -2349,7 +2641,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "OpenAI API",
@@ -2364,7 +2658,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Ollama",
@@ -2379,7 +2675,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "Linux"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Figma",
@@ -2394,7 +2692,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "CSS",
       "HTML"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Jira",
@@ -2408,7 +2708,9 @@ const DP_LINGUAGENS = [
     "mercado": "Corporativo",
     "relacionados": [
       "Git"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Postman",
@@ -2423,7 +2725,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "OpenAPI / Swagger",
       "JSON / YAML"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Insomnia",
@@ -2438,7 +2742,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Postman",
       "GraphQL"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "VS Code",
@@ -2453,7 +2759,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Git",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "IntelliJ IDEA",
@@ -2468,7 +2776,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Java",
       "Kotlin"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Visual Studio",
@@ -2483,7 +2793,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "C#",
       "C++"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Xcode",
@@ -2498,7 +2810,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Swift",
       "Objective-C"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Android Studio",
@@ -2514,7 +2828,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Kotlin",
       "Java"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Vite",
@@ -2529,7 +2845,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Webpack",
@@ -2543,7 +2861,9 @@ const DP_LINGUAGENS = [
     "mercado": "Front",
     "relacionados": [
       "JavaScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "esbuild / SWC",
@@ -2558,7 +2878,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "TypeScript",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Babel",
@@ -2572,7 +2894,9 @@ const DP_LINGUAGENS = [
     "mercado": "Front",
     "relacionados": [
       "JavaScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "ESLint",
@@ -2587,7 +2911,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "TypeScript",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Prettier",
@@ -2602,7 +2928,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "ESLint",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "SonarQube",
@@ -2617,7 +2945,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Java",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "OWASP ZAP",
@@ -2632,7 +2962,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "Bash / Shell"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Wireshark",
@@ -2646,7 +2978,9 @@ const DP_LINGUAGENS = [
     "mercado": "Rede/segurança",
     "relacionados": [
       "Linux"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Burp Suite",
@@ -2661,7 +2995,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "OWASP ZAP",
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "Make / CMake",
@@ -2676,7 +3012,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "C",
       "C++"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Gradle",
@@ -2691,7 +3029,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Groovy",
       "Kotlin"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Maven",
@@ -2705,7 +3045,9 @@ const DP_LINGUAGENS = [
     "mercado": "Java",
     "relacionados": [
       "Java"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "npm / pnpm / yarn",
@@ -2721,7 +3063,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Node.js",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "pip / uv / poetry",
@@ -2736,7 +3080,9 @@ const DP_LINGUAGENS = [
     "mercado": "Python",
     "relacionados": [
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Cargo",
@@ -2750,7 +3096,9 @@ const DP_LINGUAGENS = [
     "mercado": "Rust",
     "relacionados": [
       "Rust"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "NuGet",
@@ -2764,7 +3112,9 @@ const DP_LINGUAGENS = [
     "mercado": ".NET",
     "relacionados": [
       "C#"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Homebrew",
@@ -2778,7 +3128,9 @@ const DP_LINGUAGENS = [
     "mercado": "macOS devs",
     "relacionados": [
       "Bash / Shell"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Chocolatey / winget",
@@ -2792,7 +3144,9 @@ const DP_LINGUAGENS = [
     "mercado": "Windows",
     "relacionados": [
       "PowerShell"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Zig build",
@@ -2807,7 +3161,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Zig",
       "C"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "SDL",
@@ -2822,7 +3178,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "C",
       "C++"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "OpenGL / Vulkan",
@@ -2837,7 +3195,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "C++",
       "Rust"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "DirectX",
@@ -2852,7 +3212,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "C++",
       "C#"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "Three.js",
@@ -2867,7 +3229,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "WebAssembly (WASM)"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Socket.IO",
@@ -2882,7 +3246,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "Node.js"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "WebRTC",
@@ -2896,7 +3262,9 @@ const DP_LINGUAGENS = [
     "mercado": "Comms",
     "relacionados": [
       "JavaScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "OAuth 2 / OIDC",
@@ -2911,7 +3279,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "HTTP",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "JWT",
@@ -2926,7 +3296,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JSON / YAML",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 6
   },
   {
     "nome": "GraphQL Federation",
@@ -2941,7 +3313,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "GraphQL",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "tRPC",
@@ -2956,7 +3330,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "TypeScript",
       "Node.js"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Prisma",
@@ -2972,7 +3348,9 @@ const DP_LINGUAGENS = [
       "TypeScript",
       "SQL",
       "PostgreSQL"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Hibernate / JPA",
@@ -2987,7 +3365,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Java",
       "SQL"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Entity Framework",
@@ -3002,7 +3382,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "C#",
       "SQL"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "SQLAlchemy",
@@ -3017,7 +3399,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "SQL"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Celery",
@@ -3033,7 +3417,9 @@ const DP_LINGUAGENS = [
       "Python",
       "Redis",
       "RabbitMQ"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Sidekiq",
@@ -3048,7 +3434,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Ruby",
       "Redis"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "BullMQ",
@@ -3063,7 +3451,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Node.js",
       "Redis"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "VB.NET",
@@ -3078,7 +3468,9 @@ const DP_LINGUAGENS = [
     "quandoAprender": "Quando alinhar à sua meta",
     "relacionados": [
       "C#"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Delphi / Object Pascal",
@@ -3094,7 +3486,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "C#",
       "C++"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Prolog",
@@ -3110,7 +3504,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Haskell",
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "Scheme",
@@ -3126,7 +3522,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Clojure",
       "Haskell"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 6
   },
   {
     "nome": "Smalltalk",
@@ -3142,7 +3540,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Ruby",
       "Java"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Tcl",
@@ -3159,7 +3559,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Python",
       "Lua"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Hack",
@@ -3175,7 +3577,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "PHP",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Reason / ReScript",
@@ -3191,7 +3595,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "TypeScript",
       "OCaml"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Elm",
@@ -3207,7 +3613,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Haskell",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "PureScript",
@@ -3223,7 +3631,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Haskell",
       "Elm"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 8
   },
   {
     "nome": "CoffeeScript",
@@ -3239,7 +3649,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "ClojureScript",
@@ -3255,7 +3667,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Clojure",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Haxe",
@@ -3271,7 +3685,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "TypeScript",
       "C#"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Ring",
@@ -3286,7 +3702,9 @@ const DP_LINGUAGENS = [
     "quandoAprender": "Quando alinhar à sua meta",
     "relacionados": [
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "ABAP",
@@ -3302,7 +3720,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Java",
       "SQL"
-    ]
+    ],
+    "popularidade": 42,
+    "dificuldade": 4
   },
   {
     "nome": "Apex",
@@ -3318,7 +3738,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Java",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "TIA Portal / Ladder",
@@ -3334,7 +3756,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "C",
       "Python"
-    ]
+    ],
+    "popularidade": 40,
+    "dificuldade": 4
   },
   {
     "nome": "Less",
@@ -3350,7 +3774,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "CSS",
       "Sass / SCSS"
-    ]
+    ],
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "PostCSS",
@@ -3366,7 +3792,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "CSS",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "HTML5 APIs",
@@ -3383,7 +3811,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 70,
+    "dificuldade": 4
   },
   {
     "nome": "Web Components",
@@ -3399,7 +3829,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "TypeScript"
-    ]
+    ],
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "SVG",
@@ -3416,7 +3848,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "HTML",
       "CSS"
-    ]
+    ],
+    "popularidade": 60,
+    "dificuldade": 4
   },
   {
     "nome": "Canvas API",
@@ -3433,7 +3867,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "WebAssembly (WASM)"
-    ]
+    ],
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "WebGL",
@@ -3449,7 +3885,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "WebAssembly (WASM)"
-    ]
+    ],
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "Liquid / Jinja (templates)",
@@ -3465,7 +3903,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "HTML",
       "Python"
-    ]
+    ],
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "Pug / Jade",
@@ -3481,7 +3921,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "HTML",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "HTMX",
@@ -3497,7 +3939,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "HTML",
       "JavaScript"
-    ]
+    ],
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "Alpine.js",
@@ -3513,7 +3957,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JavaScript",
       "HTML"
-    ]
+    ],
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "T-SQL",
@@ -3529,7 +3975,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "C#"
-    ]
+    ],
+    "popularidade": 60,
+    "dificuldade": 4
   },
   {
     "nome": "PL/pgSQL",
@@ -3545,7 +3993,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Python"
-    ]
+    ],
+    "popularidade": 58,
+    "dificuldade": 4
   },
   {
     "nome": "PL/SQL",
@@ -3561,7 +4011,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Java"
-    ]
+    ],
+    "popularidade": 55,
+    "dificuldade": 4
   },
   {
     "nome": "LogQL",
@@ -3576,7 +4028,9 @@ const DP_LINGUAGENS = [
     "quandoAprender": "Quando alinhar à sua meta",
     "relacionados": [
       "PromQL"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "Kusto (KQL)",
@@ -3591,7 +4045,9 @@ const DP_LINGUAGENS = [
     "quandoAprender": "Quando alinhar à sua meta",
     "relacionados": [
       "SQL"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "HiveQL",
@@ -3607,7 +4063,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Spark"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "Spark SQL",
@@ -3623,7 +4081,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "Scala"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "PrQL",
@@ -3638,7 +4098,9 @@ const DP_LINGUAGENS = [
     "quandoAprender": "Quando alinhar à sua meta",
     "relacionados": [
       "SQL"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "EdgeQL",
@@ -3654,7 +4116,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "GraphQL"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "CQL (Cassandra)",
@@ -3669,7 +4133,9 @@ const DP_LINGUAGENS = [
     "quandoAprender": "Quando alinhar à sua meta",
     "relacionados": [
       "SQL"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "N1QL",
@@ -3685,7 +4151,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "NoSQL Query (MongoDB)"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "AQL",
@@ -3701,7 +4169,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Cypher",
       "SQL"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "Flux",
@@ -3717,7 +4187,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "PromQL",
       "SQL"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "Gremlin",
@@ -3732,7 +4204,9 @@ const DP_LINGUAGENS = [
     "quandoAprender": "Quando alinhar à sua meta",
     "relacionados": [
       "Cypher"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "MDX",
@@ -3748,7 +4222,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "SQL",
       "DAX"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   },
   {
     "nome": "jq",
@@ -3764,7 +4240,9 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "JSON / YAML",
       "Bash / Shell"
-    ]
+    ],
+    "popularidade": 50,
+    "dificuldade": 4
   }
 ];
 const DP_AREAS = [
@@ -3780,14 +4258,14 @@ const DP_AREAS = [
       "Node.js"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> HTML, CSS, JavaScript, TypeScript, SQL, Node.js",
-      "<strong>Próximo passo:</strong> GitHub com README claro vale mais que 10 cursos pela metade.",
-      "<strong>Mercado:</strong> No Brasil e no mundo a demanda por quem entrega front+API+banco continua alta, especialmente em produtos digitais e e-commerce. Plenos/sêniores com TypeScript e bom SQL se destacam; júnior puro sem portfólio sofre mais concorrência."
+      "Stack comum: HTML, CSS, JavaScript, TypeScript, SQL, Node.js",
+      "Próximo passo: GitHub com README claro vale mais que 10 cursos pela metade.",
+      "Mercado: No Brasil a demanda segue alta em produtos digitais, fintechs e e-commerce; pleno com TypeScript + SQL se destaca. Nos EUA/Europa o remoto internacional paga melhor, mas exige inglês e portfólio. Júnior saturado sem projetos públicos."
     ],
     "dica": "GitHub com README claro vale mais que 10 cursos pela metade.",
     "stackComum": "HTML, CSS, JavaScript, TypeScript, SQL, Node.js",
     "proximoPasso": "GitHub com README claro vale mais que 10 cursos pela metade.",
-    "mercadoTexto": "No Brasil e no mundo a demanda por quem entrega front+API+banco continua alta, especialmente em produtos digitais e e-commerce. Plenos/sêniores com TypeScript e bom SQL se destacam; júnior puro sem portfólio sofre mais concorrência."
+    "mercadoTexto": "No Brasil a demanda segue alta em produtos digitais, fintechs e e-commerce; pleno com TypeScript + SQL se destaca. Nos EUA/Europa o remoto internacional paga melhor, mas exige inglês e portfólio. Júnior saturado sem projetos públicos."
   },
   {
     "nome": "Frontend / UI Engineering",
@@ -3800,14 +4278,14 @@ const DP_AREAS = [
       "React"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> HTML, CSS, JavaScript, TypeScript, React",
-      "<strong>Próximo passo:</strong> CSS profundo > depender só de lib.",
-      "<strong>Mercado:</strong> Forte em mercados com muitos produtos SaaS (EUA, Europa, Brasil remoto). Ênfase em React/TypeScript, a11y e performance. Vagas júnior saturadas; mid com design system e métricas web se diferencia."
+      "Stack comum: HTML, CSS, JavaScript, TypeScript, React",
+      "Próximo passo: CSS profundo > depender só de lib.",
+      "Mercado: SaaS e agências no BR contratam React/TS o ano todo; a11y e performance viraram filtro. Nos EUA o mercado é grande porém seletivo em mid+. Design systems são diferencial global."
     ],
     "dica": "CSS profundo > depender só de lib.",
     "stackComum": "HTML, CSS, JavaScript, TypeScript, React",
     "proximoPasso": "CSS profundo > depender só de lib.",
-    "mercadoTexto": "Forte em mercados com muitos produtos SaaS (EUA, Europa, Brasil remoto). Ênfase em React/TypeScript, a11y e performance. Vagas júnior saturadas; mid com design system e métricas web se diferencia."
+    "mercadoTexto": "SaaS e agências no BR contratam React/TS o ano todo; a11y e performance viraram filtro. Nos EUA o mercado é grande porém seletivo em mid+. Design systems são diferencial global."
   },
   {
     "nome": "Backend / APIs",
@@ -3821,14 +4299,14 @@ const DP_AREAS = [
       "TypeScript"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Java, Go (Golang), Python, C#, SQL, TypeScript",
-      "<strong>Próximo passo:</strong> SQL avançado é diferencial.",
-      "<strong>Mercado:</strong> Demanda estável globalmente (fintechs, varejo, saúde). Go, Java e Node lideram stacks; quem domina SQL, filas e observabilidade emprega bem no BR e exterior."
+      "Stack comum: Java, Go (Golang), Python, C#, SQL, TypeScript",
+      "Próximo passo: SQL avançado é diferencial.",
+      "Mercado: Fintechs, varejo e healthtech no BR pagam bem por Java, Go ou Node com SQL sólido. Globalmente cloud-native (K8s, observabilidade) separa pleno de sênior. Pouca vaga para quem só sabe CRUD sem testes."
     ],
     "dica": "SQL avançado é diferencial.",
     "stackComum": "Java, Go (Golang), Python, C#, SQL, TypeScript",
     "proximoPasso": "SQL avançado é diferencial.",
-    "mercadoTexto": "Demanda estável globalmente (fintechs, varejo, saúde). Go, Java e Node lideram stacks; quem domina SQL, filas e observabilidade emprega bem no BR e exterior."
+    "mercadoTexto": "Fintechs, varejo e healthtech no BR pagam bem por Java, Go ou Node com SQL sólido. Globalmente cloud-native (K8s, observabilidade) separa pleno de sênior. Pouca vaga para quem só sabe CRUD sem testes."
   },
   {
     "nome": "Engenharia de Software (visão geral)",
@@ -3840,14 +4318,14 @@ const DP_AREAS = [
       "Python"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Git, SQL, JavaScript, Python",
-      "<strong>Próximo passo:</strong> Escreva RFCs curtas.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Escreva RFCs curtas."
+      "Stack comum: Git, SQL, JavaScript, Python",
+      "Próximo passo: Escreva RFCs curtas.",
+      "Mercado: Perfil transversal pedido em product companies: qualidade, desenho e entrega. No BR aparece mais em empresas médias/grandes; no exterior o título 'Software Engineer' é o padrão e cobre várias stacks."
     ],
     "dica": "Escreva RFCs curtas.",
     "stackComum": "Git, SQL, JavaScript, Python",
     "proximoPasso": "Escreva RFCs curtas.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Escreva RFCs curtas."
+    "mercadoTexto": "Perfil transversal pedido em product companies: qualidade, desenho e entrega. No BR aparece mais em empresas médias/grandes; no exterior o título 'Software Engineer' é o padrão e cobre várias stacks."
   },
   {
     "nome": "Mobile Android",
@@ -3858,14 +4336,14 @@ const DP_AREAS = [
       "SQL"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Kotlin, Java, SQL",
-      "<strong>Próximo passo:</strong> Kotlin first.",
-      "<strong>Mercado:</strong> Mercado global grande; no BR há vagas em bancos e retail. Kotlin é o padrão. Concorrência alta em júnior; apps publicados e Play Console pesam."
+      "Stack comum: Kotlin, Java, SQL",
+      "Próximo passo: Kotlin first.",
+      "Mercado: Bancos e varejo BR mantêm times Kotlin. Globalmente o mercado é estável após o pico dos anos 2010; apps publicados e arquitetura moderna (Compose) pesam mais que certificado."
     ],
     "dica": "Kotlin first.",
     "stackComum": "Kotlin, Java, SQL",
     "proximoPasso": "Kotlin first.",
-    "mercadoTexto": "Mercado global grande; no BR há vagas em bancos e retail. Kotlin é o padrão. Concorrência alta em júnior; apps publicados e Play Console pesam."
+    "mercadoTexto": "Bancos e varejo BR mantêm times Kotlin. Globalmente o mercado é estável após o pico dos anos 2010; apps publicados e arquitetura moderna (Compose) pesam mais que certificado."
   },
   {
     "nome": "Mobile iOS",
@@ -3875,14 +4353,14 @@ const DP_AREAS = [
       "Objective-C"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Swift, Objective-C",
-      "<strong>Próximo passo:</strong> SwiftUI + networking sólido.",
-      "<strong>Mercado:</strong> Concentrado em empresas com orçamento Apple e produtos premium. SwiftUI em alta. Menos vagas que Android no BR, porém bem pagas em hubs e remoto internacional."
+      "Stack comum: Swift, Objective-C",
+      "Próximo passo: SwiftUI + networking sólido.",
+      "Mercado: Menos vagas que Android no BR, porém bem remuneradas em hubs e remoto para produtos premium. SwiftUI dominou vagas novas; Objective-C só em legado."
     ],
     "dica": "SwiftUI + networking sólido.",
     "stackComum": "Swift, Objective-C",
     "proximoPasso": "SwiftUI + networking sólido.",
-    "mercadoTexto": "Concentrado em empresas com orçamento Apple e produtos premium. SwiftUI em alta. Menos vagas que Android no BR, porém bem pagas em hubs e remoto internacional."
+    "mercadoTexto": "Menos vagas que Android no BR, porém bem remuneradas em hubs e remoto para produtos premium. SwiftUI dominou vagas novas; Objective-C só em legado."
   },
   {
     "nome": "Mobile Multiplataforma",
@@ -3894,14 +4372,14 @@ const DP_AREAS = [
       "React Native"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Dart, Flutter, TypeScript, React Native",
-      "<strong>Próximo passo:</strong> Escolha Flutter OU RN e aprofunde.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Escolha Flutter OU RN e aprofunde."
+      "Stack comum: Dart, Flutter, TypeScript, React Native",
+      "Próximo passo: Escolha Flutter OU RN e aprofunde.",
+      "Mercado: Flutter e React Native crescem em startups que precisam de iOS+Android barato. Studios sérios ainda preferem nativo para core; no BR há espaço em MVPs e apps internos."
     ],
     "dica": "Escolha Flutter OU RN e aprofunde.",
     "stackComum": "Dart, Flutter, TypeScript, React Native",
     "proximoPasso": "Escolha Flutter OU RN e aprofunde.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Escolha Flutter OU RN e aprofunde."
+    "mercadoTexto": "Flutter e React Native crescem em startups que precisam de iOS+Android barato. Studios sérios ainda preferem nativo para core; no BR há espaço em MVPs e apps internos."
   },
   {
     "nome": "Game Development (Unity)",
@@ -3911,14 +4389,14 @@ const DP_AREAS = [
       "Unity (C#)"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> C#, Unity (C#)",
-      "<strong>Próximo passo:</strong> Termine jogos curtos.",
-      "<strong>Mercado:</strong> Indie global aquecido; studios médios seletivos. C# + Unity ainda é a porta mais comum. Renda instável no indie; clutches em live-ops e mobile games."
+      "Stack comum: C#, Unity (C#)",
+      "Próximo passo: Termine jogos curtos.",
+      "Mercado: Indie global aquecido; no BR o mercado formal é pequeno e concentrado em mobile/live-ops. Portfólio jogável > diploma. Renda instável no indie puro."
     ],
     "dica": "Termine jogos curtos.",
     "stackComum": "C#, Unity (C#)",
     "proximoPasso": "Termine jogos curtos.",
-    "mercadoTexto": "Indie global aquecido; studios médios seletivos. C# + Unity ainda é a porta mais comum. Renda instável no indie; clutches em live-ops e mobile games."
+    "mercadoTexto": "Indie global aquecido; no BR o mercado formal é pequeno e concentrado em mobile/live-ops. Portfólio jogável > diploma. Renda instável no indie puro."
   },
   {
     "nome": "Game Development (Godot)",
@@ -3929,14 +4407,14 @@ const DP_AREAS = [
       "Godot"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> GDScript, C#, Godot",
-      "<strong>Próximo passo:</strong> Ideal indie sem taxa de engine.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Ideal indie sem taxa de engine."
+      "Stack comum: GDScript, C#, Godot",
+      "Próximo passo: Ideal indie sem taxa de engine.",
+      "Mercado: Comunidade global em expansão; poucas vagas CLT no BR. Ideal para portfólio e jogos autorais. Monetização ainda depende de lojas e marketing."
     ],
     "dica": "Ideal indie sem taxa de engine.",
     "stackComum": "GDScript, C#, Godot",
     "proximoPasso": "Ideal indie sem taxa de engine.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Ideal indie sem taxa de engine."
+    "mercadoTexto": "Comunidade global em expansão; poucas vagas CLT no BR. Ideal para portfólio e jogos autorais. Monetização ainda depende de lojas e marketing."
   },
   {
     "nome": "Game Development (Unreal)",
@@ -3946,14 +4424,14 @@ const DP_AREAS = [
       "Unreal Blueprints / C++"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> C++, Unreal Blueprints / C++",
-      "<strong>Próximo passo:</strong> Curva alta — foque um sistema por vez.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Curva alta — foque um sistema por vez."
+      "Stack comum: C++, Unreal Blueprints / C++",
+      "Próximo passo: Curva alta — foque um sistema por vez.",
+      "Mercado: Vagas em studios AAA e virtual production (EUA/Europa/Ásia). Barreira alta (C++/gráficos). No BR quase só terceirização ou projetos pontuais."
     ],
     "dica": "Curva alta — foque um sistema por vez.",
     "stackComum": "C++, Unreal Blueprints / C++",
     "proximoPasso": "Curva alta — foque um sistema por vez.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Curva alta — foque um sistema por vez."
+    "mercadoTexto": "Vagas em studios AAA e virtual production (EUA/Europa/Ásia). Barreira alta (C++/gráficos). No BR quase só terceirização ou projetos pontuais."
   },
   {
     "nome": "Ciência de Dados",
@@ -3965,14 +4443,14 @@ const DP_AREAS = [
       "Pandas"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Python, SQL, R, Pandas",
-      "<strong>Próximo passo:</strong> SQL + pandas antes de deep learning.",
-      "<strong>Mercado:</strong> Demanda alta onde há dados maduros (EUA, Europa, grandes empresas BR). Exigem SQL forte + Python; título de 'cientista' sem entrega de negócio está mais filtrado."
+      "Stack comum: Python, SQL, R, Pandas",
+      "Próximo passo: SQL + pandas antes de deep learning.",
+      "Mercado: Grandes empresas e consultorias BR contratam quem entrega insight com SQL+Python. O título inchou; quem não prova impacto de negócio é filtrado. Nos EUA o mercado é maduro e competitivo."
     ],
     "dica": "SQL + pandas antes de deep learning.",
     "stackComum": "Python, SQL, R, Pandas",
     "proximoPasso": "SQL + pandas antes de deep learning.",
-    "mercadoTexto": "Demanda alta onde há dados maduros (EUA, Europa, grandes empresas BR). Exigem SQL forte + Python; título de 'cientista' sem entrega de negócio está mais filtrado."
+    "mercadoTexto": "Grandes empresas e consultorias BR contratam quem entrega insight com SQL+Python. O título inchou; quem não prova impacto de negócio é filtrado. Nos EUA o mercado é maduro e competitivo."
   },
   {
     "nome": "Engenharia de Dados",
@@ -3985,14 +4463,14 @@ const DP_AREAS = [
       "dbt"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> SQL, Python, Spark, Airflow, dbt",
-      "<strong>Próximo passo:</strong> Confiabilidade > modelo fancy.",
-      "<strong>Mercado:</strong> Uma das áreas mais aquecidas globalmente (pipelines, warehouse, qualidade). No BR, fintechs e varejo contratam bem quem sabe SQL + cloud + orquestração."
+      "Stack comum: SQL, Python, Spark, Airflow, dbt",
+      "Próximo passo: Confiabilidade > modelo fancy.",
+      "Mercado: Uma das áreas mais aquecidas no BR (fintech, varejo, telecom) e no mundo. Pipelines, warehouse e qualidade de dados pagam acima da média. Cloud (AWS/GCP) quase obrigatório."
     ],
     "dica": "Confiabilidade > modelo fancy.",
     "stackComum": "SQL, Python, Spark, Airflow, dbt",
     "proximoPasso": "Confiabilidade > modelo fancy.",
-    "mercadoTexto": "Uma das áreas mais aquecidas globalmente (pipelines, warehouse, qualidade). No BR, fintechs e varejo contratam bem quem sabe SQL + cloud + orquestração."
+    "mercadoTexto": "Uma das áreas mais aquecidas no BR (fintech, varejo, telecom) e no mundo. Pipelines, warehouse e qualidade de dados pagam acima da média. Cloud (AWS/GCP) quase obrigatório."
   },
   {
     "nome": "Analytics / BI",
@@ -4005,14 +4483,14 @@ const DP_AREAS = [
       "Excel / Google Sheets"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> SQL, Power BI, Tableau, DAX, Excel / Google Sheets",
-      "<strong>Próximo passo:</strong> Defina a métrica antes do gráfico.",
-      "<strong>Mercado:</strong> Forte no corporativo BR (Power BI/Tableau). Self-service cresce; falta de modelagem e governança ainda gera muita vaga de quem 'traduz negócio → métrica'."
+      "Stack comum: SQL, Power BI, Tableau, DAX, Excel / Google Sheets",
+      "Próximo passo: Defina a métrica antes do gráfico.",
+      "Mercado: Power BI domina o corporativo brasileiro; Tableau em multinacionais. Muita vaga de quem une regra de negócio + modelo semântico. Self-service cresceu e exigiu mais governança."
     ],
     "dica": "Defina a métrica antes do gráfico.",
     "stackComum": "SQL, Power BI, Tableau, DAX, Excel / Google Sheets",
     "proximoPasso": "Defina a métrica antes do gráfico.",
-    "mercadoTexto": "Forte no corporativo BR (Power BI/Tableau). Self-service cresce; falta de modelagem e governança ainda gera muita vaga de quem 'traduz negócio → métrica'."
+    "mercadoTexto": "Power BI domina o corporativo brasileiro; Tableau em multinacionais. Muita vaga de quem une regra de negócio + modelo semântico. Self-service cresceu e exigiu mais governança."
   },
   {
     "nome": "Machine Learning Engineering",
@@ -4024,14 +4502,14 @@ const DP_AREAS = [
       "MLFlow"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Python, scikit-learn, PyTorch, MLFlow",
-      "<strong>Próximo passo:</strong> Baseline simples primeiro.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Baseline simples primeiro."
+      "Stack comum: Python, scikit-learn, PyTorch, MLFlow",
+      "Próximo passo: Baseline simples primeiro.",
+      "Mercado: Escassez global de quem coloca modelo em produção com monitoramento. No BR há vagas em big tech local, fintechs e consultorias; exige engenharia além do notebook."
     ],
     "dica": "Baseline simples primeiro.",
     "stackComum": "Python, scikit-learn, PyTorch, MLFlow",
     "proximoPasso": "Baseline simples primeiro.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Baseline simples primeiro."
+    "mercadoTexto": "Escassez global de quem coloca modelo em produção com monitoramento. No BR há vagas em big tech local, fintechs e consultorias; exige engenharia além do notebook."
   },
   {
     "nome": "Deep Learning / IA Generativa",
@@ -4043,14 +4521,14 @@ const DP_AREAS = [
       "LangChain / LlamaIndex"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Python, PyTorch, Hugging Face, LangChain / LlamaIndex",
-      "<strong>Próximo passo:</strong> Não pule fundamentos de ML.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Não pule fundamentos de ML."
+      "Stack comum: Python, PyTorch, Hugging Face, LangChain / LlamaIndex",
+      "Próximo passo: Não pule fundamentos de ML.",
+      "Mercado: Boom de vagas ligadas a LLM/RAG, mas muitas são 'prompt + API'. Quem entende avaliação, custo e segurança se destaca no BR e no exterior. Mercado volátil e hype-driven."
     ],
     "dica": "Não pule fundamentos de ML.",
     "stackComum": "Python, PyTorch, Hugging Face, LangChain / LlamaIndex",
     "proximoPasso": "Não pule fundamentos de ML.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Não pule fundamentos de ML."
+    "mercadoTexto": "Boom de vagas ligadas a LLM/RAG, mas muitas são 'prompt + API'. Quem entende avaliação, custo e segurança se destaca no BR e no exterior. Mercado volátil e hype-driven."
   },
   {
     "nome": "MLOps",
@@ -4062,14 +4540,14 @@ const DP_AREAS = [
       "MLFlow"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Python, Docker, Kubernetes, MLFlow",
-      "<strong>Próximo passo:</strong> Trate modelo como software.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Trate modelo como software."
+      "Stack comum: Python, Docker, Kubernetes, MLFlow",
+      "Próximo passo: Trate modelo como software.",
+      "Mercado: Nasce como especialização em empresas com vários modelos. Mais comum em mercados maduros (EUA/Europa); no BR aparece em times de dados maiores. Docker/K8s + experiment tracking."
     ],
     "dica": "Trate modelo como software.",
     "stackComum": "Python, Docker, Kubernetes, MLFlow",
     "proximoPasso": "Trate modelo como software.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Trate modelo como software."
+    "mercadoTexto": "Nasce como especialização em empresas com vários modelos. Mais comum em mercados maduros (EUA/Europa); no BR aparece em times de dados maiores. Docker/K8s + experiment tracking."
   },
   {
     "nome": "DevOps",
@@ -4081,14 +4559,14 @@ const DP_AREAS = [
       "Terraform (HCL)"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Bash / Shell, Docker, GitHub Actions, Terraform (HCL)",
-      "<strong>Próximo passo:</strong> Automatize a terceira repetição.",
-      "<strong>Mercado:</strong> Demanda alta mundial por CI/CD, cloud e automação. No BR, perfil híbrido (dev que opera) está valorizado; Kubernetes sem base de Linux/rede não segura vaga boa."
+      "Stack comum: Bash / Shell, Docker, GitHub Actions, Terraform (HCL)",
+      "Próximo passo: Automatize a terceira repetição.",
+      "Mercado: Demanda alta no BR por CI/CD e cloud híbrida. Globalmente o papel se funde com platform eng. Kubernetes sem base de rede/Linux não segura vaga boa."
     ],
     "dica": "Automatize a terceira repetição.",
     "stackComum": "Bash / Shell, Docker, GitHub Actions, Terraform (HCL)",
     "proximoPasso": "Automatize a terceira repetição.",
-    "mercadoTexto": "Demanda alta mundial por CI/CD, cloud e automação. No BR, perfil híbrido (dev que opera) está valorizado; Kubernetes sem base de Linux/rede não segura vaga boa."
+    "mercadoTexto": "Demanda alta no BR por CI/CD e cloud híbrida. Globalmente o papel se funde com platform eng. Kubernetes sem base de rede/Linux não segura vaga boa."
   },
   {
     "nome": "SRE (Site Reliability)",
@@ -4100,14 +4578,14 @@ const DP_AREAS = [
       "Grafana"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Go (Golang), Python, Prometheus, Grafana",
-      "<strong>Próximo passo:</strong> Métrica de dor do usuário > CPU só.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Métrica de dor do usuário > CPU só."
+      "Stack comum: Go (Golang), Python, Prometheus, Grafana",
+      "Próximo passo: Métrica de dor do usuário > CPU só.",
+      "Mercado: Forte em big tech e unicorns; no BR ainda concentrado em empresas de escala. SLOs e postmortems são o idioma. Pagamento acima da média de ops tradicional."
     ],
     "dica": "Métrica de dor do usuário > CPU só.",
     "stackComum": "Go (Golang), Python, Prometheus, Grafana",
     "proximoPasso": "Métrica de dor do usuário > CPU só.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Métrica de dor do usuário > CPU só."
+    "mercadoTexto": "Forte em big tech e unicorns; no BR ainda concentrado em empresas de escala. SLOs e postmortems são o idioma. Pagamento acima da média de ops tradicional."
   },
   {
     "nome": "Cloud Architect (visão)",
@@ -4119,14 +4597,14 @@ const DP_AREAS = [
       "Terraform (HCL)"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> AWS, GCP, Azure, Terraform (HCL)",
-      "<strong>Próximo passo:</strong> Comece por uma cloud só.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Comece por uma cloud só."
+      "Stack comum: AWS, GCP, Azure, Terraform (HCL)",
+      "Próximo passo: Comece por uma cloud só.",
+      "Mercado: Consultorias e grandes contas BR pagam bem por quem desenha custo+segurança na AWS/Azure. Certificação ajuda a abrir porta; experiência de incidentes fecha."
     ],
     "dica": "Comece por uma cloud só.",
     "stackComum": "AWS, GCP, Azure, Terraform (HCL)",
     "proximoPasso": "Comece por uma cloud só.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Comece por uma cloud só."
+    "mercadoTexto": "Consultorias e grandes contas BR pagam bem por quem desenha custo+segurança na AWS/Azure. Certificação ajuda a abrir porta; experiência de incidentes fecha."
   },
   {
     "nome": "Cibersegurança Ofensiva",
@@ -4138,14 +4616,14 @@ const DP_AREAS = [
       "OWASP ZAP"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Python, Bash / Shell, Burp Suite, OWASP ZAP",
-      "<strong>Próximo passo:</strong> Sem autorização é crime.",
-      "<strong>Mercado:</strong> Escassez global de profissionais sérios. No BR cresce compliance e appsec. Sem labs/portfólio ético a entrada é difícil; senior bem pago."
+      "Stack comum: Python, Bash / Shell, Burp Suite, OWASP ZAP",
+      "Próximo passo: Sem autorização é crime.",
+      "Mercado: Escassez mundial. No BR cresce com LGPD e appsec, mas entrada exige labs éticos e inglês técnico. Senior ofensivo é raro e bem pago."
     ],
     "dica": "Sem autorização é crime.",
     "stackComum": "Python, Bash / Shell, Burp Suite, OWASP ZAP",
     "proximoPasso": "Sem autorização é crime.",
-    "mercadoTexto": "Escassez global de profissionais sérios. No BR cresce compliance e appsec. Sem labs/portfólio ético a entrada é difícil; senior bem pago."
+    "mercadoTexto": "Escassez mundial. No BR cresce com LGPD e appsec, mas entrada exige labs éticos e inglês técnico. Senior ofensivo é raro e bem pago."
   },
   {
     "nome": "Cibersegurança Defensiva",
@@ -4157,14 +4635,14 @@ const DP_AREAS = [
       "Linux"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Python, SQL, Elasticsearch, Linux",
-      "<strong>Próximo passo:</strong> Fundamentos de rede e SO.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Fundamentos de rede e SO."
+      "Stack comum: Python, SQL, Elasticsearch, Linux",
+      "Próximo passo: Fundamentos de rede e SO.",
+      "Mercado: SOCs e blue teams expandem em bancos e governo BR. Turnos e ferramentas SIEM fazem parte do pacote. Exterior oferece mais automação e melhor processo."
     ],
     "dica": "Fundamentos de rede e SO.",
     "stackComum": "Python, SQL, Elasticsearch, Linux",
     "proximoPasso": "Fundamentos de rede e SO.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Fundamentos de rede e SO."
+    "mercadoTexto": "SOCs e blue teams expandem em bancos e governo BR. Turnos e ferramentas SIEM fazem parte do pacote. Exterior oferece mais automação e melhor processo."
   },
   {
     "nome": "AppSec",
@@ -4176,14 +4654,14 @@ const DP_AREAS = [
       "Python"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> OWASP ZAP, SonarQube, JavaScript, Python",
-      "<strong>Próximo passo:</strong> Shift-left de verdade.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Shift-left de verdade."
+      "Stack comum: OWASP ZAP, SonarQube, JavaScript, Python",
+      "Próximo passo: Shift-left de verdade.",
+      "Mercado: Shift-left virou discurso e, devagar, prática. Empresas de produto buscam quem fala com devs. No BR ainda há poucas vagas dedicadas; muitas acumulam com backend."
     ],
     "dica": "Shift-left de verdade.",
     "stackComum": "OWASP ZAP, SonarQube, JavaScript, Python",
     "proximoPasso": "Shift-left de verdade.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Shift-left de verdade."
+    "mercadoTexto": "Shift-left virou discurso e, devagar, prática. Empresas de produto buscam quem fala com devs. No BR ainda há poucas vagas dedicadas; muitas acumulam com backend."
   },
   {
     "nome": "QA Manual",
@@ -4194,14 +4672,14 @@ const DP_AREAS = [
       "SQL"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Jira, Markdown, SQL",
-      "<strong>Próximo passo:</strong> Reproduzir > opinião.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Reproduzir > opinião."
+      "Stack comum: Jira, Markdown, SQL",
+      "Próximo passo: Reproduzir > opinião.",
+      "Mercado: Ainda existe em empresas legadas e apps regulados, mas sozinho está apertado. Quem só executa roteiro sente pressão de automação no BR e no mundo."
     ],
     "dica": "Reproduzir > opinião.",
     "stackComum": "Jira, Markdown, SQL",
     "proximoPasso": "Reproduzir > opinião.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Reproduzir > opinião."
+    "mercadoTexto": "Ainda existe em empresas legadas e apps regulados, mas sozinho está apertado. Quem só executa roteiro sente pressão de automação no BR e no mundo."
   },
   {
     "nome": "QA Automation",
@@ -4214,14 +4692,14 @@ const DP_AREAS = [
       "Python"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Playwright, Cypress, Selenium, TypeScript, Python",
-      "<strong>Próximo passo:</strong> Menos E2E frágeis, mais unit/API.",
-      "<strong>Mercado:</strong> Empresas maduras (global e BR) buscam automação além do clique manual. Playwright/Cypress + API tests abrem portas; só QA manual está mais apertado."
+      "Stack comum: Playwright, Cypress, Selenium, TypeScript, Python",
+      "Próximo passo: Menos E2E frágeis, mais unit/API.",
+      "Mercado: Playwright/Cypress + testes de API estão em alta. Product companies globais e BR maduras pagam bem. Pirâmide de testes bem contada vende a vaga."
     ],
     "dica": "Menos E2E frágeis, mais unit/API.",
     "stackComum": "Playwright, Cypress, Selenium, TypeScript, Python",
     "proximoPasso": "Menos E2E frágeis, mais unit/API.",
-    "mercadoTexto": "Empresas maduras (global e BR) buscam automação além do clique manual. Playwright/Cypress + API tests abrem portas; só QA manual está mais apertado."
+    "mercadoTexto": "Playwright/Cypress + testes de API estão em alta. Product companies globais e BR maduras pagam bem. Pirâmide de testes bem contada vende a vaga."
   },
   {
     "nome": "Engenharia de Plataforma",
@@ -4233,14 +4711,14 @@ const DP_AREAS = [
       "Terraform (HCL)"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Kubernetes, Go (Golang), TypeScript, Terraform (HCL)",
-      "<strong>Próximo passo:</strong> Reduza toil do time.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Reduza toil do time."
+      "Stack comum: Kubernetes, Go (Golang), TypeScript, Terraform (HCL)",
+      "Próximo passo: Reduza toil do time.",
+      "Mercado: Times internos de DX em empresas grandes (mais EUA/Europa; no BR em unicorns). Golden paths e redução de toil são o valor. Poucas vagas, alto impacto."
     ],
     "dica": "Reduza toil do time.",
     "stackComum": "Kubernetes, Go (Golang), TypeScript, Terraform (HCL)",
     "proximoPasso": "Reduza toil do time.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Reduza toil do time."
+    "mercadoTexto": "Times internos de DX em empresas grandes (mais EUA/Europa; no BR em unicorns). Golden paths e redução de toil são o valor. Poucas vagas, alto impacto."
   },
   {
     "nome": "Arquitetura de Software",
@@ -4252,14 +4730,14 @@ const DP_AREAS = [
       "TypeScript"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> SQL, Java, Go (Golang), TypeScript",
-      "<strong>Próximo passo:</strong> Documente decisões (ADR).",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Documente decisões (ADR)."
+      "Stack comum: SQL, Java, Go (Golang), TypeScript",
+      "Próximo passo: Documente decisões (ADR).",
+      "Mercado: Papel de senior/staff. No BR aparece com título formal em empresas grandes; no exterior muitas vezes é expectativa do staff eng. ADRs e trade-offs claros."
     ],
     "dica": "Documente decisões (ADR).",
     "stackComum": "SQL, Java, Go (Golang), TypeScript",
     "proximoPasso": "Documente decisões (ADR).",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Documente decisões (ADR)."
+    "mercadoTexto": "Papel de senior/staff. No BR aparece com título formal em empresas grandes; no exterior muitas vezes é expectativa do staff eng. ADRs e trade-offs claros."
   },
   {
     "nome": "Integração de Sistemas / Middleware",
@@ -4271,14 +4749,14 @@ const DP_AREAS = [
       "RabbitMQ"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Java, C#, Kafka, RabbitMQ",
-      "<strong>Próximo passo:</strong> Contratos explícitos.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Contratos explícitos."
+      "Stack comum: Java, C#, Kafka, RabbitMQ",
+      "Próximo passo: Contratos explícitos.",
+      "Mercado: Forte no corporativo BR (bancos, indústria, varejo) com filas e ESBs legados. Modernização para eventos (Kafka) cria demanda híbrida."
     ],
     "dica": "Contratos explícitos.",
     "stackComum": "Java, C#, Kafka, RabbitMQ",
     "proximoPasso": "Contratos explícitos.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Contratos explícitos."
+    "mercadoTexto": "Forte no corporativo BR (bancos, indústria, varejo) com filas e ESBs legados. Modernização para eventos (Kafka) cria demanda híbrida."
   },
   {
     "nome": "ERP / Sistemas Corporativos",
@@ -4289,14 +4767,14 @@ const DP_AREAS = [
       "Java"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> ABAP (conceito), SQL, Java",
-      "<strong>Próximo passo:</strong> Negócio + sistema, não só tela.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Negócio + sistema, não só tela."
+      "Stack comum: ABAP (conceito), SQL, Java",
+      "Próximo passo: Negócio + sistema, não só tela.",
+      "Mercado: SAP e similares: mercado estável e bem pago no BR, menos 'sexy' em tech product. Domínio de processo de negócio vale tanto quanto ABAP."
     ],
     "dica": "Negócio + sistema, não só tela.",
     "stackComum": "ABAP (conceito), SQL, Java",
     "proximoPasso": "Negócio + sistema, não só tela.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Negócio + sistema, não só tela."
+    "mercadoTexto": "SAP e similares: mercado estável e bem pago no BR, menos 'sexy' em tech product. Domínio de processo de negócio vale tanto quanto ABAP."
   },
   {
     "nome": "Mainframe & Legado",
@@ -4307,14 +4785,14 @@ const DP_AREAS = [
       "Java"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> COBOL, SQL, Java",
-      "<strong>Próximo passo:</strong> Pagamento alto, stack antiga.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Pagamento alto, stack antiga."
+      "Stack comum: COBOL, SQL, Java",
+      "Próximo passo: Pagamento alto, stack antiga.",
+      "Mercado: Escassez crítica de quem mantém COBOL/mainframe em bancos. Salários altos, stack antiga, pouco glamour. Aposentadorias abrem vagas silenciosas."
     ],
     "dica": "Pagamento alto, stack antiga.",
     "stackComum": "COBOL, SQL, Java",
     "proximoPasso": "Pagamento alto, stack antiga.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Pagamento alto, stack antiga."
+    "mercadoTexto": "Escassez crítica de quem mantém COBOL/mainframe em bancos. Salários altos, stack antiga, pouco glamour. Aposentadorias abrem vagas silenciosas."
   },
   {
     "nome": "Embarcados / Firmware",
@@ -4326,14 +4804,14 @@ const DP_AREAS = [
       "Assembly"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> C, C++, Rust, Assembly",
-      "<strong>Próximo passo:</strong> Comece com ESP32 + C.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Comece com ESP32 + C."
+      "Stack comum: C, C++, Rust, Assembly",
+      "Próximo passo: Comece com ESP32 + C.",
+      "Mercado: Indústria, automotivo e IoT hardware. No BR concentrado em polos industriais. C/C++ e eletrônica básica. Exterior tem mais abertura em devices de consumo."
     ],
     "dica": "Comece com ESP32 + C.",
     "stackComum": "C, C++, Rust, Assembly",
     "proximoPasso": "Comece com ESP32 + C.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Comece com ESP32 + C."
+    "mercadoTexto": "Indústria, automotivo e IoT hardware. No BR concentrado em polos industriais. C/C++ e eletrônica básica. Exterior tem mais abertura em devices de consumo."
   },
   {
     "nome": "IoT",
@@ -4345,14 +4823,14 @@ const DP_AREAS = [
       "Linux"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> C, Python, MQTT (conceito), Linux",
-      "<strong>Próximo passo:</strong> Protótipo ponta a ponta simples.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Protótipo ponta a ponta simples."
+      "Stack comum: C, Python, MQTT (conceito), Linux",
+      "Próximo passo: Protótipo ponta a ponta simples.",
+      "Mercado: Projetos pontuais no BR (agro, utilities); globalmente edge+cloud. Segurança de device é o calcanhar. Protótipo ponta a ponta fala mais que slide."
     ],
     "dica": "Protótipo ponta a ponta simples.",
     "stackComum": "C, Python, MQTT (conceito), Linux",
     "proximoPasso": "Protótipo ponta a ponta simples.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Protótipo ponta a ponta simples."
+    "mercadoTexto": "Projetos pontuais no BR (agro, utilities); globalmente edge+cloud. Segurança de device é o calcanhar. Protótipo ponta a ponta fala mais que slide."
   },
   {
     "nome": "Redes e Infraestrutura",
@@ -4363,14 +4841,14 @@ const DP_AREAS = [
       "Wireshark"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Linux, Bash / Shell, Wireshark",
-      "<strong>Próximo passo:</strong> Laboratório caseiro ajuda.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Laboratório caseiro ajuda."
+      "Stack comum: Linux, Bash / Shell, Wireshark",
+      "Próximo passo: Laboratório caseiro ajuda.",
+      "Mercado: Base de tudo; vagas estáveis em telecom e datacenter BR. Certificações ainda contam. Evolução para SDN/cloud networking no exterior."
     ],
     "dica": "Laboratório caseiro ajuda.",
     "stackComum": "Linux, Bash / Shell, Wireshark",
     "proximoPasso": "Laboratório caseiro ajuda.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Laboratório caseiro ajuda."
+    "mercadoTexto": "Base de tudo; vagas estáveis em telecom e datacenter BR. Certificações ainda contam. Evolução para SDN/cloud networking no exterior."
   },
   {
     "nome": "Administração de Sistemas",
@@ -4382,14 +4860,14 @@ const DP_AREAS = [
       "Nginx"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Linux, Bash / Shell, Ansible, Nginx",
-      "<strong>Próximo passo:</strong> Infrastructure as code cedo.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Infrastructure as code cedo."
+      "Stack comum: Linux, Bash / Shell, Ansible, Nginx",
+      "Próximo passo: Infrastructure as code cedo.",
+      "Mercado: Linux e automação (Ansible) no corporativo. Muitas funções migraram para SRE/DevOps; sysadmin puro encolheu mas não sumiu em empresas tradicionais."
     ],
     "dica": "Infrastructure as code cedo.",
     "stackComum": "Linux, Bash / Shell, Ansible, Nginx",
     "proximoPasso": "Infrastructure as code cedo.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Infrastructure as code cedo."
+    "mercadoTexto": "Linux e automação (Ansible) no corporativo. Muitas funções migraram para SRE/DevOps; sysadmin puro encolheu mas não sumiu em empresas tradicionais."
   },
   {
     "nome": "Banco de Dados (DBA)",
@@ -4400,14 +4878,14 @@ const DP_AREAS = [
       "MySQL / MariaDB"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> SQL, PostgreSQL, MySQL / MariaDB",
-      "<strong>Próximo passo:</strong> Entenda planos de execução.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Entenda planos de execução."
+      "Stack comum: SQL, PostgreSQL, MySQL / MariaDB",
+      "Próximo passo: Entenda planos de execução.",
+      "Mercado: PostgreSQL/MySQL na nuvem mudaram o papel: menos 'cuidar do servidor', mais performance e confiabilidade. DBAs que falam com devs empregam melhor."
     ],
     "dica": "Entenda planos de execução.",
     "stackComum": "SQL, PostgreSQL, MySQL / MariaDB",
     "proximoPasso": "Entenda planos de execução.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Entenda planos de execução."
+    "mercadoTexto": "PostgreSQL/MySQL na nuvem mudaram o papel: menos 'cuidar do servidor', mais performance e confiabilidade. DBAs que falam com devs empregam melhor."
   },
   {
     "nome": "Data Analytics Product",
@@ -4419,14 +4897,14 @@ const DP_AREAS = [
       "Looker / Looker Studio"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> SQL, Python, Metabase, Looker / Looker Studio",
-      "<strong>Próximo passo:</strong> Métrica acionável > vaidade.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Métrica acionável > vaidade."
+      "Stack comum: SQL, Python, Metabase, Looker / Looker Studio",
+      "Próximo passo: Métrica acionável > vaidade.",
+      "Mercado: Startups e product companies querem métricas de funil e experimentos. No BR o cargo mistura BI + produto. SQL avançado é o mínimo."
     ],
     "dica": "Métrica acionável > vaidade.",
     "stackComum": "SQL, Python, Metabase, Looker / Looker Studio",
     "proximoPasso": "Métrica acionável > vaidade.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Métrica acionável > vaidade."
+    "mercadoTexto": "Startups e product companies querem métricas de funil e experimentos. No BR o cargo mistura BI + produto. SQL avançado é o mínimo."
   },
   {
     "nome": "Business Intelligence Corporativo",
@@ -4438,14 +4916,14 @@ const DP_AREAS = [
       "DAX"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Power BI, Tableau, SQL, DAX",
-      "<strong>Próximo passo:</strong> Negócio define KPI.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Negócio define KPI."
+      "Stack comum: Power BI, Tableau, SQL, DAX",
+      "Próximo passo: Negócio define KPI.",
+      "Mercado: Governança e self-service no ERP/financeiro BR. Power BI lidera. Diferença BR vs exterior: no exterior há mais engenharia de analytics embutida."
     ],
     "dica": "Negócio define KPI.",
     "stackComum": "Power BI, Tableau, SQL, DAX",
     "proximoPasso": "Negócio define KPI.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Negócio define KPI."
+    "mercadoTexto": "Governança e self-service no ERP/financeiro BR. Power BI lidera. Diferença BR vs exterior: no exterior há mais engenharia de analytics embutida."
   },
   {
     "nome": "Engenharia Frontend de Design Systems",
@@ -4457,14 +4935,14 @@ const DP_AREAS = [
       "Figma"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> TypeScript, React, CSS, Figma",
-      "<strong>Próximo passo:</strong> Documentação é feature.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Documentação é feature."
+      "Stack comum: TypeScript, React, CSS, Figma",
+      "Próximo passo: Documentação é feature.",
+      "Mercado: Empresas com vários produtos (fintechs, marketplaces) investem em DS. Mercado menor, mas estável e bem pago quando existe. Documentação é feature."
     ],
     "dica": "Documentação é feature.",
     "stackComum": "TypeScript, React, CSS, Figma",
     "proximoPasso": "Documentação é feature.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Documentação é feature."
+    "mercadoTexto": "Empresas com vários produtos (fintechs, marketplaces) investem em DS. Mercado menor, mas estável e bem pago quando existe. Documentação é feature."
   },
   {
     "nome": "Web Performance",
@@ -4475,14 +4953,14 @@ const DP_AREAS = [
       "WebAssembly (WASM)"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> JavaScript, CSS, WebAssembly (WASM)",
-      "<strong>Próximo passo:</strong> Meça no device lento.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Meça no device lento."
+      "Stack comum: JavaScript, CSS, WebAssembly (WASM)",
+      "Próximo passo: Meça no device lento.",
+      "Mercado: Especialização rara. E-commerces e mídia pagam por quem move LCP/INP. Globalmente mais maduro; no BR ainda é papel parcial de front sênior."
     ],
     "dica": "Meça no device lento.",
     "stackComum": "JavaScript, CSS, WebAssembly (WASM)",
     "proximoPasso": "Meça no device lento.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Meça no device lento."
+    "mercadoTexto": "Especialização rara. E-commerces e mídia pagam por quem move LCP/INP. Globalmente mais maduro; no BR ainda é papel parcial de front sênior."
   },
   {
     "nome": "Acessibilidade Digital (a11y)",
@@ -4493,14 +4971,14 @@ const DP_AREAS = [
       "JavaScript"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> HTML, CSS, JavaScript",
-      "<strong>Próximo passo:</strong> a11y desde o primeiro PR.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. a11y desde o primeiro PR."
+      "Stack comum: HTML, CSS, JavaScript",
+      "Próximo passo: a11y desde o primeiro PR.",
+      "Mercado: Legislação e litígio empurram demanda nos EUA; no BR cresce em governo e grandes empresas. Poucos especialistas — oportunidade para quem combina front + WCAG."
     ],
     "dica": "a11y desde o primeiro PR.",
     "stackComum": "HTML, CSS, JavaScript",
     "proximoPasso": "a11y desde o primeiro PR.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. a11y desde o primeiro PR."
+    "mercadoTexto": "Legislação e litígio empurram demanda nos EUA; no BR cresce em governo e grandes empresas. Poucos especialistas — oportunidade para quem combina front + WCAG."
   },
   {
     "nome": "Tech Writing",
@@ -4510,14 +4988,14 @@ const DP_AREAS = [
       "Git"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Markdown, Git",
-      "<strong>Próximo passo:</strong> Escreva para o você do futuro.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Escreva para o você do futuro."
+      "Stack comum: Markdown, Git",
+      "Próximo passo: Escreva para o você do futuro.",
+      "Mercado: Docs de API e developer experience. Mais comum em product companies internacionais; no BR ainda raro como cargo dedicado, comum como skill extra."
     ],
     "dica": "Escreva para o você do futuro.",
     "stackComum": "Markdown, Git",
     "proximoPasso": "Escreva para o você do futuro.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Escreva para o você do futuro."
+    "mercadoTexto": "Docs de API e developer experience. Mais comum em product companies internacionais; no BR ainda raro como cargo dedicado, comum como skill extra."
   },
   {
     "nome": "Developer Relations / Advocacy",
@@ -4528,14 +5006,14 @@ const DP_AREAS = [
       "Python"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Markdown, JavaScript, Python",
-      "<strong>Próximo passo:</strong> Credibilidade vem de código real.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Credibilidade vem de código real."
+      "Stack comum: Markdown, JavaScript, Python",
+      "Próximo passo: Credibilidade vem de código real.",
+      "Mercado: Mercado global em big tech e devtools; no BR poucas vagas full-time. Exige código público + comunicação. Ciclo de hiring acompanha budget de marketing tech."
     ],
     "dica": "Credibilidade vem de código real.",
     "stackComum": "Markdown, JavaScript, Python",
     "proximoPasso": "Credibilidade vem de código real.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Credibilidade vem de código real."
+    "mercadoTexto": "Mercado global em big tech e devtools; no BR poucas vagas full-time. Exige código público + comunicação. Ciclo de hiring acompanha budget de marketing tech."
   },
   {
     "nome": "Product Management técnico",
@@ -4546,14 +5024,14 @@ const DP_AREAS = [
       "Jira"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> SQL, Markdown, Jira",
-      "<strong>Próximo passo:</strong> Fale a língua de dados e de pessoas.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Fale a língua de dados e de pessoas."
+      "Stack comum: SQL, Markdown, Jira",
+      "Próximo passo: Fale a língua de dados e de pessoas.",
+      "Mercado: PMs que falam SQL e trade-offs técnicos são disputados em product companies. No BR o título varia (PO/PM); no exterior a trilha é mais clara."
     ],
     "dica": "Fale a língua de dados e de pessoas.",
     "stackComum": "SQL, Markdown, Jira",
     "proximoPasso": "Fale a língua de dados e de pessoas.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Fale a língua de dados e de pessoas."
+    "mercadoTexto": "PMs que falam SQL e trade-offs técnicos são disputados em product companies. No BR o título varia (PO/PM); no exterior a trilha é mais clara."
   },
   {
     "nome": "Engineering Management",
@@ -4564,14 +5042,14 @@ const DP_AREAS = [
       "Git"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Markdown, Jira, Git",
-      "<strong>Próximo passo:</strong> Contexto > controle.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Contexto > controle."
+      "Stack comum: Markdown, Jira, Git",
+      "Próximo passo: Contexto > controle.",
+      "Mercado: Liderança de time: 1:1, hiring, entrega. Mercado BR amadureceu em startups series B+. Exterior diferencia melhor EM de tech lead."
     ],
     "dica": "Contexto > controle.",
     "stackComum": "Markdown, Jira, Git",
     "proximoPasso": "Contexto > controle.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Contexto > controle."
+    "mercadoTexto": "Liderança de time: 1:1, hiring, entrega. Mercado BR amadureceu em startups series B+. Exterior diferencia melhor EM de tech lead."
   },
   {
     "nome": "Compliance & Privacy (tech)",
@@ -4581,14 +5059,14 @@ const DP_AREAS = [
       "Python"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> SQL, Python",
-      "<strong>Próximo passo:</strong> Privacidade por design.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Privacidade por design."
+      "Stack comum: SQL, Python",
+      "Próximo passo: Privacidade por design.",
+      "Mercado: LGPD empurrou demanda no BR; GDPR no exterior. Perfil híbrido jurídico+técnico. Ainda há mais consultoria do que time interno em empresas médias."
     ],
     "dica": "Privacidade por design.",
     "stackComum": "SQL, Python",
     "proximoPasso": "Privacidade por design.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Privacidade por design."
+    "mercadoTexto": "LGPD empurrou demanda no BR; GDPR no exterior. Perfil híbrido jurídico+técnico. Ainda há mais consultoria do que time interno em empresas médias."
   },
   {
     "nome": "FinOps",
@@ -4600,14 +5078,14 @@ const DP_AREAS = [
       "Azure"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> SQL, AWS, GCP, Azure",
-      "<strong>Próximo passo:</strong> Custo é métrica de engenharia.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Custo é métrica de engenharia."
+      "Stack comum: SQL, AWS, GCP, Azure",
+      "Próximo passo: Custo é métrica de engenharia.",
+      "Mercado: Custo de nuvem virou linha de P&L. EUA lidera; no BR aparece em empresas com conta cloud alta. Tags, budgets e rightsizing são o dia a dia."
     ],
     "dica": "Custo é métrica de engenharia.",
     "stackComum": "SQL, AWS, GCP, Azure",
     "proximoPasso": "Custo é métrica de engenharia.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Custo é métrica de engenharia."
+    "mercadoTexto": "Custo de nuvem virou linha de P&L. EUA lidera; no BR aparece em empresas com conta cloud alta. Tags, budgets e rightsizing são o dia a dia."
   },
   {
     "nome": "Blockchain / Web3 Engineering",
@@ -4618,14 +5096,14 @@ const DP_AREAS = [
       "Rust"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Solidity, JavaScript, Rust",
-      "<strong>Próximo passo:</strong> Segurança primeiro.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Segurança primeiro."
+      "Stack comum: Solidity, JavaScript, Rust",
+      "Próximo passo: Segurança primeiro.",
+      "Mercado: Mercado cíclico com o preço dos ativos. Em alta: auditoria e segurança de contratos. No BR há hubs menores; remoto internacional é a principal saída."
     ],
     "dica": "Segurança primeiro.",
     "stackComum": "Solidity, JavaScript, Rust",
     "proximoPasso": "Segurança primeiro.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Segurança primeiro."
+    "mercadoTexto": "Mercado cíclico com o preço dos ativos. Em alta: auditoria e segurança de contratos. No BR há hubs menores; remoto internacional é a principal saída."
   },
   {
     "nome": "Computer Vision",
@@ -4636,14 +5114,14 @@ const DP_AREAS = [
       "PyTorch"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Python, OpenCV, PyTorch",
-      "<strong>Próximo passo:</strong> Dados rotulados são o gargalo.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Dados rotulados são o gargalo."
+      "Stack comum: Python, OpenCV, PyTorch",
+      "Próximo passo: Dados rotulados são o gargalo.",
+      "Mercado: Indústria, agro e retail experimentam; produção estável é difícil. Globalmente forte em automotive e inspeção. Dados rotulados são o gargalo."
     ],
     "dica": "Dados rotulados são o gargalo.",
     "stackComum": "Python, OpenCV, PyTorch",
     "proximoPasso": "Dados rotulados são o gargalo.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Dados rotulados são o gargalo."
+    "mercadoTexto": "Indústria, agro e retail experimentam; produção estável é difícil. Globalmente forte em automotive e inspeção. Dados rotulados são o gargalo."
   },
   {
     "nome": "NLP / Language AI",
@@ -4654,14 +5132,14 @@ const DP_AREAS = [
       "PyTorch"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> Python, Hugging Face, PyTorch",
-      "<strong>Próximo passo:</strong> Gold set de avaliação cedo.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Gold set de avaliação cedo."
+      "Stack comum: Python, Hugging Face, PyTorch",
+      "Próximo passo: Gold set de avaliação cedo.",
+      "Mercado: LLMs redistribuíram o campo: menos modelos do zero, mais RAG e avaliação. Demanda global alta; no BR concentrada em fintechs, legaltech e big techs locais."
     ],
     "dica": "Gold set de avaliação cedo.",
     "stackComum": "Python, Hugging Face, PyTorch",
     "proximoPasso": "Gold set de avaliação cedo.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Gold set de avaliação cedo."
+    "mercadoTexto": "LLMs redistribuíram o campo: menos modelos do zero, mais RAG e avaliação. Demanda global alta; no BR concentrada em fintechs, legaltech e big techs locais."
   },
   {
     "nome": "Robotics Software",
@@ -4672,14 +5150,14 @@ const DP_AREAS = [
       "Linux"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> C++, Python, Linux",
-      "<strong>Próximo passo:</strong> Simulador antes de hardware caro.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Simulador antes de hardware caro."
+      "Stack comum: C++, Python, Linux",
+      "Próximo passo: Simulador antes de hardware caro.",
+      "Mercado: Pesquisa e indústria (automação). Poucas vagas no BR fora de polos e universidades. ROS e C++/Python. Exterior (EUA/Europa/Ásia) lidera."
     ],
     "dica": "Simulador antes de hardware caro.",
     "stackComum": "C++, Python, Linux",
     "proximoPasso": "Simulador antes de hardware caro.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Simulador antes de hardware caro."
+    "mercadoTexto": "Pesquisa e indústria (automação). Poucas vagas no BR fora de polos e universidades. ROS e C++/Python. Exterior (EUA/Europa/Ásia) lidera."
   },
   {
     "nome": "AR/VR Development",
@@ -4690,14 +5168,14 @@ const DP_AREAS = [
       "C++"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> C#, Unity (C#), C++",
-      "<strong>Próximo passo:</strong> Conforto do usuário é requisito.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Conforto do usuário é requisito."
+      "Stack comum: C#, Unity (C#), C++",
+      "Próximo passo: Conforto do usuário é requisito.",
+      "Mercado: Ondas de hype (metaverso) vs realidade de training industrial. Unity/Unreal. Mercado instável; projetos enterprise são mais sólidos que consumer."
     ],
     "dica": "Conforto do usuário é requisito.",
     "stackComum": "C#, Unity (C#), C++",
     "proximoPasso": "Conforto do usuário é requisito.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Conforto do usuário é requisito."
+    "mercadoTexto": "Ondas de hype (metaverso) vs realidade de training industrial. Unity/Unreal. Mercado instável; projetos enterprise são mais sólidos que consumer."
   },
   {
     "nome": "Audio Programming",
@@ -4708,14 +5186,14 @@ const DP_AREAS = [
       "C"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> C++, Rust, C",
-      "<strong>Próximo passo:</strong> Ouça o bug.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Ouça o bug."
+      "Stack comum: C++, Rust, C",
+      "Próximo passo: Ouça o bug.",
+      "Mercado: Nicho global (DAWs, games, telecom). Pouquíssimas vagas no BR. DSP e baixa latência. Quase sempre remoto ou exterior."
     ],
     "dica": "Ouça o bug.",
     "stackComum": "C++, Rust, C",
     "proximoPasso": "Ouça o bug.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Ouça o bug."
+    "mercadoTexto": "Nicho global (DAWs, games, telecom). Pouquíssimas vagas no BR. DSP e baixa latência. Quase sempre remoto ou exterior."
   },
   {
     "nome": "Quantitative / Fintech Engineering",
@@ -4727,14 +5205,14 @@ const DP_AREAS = [
       "SQL"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> C++, Java, Python, SQL",
-      "<strong>Próximo passo:</strong> Testes e conformidade.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Testes e conformidade."
+      "Stack comum: C++, Java, Python, SQL",
+      "Próximo passo: Testes e conformidade.",
+      "Mercado: HFT e risco em hubs financeiros. No BR, fintechs pedem mais engenharia robusta do que quant puro. C++/Java/Python e precisão numérica."
     ],
     "dica": "Testes e conformidade.",
     "stackComum": "C++, Java, Python, SQL",
     "proximoPasso": "Testes e conformidade.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Testes e conformidade."
+    "mercadoTexto": "HFT e risco em hubs financeiros. No BR, fintechs pedem mais engenharia robusta do que quant puro. C++/Java/Python e precisão numérica."
   },
   {
     "nome": "Suporte técnico N2/N3 (tech)",
@@ -4745,14 +5223,14 @@ const DP_AREAS = [
       "Bash / Shell"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> SQL, Linux, Bash / Shell",
-      "<strong>Próximo passo:</strong> Notas de caso salvam o time.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Notas de caso salvam o time."
+      "Stack comum: SQL, Linux, Bash / Shell",
+      "Próximo passo: Notas de caso salvam o time.",
+      "Mercado: Sempre há demanda em SaaS B2B. No BR salários moderados; no exterior N3 técnico pode evoluir para success eng. Diagnóstico e escrita clara."
     ],
     "dica": "Notas de caso salvam o time.",
     "stackComum": "SQL, Linux, Bash / Shell",
     "proximoPasso": "Notas de caso salvam o time.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Notas de caso salvam o time."
+    "mercadoTexto": "Sempre há demanda em SaaS B2B. No BR salários moderados; no exterior N3 técnico pode evoluir para success eng. Diagnóstico e escrita clara."
   },
   {
     "nome": "Customer Success técnico",
@@ -4762,14 +5240,14 @@ const DP_AREAS = [
       "Markdown"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> SQL, Markdown",
-      "<strong>Próximo passo:</strong> Ouça o workflow real do cliente.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Ouça o workflow real do cliente."
+      "Stack comum: SQL, Markdown",
+      "Próximo passo: Ouça o workflow real do cliente.",
+      "Mercado: SaaS B2B global e BR. Une produto, dados e relacionamento. Cresceu com subscription economy. SQL leve ajuda a falar com o cliente com números."
     ],
     "dica": "Ouça o workflow real do cliente.",
     "stackComum": "SQL, Markdown",
     "proximoPasso": "Ouça o workflow real do cliente.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Ouça o workflow real do cliente."
+    "mercadoTexto": "SaaS B2B global e BR. Une produto, dados e relacionamento. Cresceu com subscription economy. SQL leve ajuda a falar com o cliente com números."
   },
   {
     "nome": "Solutions Architecture",
@@ -4781,14 +5259,14 @@ const DP_AREAS = [
       "Java"
     ],
     "detalhes": [
-      "<strong>Stack comum:</strong> AWS, Azure, SQL, Java",
-      "<strong>Próximo passo:</strong> Documente limites.",
-      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Documente limites."
+      "Stack comum: AWS, Azure, SQL, Java",
+      "Próximo passo: Documente limites.",
+      "Mercado: Consultorias e cloud partners. No BR forte em projetos de migração. Mistura técnico e comercial. Certificações cloud abrem porta; cases fecham."
     ],
     "dica": "Documente limites.",
     "stackComum": "AWS, Azure, SQL, Java",
     "proximoPasso": "Documente limites.",
-    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Documente limites."
+    "mercadoTexto": "Consultorias e cloud partners. No BR forte em projetos de migração. Mistura técnico e comercial. Certificações cloud abrem porta; cases fecham."
   }
 ];
 const DP_CONCEITOS_LOGICA = [
@@ -6206,4 +6684,4 @@ const DP_GUIAS = [
   }
 ];
 
-// NÃO declarar var linguagens/areas — script.js usa const + merge DP_*.
+// NÃO declarar var linguagens/areas.

@@ -942,6 +942,115 @@ const cursosLogica = [
     desc: "Trilha interativa (assinatura) que ensina lógica e Python/R no contexto de análise de dados.",
     link: "https://www.datacamp.com"
   }
+  ,{
+    nome: "CS50's Introduction to Computer Science",
+    plataforma: "Harvard (edX)",
+    tipo: "Gratuito",
+    foco: "Ciência da computação do zero",
+    desc: "Curso clássico de Harvard: pensamento computacional, C, Python e bases sólidas. Grátis para assistir.",
+    link: "https://www.edx.org/learn/computer-science/harvard-university-cs50-s-introduction-to-computer-science",
+    detalhes: ["Semanas densas mas recompensadoras", "Comunidade global enorme", "Certificado verificado opcional pago"]
+  },
+  {
+    nome: "Python for Everybody",
+    plataforma: "University of Michigan (Coursera)",
+    tipo: "Gratuito",
+    foco: "Python + dados introdutórios",
+    desc: "Especialização acessível do Dr. Chuck: Python do zero até acesso a dados. Ideal após lógica básica.",
+    link: "https://www.coursera.org/specializations/python",
+    detalhes: ["Ótimo para quem prefere ritmo guiado", "Projetos pequenos a cada módulo"]
+  },
+  {
+    nome: "The Odin Project",
+    plataforma: "The Odin Project",
+    tipo: "Gratuito",
+    foco: "Full stack web na prática",
+    desc: "Currículo open-source completo (HTML → JS → backend) com projetos obrigatórios. Excelente disciplina de portfólio.",
+    link: "https://www.theodinproject.com",
+    detalhes: ["Tudo no GitHub", "Comunidade ativa", "Exige constância"]
+  },
+  {
+    nome: "MDN Web Docs — Learn Web",
+    plataforma: "Mozilla MDN",
+    tipo: "Gratuito",
+    foco: "HTML, CSS e JavaScript oficiais",
+    desc: "Documentação e trilhas da Mozilla — a referência da web. Use como material principal, não só consulta.",
+    link: "https://developer.mozilla.org/pt-BR/docs/Learn",
+    detalhes: ["Sempre atualizado", "Exemplos práticos", "Base antes de qualquer framework"]
+  },
+  {
+    nome: "SQLBolt / Mode SQL Tutorial",
+    plataforma: "SQLBolt + Mode",
+    tipo: "Gratuito",
+    foco: "SQL interativo",
+    desc: "Lições curtas com exercício embutido. O caminho mais rápido para ficar confortável com SELECT e JOINs.",
+    link: "https://sqlbolt.com",
+    detalhes: ["15–30 min por lição", "Complemente com um banco real (PostgreSQL)"]
+  },
+  {
+    nome: "Exercism",
+    plataforma: "Exercism",
+    tipo: "Gratuito",
+    foco: "Prática em dezenas de linguagens",
+    desc: "Exercícios com mentoria opcional da comunidade. Ótimo para fixar sintaxe depois da teoria.",
+    link: "https://exercism.org",
+    detalhes: ["Tracks por linguagem", "Feedback humano opcional"]
+  },
+  {
+    nome: "Frontend Mentor",
+    plataforma: "Frontend Mentor",
+    tipo: "Gratuito",
+    foco: "Projetos reais de UI",
+    desc: "Layouts profissionais para codar do zero. Sobe o nível visual do portfólio sem inventar design.",
+    link: "https://www.frontendmentor.io",
+    detalhes: ["Challenges gratuitos e pagos", "Compare com o design original"]
+  },
+  {
+    nome: "Boot.dev",
+    plataforma: "Boot.dev",
+    tipo: "Pago",
+    foco: "Backend com prática guiada",
+    desc: "Trilhas interativas (Go, Python, SQL) voltadas a backend. Boa se você aprende melhor 'fazendo no browser'.",
+    link: "https://www.boot.dev",
+    detalhes: ["Assinatura", "Foco em backend e carreira"]
+  },
+  {
+    nome: "Algoritmos e Estruturas de Dados",
+    plataforma: "Loiane Groner / cursos BR",
+    tipo: "Gratuito",
+    foco: "Estruturas em português",
+    desc: "Material em PT-BR cobrindo listas, pilhas, filas e árvores — base para entrevistas e código melhor.",
+    link: "https://loiane.training",
+    detalhes: ["Linguagem acessível", "Combine com prática no leetcode com moderação"]
+  },
+  {
+    nome: "Google Data Analytics Certificate",
+    plataforma: "Coursera (Google)",
+    tipo: "Pago",
+    foco: "Dados e análise para iniciantes",
+    desc: "Certificado Google com planilhas, SQL e visualização. Bom mapa para quem mira analytics/BI.",
+    link: "https://www.coursera.org/professional-certificates/google-data-analytics",
+    detalhes: ["Ajuda a estruturar estudo", "Não substitui projetos próprios"]
+  },
+  {
+    nome: "Kotlin for Android (Android Developers)",
+    plataforma: "Android Developers",
+    tipo: "Gratuito",
+    foco: "Android oficial",
+    desc: "Documentação e codelabs oficiais do Google. O caminho mais confiável para Kotlin + Android moderno.",
+    link: "https://developer.android.com/courses",
+    detalhes: ["Compose em alta", "Publique um app mesmo simples"]
+  },
+  {
+    nome: "SwiftUI Tutorials (Apple)",
+    plataforma: "Apple Developer",
+    tipo: "Gratuito",
+    foco: "iOS com SwiftUI",
+    desc: "Tutoriais oficiais da Apple. Gratuitos e alinhados com o que o mercado iOS espera.",
+    link: "https://developer.apple.com/tutorials/swiftui",
+    detalhes: ["Precisa de Mac para o caminho completo", "Ótimo após lógica básica"]
+  }
+
 ];
 
 const cursosTI = [
@@ -1566,6 +1675,7 @@ let comparando = [];
 const MAX_COMPARAR = 3;
 
 let filtroCategoriaLinguagens = "todas";
+let filtroOrdemLinguagens = "az"; // az | za | facil | popular
 let filtroNivelCursoTI = "todos";
 let filtroModalidadeCursoTI = "todas";
 
@@ -1866,7 +1976,7 @@ function renderCursosLogica(lista) {
   const list = lista || cursosLogica || [];
   grid.innerHTML = "";
   if (!list.length) {
-    grid.innerHTML = `<p class="no-results">Nenhum curso encontrado.</p>`;
+    grid.innerHTML = `<p class="no-results">Nenhum curso encontrado com este filtro.</p>`;
     return;
   }
   list.forEach((c, idx) => {
@@ -1874,23 +1984,31 @@ function renderCursosLogica(lista) {
     card.className = "course-card card fade-in";
     card.style.animationDelay = `${idx * 0.03}s`;
     const dets = c.detalhes || c.modulos || c.topicos || [];
+    const tipo = c.tipo || "Curso";
+    const link = c.link || c.url || "";
     card.innerHTML = `
-      <span class="tag">${c.nivel || c.tipo || "Curso"}</span>
+      <span class="tag">${tipo}${c.plataforma ? " · " + c.plataforma : ""}</span>
       <h4>${c.nome || c.titulo}</h4>
-      <p>${c.desc || c.descricao || ""}</p>
+      <p class="course-desc">${c.desc || c.descricao || ""}</p>
       <div class="details">
         <ul>
           ${c.foco ? `<li><strong>Foco:</strong> ${c.foco}</li>` : ""}
           ${c.duracao ? `<li><strong>Duração:</strong> ${c.duracao}</li>` : ""}
-          ${c.link ? `<li><strong>Onde:</strong> ${c.link}</li>` : ""}
           ${c.plataforma ? `<li><strong>Plataforma:</strong> ${c.plataforma}</li>` : ""}
           ${(dets || []).map(d => `<li>${d}</li>`).join("")}
-          <li><strong>Como usar:</strong> faça anotações e um mini-projeto ao final de cada módulo.</li>
+          <li><strong>Como usar:</strong> anote dúvidas e faça um mini-projeto ao final.</li>
         </ul>
       </div>
-      <span class="card-hint">💡 Clique para expandir</span>
+      <div class="course-footer">
+        <span class="card-hint">💡 Clique no card para detalhes</span>
+        ${link ? `<a class="btn-primary btn-tiny course-visit" href="${link}" target="_blank" rel="noopener noreferrer">Visitar site →</a>` : ""}
+      </div>
     `;
-    card.addEventListener("click", () => card.classList.toggle("open"));
+    card.addEventListener("click", (e) => {
+      if (e.target.closest("a")) return;
+      card.classList.toggle("open");
+    });
+    card.querySelector("a.course-visit")?.addEventListener("click", (e) => e.stopPropagation());
     grid.appendChild(card);
   });
 }
@@ -2401,9 +2519,12 @@ function renderDesafioLogica() {
 // ==========================================
 function aplicarFiltrosLinguagens() {
   const termo = (document.getElementById("search-lang-input")?.value || "").toLowerCase().trim();
+  const ordemSel = document.getElementById("lang-sort-select");
+  if (ordemSel) filtroOrdemLinguagens = ordemSel.value || "az";
 
-  const filtradas = linguagens.filter(l => {
-    const nome = l.nome.toLowerCase();
+  let filtradas = linguagens.filter(l => {
+    if (l.categoria === "ferramenta") return false;
+    const nome = (l.nome || "").toLowerCase();
     const matchTermo = !termo ||
       nome === termo ||
       nome.startsWith(termo + " ") ||
@@ -2419,8 +2540,17 @@ function aplicarFiltrosLinguagens() {
     } else if (filtroCategoriaLinguagens !== "todas") {
       matchCategoria = l.categoria === filtroCategoriaLinguagens;
     }
-
     return matchTermo && matchCategoria;
+  });
+
+  const ord = filtroOrdemLinguagens;
+  filtradas = [...filtradas].sort((a, b) => {
+    if (ord === "za") return b.nome.localeCompare(a.nome, "pt-BR");
+    if (ord === "facil") return (a.dificuldade || 5) - (b.dificuldade || 5) || a.nome.localeCompare(b.nome, "pt-BR");
+    if (ord === "dificil") return (b.dificuldade || 5) - (a.dificuldade || 5) || a.nome.localeCompare(b.nome, "pt-BR");
+    if (ord === "popular") return (b.popularidade || 0) - (a.popularidade || 0) || a.nome.localeCompare(b.nome, "pt-BR");
+    if (ord === "raro") return (a.popularidade || 0) - (b.popularidade || 0) || a.nome.localeCompare(b.nome, "pt-BR");
+    return a.nome.localeCompare(b.nome, "pt-BR"); // az
   });
 
   renderLinguagens(filtradas);
@@ -2445,6 +2575,25 @@ function aplicarFiltrosCursosTI() {
 function initFilters() {
   const langInput = document.getElementById("search-lang-input");
   const areaInput = document.getElementById("search-area-input");
+
+  // Controle de ordenação (injeta ao lado da busca se ainda não existir)
+  const filterBox = langInput?.closest(".filter-box") || langInput?.parentElement;
+  if (filterBox && !document.getElementById("lang-sort-select")) {
+    const wrap = document.createElement("div");
+    wrap.className = "lang-sort-wrap";
+    wrap.innerHTML = `
+      <label for="lang-sort-select" class="lang-sort-label">Ordenar</label>
+      <select id="lang-sort-select" class="lang-sort-select" aria-label="Ordenar linguagens">
+        <option value="az">A → Z</option>
+        <option value="za">Z → A</option>
+        <option value="facil">Mais fáceis primeiro</option>
+        <option value="dificil">Mais difíceis primeiro</option>
+        <option value="popular">Mais usadas primeiro</option>
+        <option value="raro">Menos usadas primeiro</option>
+      </select>`;
+    filterBox.appendChild(wrap);
+    document.getElementById("lang-sort-select")?.addEventListener("change", aplicarFiltrosLinguagens);
+  }
 
   langInput?.addEventListener("input", aplicarFiltrosLinguagens);
 

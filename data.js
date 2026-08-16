@@ -1,10 +1,7 @@
 // ==========================================
-// DevPortal — data.js (EXPANDIDO)
-// Carregar ANTES de script.js:
-//   <script src="data.js"></script>
-//   <script src="script.js" defer></script>
+// DevPortal — data.js (EXPANDIDO + CORRIGIDO)
+// Carregar ANTES de script.js
 // ==========================================
-
 const DP_LINGUAGENS = [
   {
     "nome": "JavaScript",
@@ -3101,7 +3098,6 @@ const DP_LINGUAGENS = [
     ]
   }
 ];
-
 const DP_AREAS = [
   {
     "nome": "Desenvolvimento Web Fullstack",
@@ -3948,8 +3944,46 @@ const DP_AREAS = [
     "dica": "Documente limites."
   }
 ];
-
 const DP_CONCEITOS_LOGICA = [
+  {
+    "nome": "Teste de mesa",
+    "desc": "Simular o programa no papel.",
+    "detalhes": [
+      "Colunas: passo, variáveis, saída.",
+      "Ótimo para laços e condições.",
+      "Exercício: while contando de 1 a 5."
+    ]
+  },
+  {
+    "nome": "Escopo de variáveis",
+    "desc": "Onde cada variável existe no código.",
+    "detalhes": [
+      "Bloco, função e global.",
+      "Prefira const/let a var em JavaScript.",
+      "Evite poluir o escopo global."
+    ]
+  },
+  {
+    "nome": "Operadores",
+    "desc": "Símbolos de cálculo, comparação e lógica.",
+    "detalhes": [
+      "Aritméticos + - * / %",
+      "Comparação > < >= <= === !==",
+      "Lógicos && || !",
+      "Use parênteses para deixar a ordem clara."
+    ]
+  },
+  {
+    "nome": "Condicionais (if/else)",
+    "desc": "Desviar o fluxo conforme uma condição verdadeira ou falsa.",
+    "detalhes": [
+      "if / else if / else escolhem caminhos diferentes.",
+      "Compare com === em JS (valor e tipo).",
+      "Operadores: && (e), || (ou), ! (não).",
+      "Exercício: classificar um número em negativo, zero ou positivo.",
+      "Erro clássico: usar = (atribuir) em vez de === (comparar)."
+    ]
+  },
   {
     "nome": "Sequência",
     "desc": "Passos em ordem definida.",
@@ -4183,7 +4217,6 @@ const DP_CONCEITOS_LOGICA = [
     ]
   }
 ];
-
 const DP_TRILHAS = [
   {
     "nome": "Iniciante absoluto",
@@ -4390,7 +4423,6 @@ const DP_TRILHAS = [
     ]
   }
 ];
-
 const DP_FERRAMENTAS = [
   {
     "nome": "ChatGPT",
@@ -4689,7 +4721,6 @@ const DP_FERRAMENTAS = [
     ]
   }
 ];
-
 const DP_FAQ = [
   {
     "q": "Por onde começar do zero?",
@@ -4764,206 +4795,253 @@ const DP_FAQ = [
     "a": "Colocar a aplicação em um ambiente acessível (nuvem/servidor), não só rodar na sua máquina."
   }
 ];
-
 const DP_GLOSSARIO = [
   {
     "term": "API",
-    "def": "Interface de comunicação entre sistemas."
+    "def": "Interface de comunicação entre sistemas.",
+    "termo": "API"
   },
   {
     "term": "Framework",
-    "def": "Base com convenções que estrutura o app."
+    "def": "Base com convenções que estrutura o app.",
+    "termo": "Framework"
   },
   {
     "term": "Library",
-    "def": "Conjunto de funções que você chama."
+    "def": "Conjunto de funções que você chama.",
+    "termo": "Library"
   },
   {
     "term": "IDE",
-    "def": "Editor com ferramentas de desenvolvimento."
+    "def": "Editor com ferramentas de desenvolvimento.",
+    "termo": "IDE"
   },
   {
     "term": "Runtime",
-    "def": "Ambiente que executa o programa."
+    "def": "Ambiente que executa o programa.",
+    "termo": "Runtime"
   },
   {
     "term": "Compile",
-    "def": "Traduzir código antes de executar."
+    "def": "Traduzir código antes de executar.",
+    "termo": "Compile"
   },
   {
     "term": "Repo",
-    "def": "Repositório de código versionado."
+    "def": "Repositório de código versionado.",
+    "termo": "Repo"
   },
   {
     "term": "PR",
-    "def": "Pull Request — proposta de mudança com revisão."
+    "def": "Pull Request — proposta de mudança com revisão.",
+    "termo": "PR"
   },
   {
     "term": "CI/CD",
-    "def": "Automação de teste e entrega."
+    "def": "Automação de teste e entrega.",
+    "termo": "CI/CD"
   },
   {
     "term": "Container",
-    "def": "Pacote isolado da aplicação e deps."
+    "def": "Pacote isolado da aplicação e deps.",
+    "termo": "Container"
   },
   {
     "term": "REST",
-    "def": "Estilo de API HTTP orientado a recursos."
+    "def": "Estilo de API HTTP orientado a recursos.",
+    "termo": "REST"
   },
   {
     "term": "ORM",
-    "def": "Mapeia objetos para tabelas."
+    "def": "Mapeia objetos para tabelas.",
+    "termo": "ORM"
   },
   {
     "term": "Null",
-    "def": "Ausência de valor."
+    "def": "Ausência de valor.",
+    "termo": "Null"
   },
   {
     "term": "Refactor",
-    "def": "Melhorar código sem mudar comportamento externo."
+    "def": "Melhorar código sem mudar comportamento externo.",
+    "termo": "Refactor"
   },
   {
     "term": "Tech debt",
-    "def": "Atalho que gera custo futuro."
+    "def": "Atalho que gera custo futuro.",
+    "termo": "Tech debt"
   },
   {
     "term": "SDK",
-    "def": "Kit para desenvolver em uma plataforma."
+    "def": "Kit para desenvolver em uma plataforma.",
+    "termo": "SDK"
   },
   {
     "term": "CLI",
-    "def": "Programa de linha de comando."
+    "def": "Programa de linha de comando.",
+    "termo": "CLI"
   },
   {
     "term": "Open source",
-    "def": "Código disponível para estudo e contribuição."
+    "def": "Código disponível para estudo e contribuição.",
+    "termo": "Open source"
   },
   {
     "term": "SemVer",
-    "def": "Versionamento MAJOR.MINOR.PATCH."
+    "def": "Versionamento MAJOR.MINOR.PATCH.",
+    "termo": "SemVer"
   },
   {
     "term": "Cache",
-    "def": "Armazenamento rápido de resultados frequentes."
+    "def": "Armazenamento rápido de resultados frequentes.",
+    "termo": "Cache"
   },
   {
     "term": "Index (DB)",
-    "def": "Estrutura que acelera busca no banco."
+    "def": "Estrutura que acelera busca no banco.",
+    "termo": "Index (DB)"
   },
   {
     "term": "Transaction",
-    "def": "Bloco atômico no banco (tudo ou nada)."
+    "def": "Bloco atômico no banco (tudo ou nada).",
+    "termo": "Transaction"
   },
   {
     "term": "Idempotent",
-    "def": "Repetir a operação não altera o resultado final."
+    "def": "Repetir a operação não altera o resultado final.",
+    "termo": "Idempotent"
   },
   {
     "term": "Latency",
-    "def": "Tempo de resposta."
+    "def": "Tempo de resposta.",
+    "termo": "Latency"
   },
   {
     "term": "Throughput",
-    "def": "Quantidade processada por unidade de tempo."
+    "def": "Quantidade processada por unidade de tempo.",
+    "termo": "Throughput"
   },
   {
     "term": "SLA/SLO/SLI",
-    "def": "Acordo, objetivo e indicador de nível de serviço."
+    "def": "Acordo, objetivo e indicador de nível de serviço.",
+    "termo": "SLA/SLO/SLI"
   },
   {
     "term": "RAG",
-    "def": "Retrieval-Augmented Generation — LLM + busca em documentos."
+    "def": "Retrieval-Augmented Generation — LLM + busca em documentos.",
+    "termo": "RAG"
   },
   {
     "term": "Token (LLM)",
-    "def": "Pedaço de texto processado pelo modelo."
+    "def": "Pedaço de texto processado pelo modelo.",
+    "termo": "Token (LLM)"
   },
   {
     "term": "Env var",
-    "def": "Configuração por variável de ambiente."
+    "def": "Configuração por variável de ambiente.",
+    "termo": "Env var"
   },
   {
     "term": "Secret",
-    "def": "Credencial que não deve ir ao código público."
+    "def": "Credencial que não deve ir ao código público.",
+    "termo": "Secret"
   },
   {
     "term": "Load balancer",
-    "def": "Distribui tráfego entre instâncias."
+    "def": "Distribui tráfego entre instâncias.",
+    "termo": "Load balancer"
   },
   {
     "term": "CDN",
-    "def": "Rede de distribuição de conteúdo estático."
+    "def": "Rede de distribuição de conteúdo estático.",
+    "termo": "CDN"
   },
   {
     "term": "DNS",
-    "def": "Resolve nomes para endereços IP."
+    "def": "Resolve nomes para endereços IP.",
+    "termo": "DNS"
   },
   {
     "term": "TLS/HTTPS",
-    "def": "Criptografia no transporte web."
+    "def": "Criptografia no transporte web.",
+    "termo": "TLS/HTTPS"
   },
   {
     "term": "OAuth",
-    "def": "Delegação de autorização."
+    "def": "Delegação de autorização.",
+    "termo": "OAuth"
   },
   {
     "term": "JWT",
-    "def": "Token assinados compactos."
+    "def": "Token assinados compactos.",
+    "termo": "JWT"
   },
   {
     "term": "Monorepo",
-    "def": "Vários projetos no mesmo repositório."
+    "def": "Vários projetos no mesmo repositório.",
+    "termo": "Monorepo"
   },
   {
     "term": "Microservice",
-    "def": "Serviço pequeno com deploy independente."
+    "def": "Serviço pequeno com deploy independente.",
+    "termo": "Microservice"
   },
   {
     "term": "Monolith",
-    "def": "Aplicação única deployada junta."
+    "def": "Aplicação única deployada junta.",
+    "termo": "Monolith"
   },
   {
     "term": "Event-driven",
-    "def": "Arquitetura reativa a eventos."
+    "def": "Arquitetura reativa a eventos.",
+    "termo": "Event-driven"
   },
   {
     "term": "ACID",
-    "def": "Propriedades clássicas de transações."
+    "def": "Propriedades clássicas de transações.",
+    "termo": "ACID"
   },
   {
     "term": "BASE",
-    "def": "Modelo mais flexível de consistência eventual."
+    "def": "Modelo mais flexível de consistência eventual.",
+    "termo": "BASE"
   },
   {
     "term": "ETL/ELT",
-    "def": "Movimentação e transformação de dados."
+    "def": "Movimentação e transformação de dados.",
+    "termo": "ETL/ELT"
   },
   {
     "term": "Data warehouse",
-    "def": "Banco analítico integrado."
+    "def": "Banco analítico integrado.",
+    "termo": "Data warehouse"
   },
   {
     "term": "OLTP vs OLAP",
-    "def": "Transacional vs analítico."
+    "def": "Transacional vs analítico.",
+    "termo": "OLTP vs OLAP"
   },
   {
     "term": "Feature flag",
-    "def": "Liga/desliga comportamento sem redeploy."
+    "def": "Liga/desliga comportamento sem redeploy.",
+    "termo": "Feature flag"
   },
   {
     "term": "Canary deploy",
-    "def": "Liberação gradual para parte do tráfego."
+    "def": "Liberação gradual para parte do tráfego.",
+    "termo": "Canary deploy"
   },
   {
     "term": "Blue-green",
-    "def": "Dois ambientes para alternar release."
+    "def": "Dois ambientes para alternar release.",
+    "termo": "Blue-green"
   },
   {
     "term": "Observability",
-    "def": "Logs, métricas e traces para entender o sistema."
+    "def": "Logs, métricas e traces para entender o sistema.",
+    "termo": "Observability"
   }
 ];
-
 const DP_FACULDADES = [
   {
     "nome": "Ciência da Computação",
@@ -5188,6 +5266,4 @@ const DP_FACULDADES = [
   }
 ];
 
-
-// NÃO declarar var linguagens/areas aqui — o script.js já tem const linguagens/areas.
-// A mescla é feita em mergeDataModule() lendo DP_LINGUAGENS / DP_AREAS etc.
+// NÃO criar var linguagens/areas — script.js já declara const.

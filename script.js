@@ -1648,12 +1648,10 @@ function updateCounters() {
   const codeCountLangs = document.getElementById("code-count-langs");
   const codeCountAreas = document.getElementById("code-count-areas");
 
-  if (countLangs) countLangs.textContent = linguagens.length;
   if (countAreas) countAreas.textContent = areas.length;
   if (countCursos) countCursos.textContent = cursosLogica.length;
-  if (codeCountLangs) codeCountLangs.textContent = linguagens.length;
   if (codeCountAreas) codeCountAreas.textContent = areas.length;
-
+  // countLangs / codeCountLangs atualizados em updateSidebarCounts (soma real)
   updateSidebarCounts();
 }
 
@@ -1664,11 +1662,23 @@ function updateSidebarCounts() {
   const cntDados = document.getElementById("cnt-dados");
   const cntFavoritos = document.getElementById("cnt-favoritos");
 
-  if (cntTodas) cntTodas.textContent = linguagens.length;
-  if (cntLinguagem) cntLinguagem.textContent = linguagens.filter(l => l.categoria === "linguagem").length;
-  if (cntWeb) cntWeb.textContent = linguagens.filter(l => l.categoria === "web").length;
-  if (cntDados) cntDados.textContent = linguagens.filter(l => l.categoria === "dados").length;
+  // Só conta o que está na lista de linguagens (ferramentas ficam em Ferramentas/Trilhas)
+  const nLang = linguagens.filter(l => l.categoria === "linguagem").length;
+  const nWeb = linguagens.filter(l => l.categoria === "web").length;
+  const nDados = linguagens.filter(l => l.categoria === "dados").length;
+  const nTodas = nLang + nWeb + nDados;
+
+  if (cntTodas) cntTodas.textContent = nTodas;
+  if (cntLinguagem) cntLinguagem.textContent = nLang;
+  if (cntWeb) cntWeb.textContent = nWeb;
+  if (cntDados) cntDados.textContent = nDados;
   if (cntFavoritos) cntFavoritos.textContent = favoritos.size;
+
+  // Hero / home counters
+  const countLangs = document.getElementById("count-langs");
+  if (countLangs) countLangs.textContent = nTodas;
+  const codeCountLangs = document.getElementById("code-count-langs");
+  if (codeCountLangs) codeCountLangs.textContent = nTodas;
 }
 
 // ==========================================
@@ -1751,12 +1761,10 @@ function renderAreas(lista) {
   const areasGrid = document.getElementById("areas-grid");
   if (!areasGrid) return;
   areasGrid.innerHTML = "";
-
-  if (lista.length === 0) {
+  if (!lista.length) {
     areasGrid.innerHTML = `<p class="no-results">Nenhuma área encontrada com este termo.</p>`;
     return;
   }
-
   lista.forEach((area, idx) => {
     const card = document.createElement("div");
     card.className = "area-card card fade-in";
@@ -1766,13 +1774,15 @@ function renderAreas(lista) {
     if (area.diaADia) extra.push(`<li><strong>Dia a dia:</strong> ${area.diaADia}</li>`);
     if (area.softSkills?.length) extra.push(`<li><strong>Soft skills:</strong> ${area.softSkills.join(", ")}</li>`);
     if (area.dica) extra.push(`<li><strong>Dica:</strong> ${area.dica}</li>`);
-
+    if (!detalhes.length && !extra.length) {
+      extra.push(`<li><strong>Stack comum:</strong> ${(area.langs || []).join(", ") || "varia"}</li>`);
+      extra.push(`<li><strong>Próximo passo:</strong> monte um projeto pequeno e publique no GitHub.</li>`);
+      extra.push(`<li><strong>Mercado:</strong> pesquise vagas com esses termos no LinkedIn/Gupy.</li>`);
+    }
     card.innerHTML = `
       <h3>${area.nome}</h3>
       <p>${area.desc}</p>
-      <div class="langs">
-        ${(area.langs || []).map(l => `<span>${l}</span>`).join("")}
-      </div>
+      <div class="langs">${(area.langs || []).map(l => `<span>${l}</span>`).join("")}</div>
       <div class="details">
         <ul>
           ${detalhes.map(d => `<li>${d}</li>`).join("")}
@@ -1790,12 +1800,50 @@ function renderConceitos() {
   const grid = document.getElementById("concepts-grid");
   if (!grid) return;
 
+  // Garante detalhes mínimos se o item veio sem texto
+  const fallbackDetalhes = (nome) => {
+    const n = (nome || "").toLowerCase();
+    if (n.includes("condic") || n.includes("if") || n.includes("decis")) {
+      return [
+        "Condições comparam valores e escolhem o caminho (if / else / else if).",
+        "Operadores: ===, !==, <, >, &&, ||, !",
+        "Evite aninhar muitos if — use early return ou switch quando fizer sentido.",
+        "Exercício: classificar idade em faixas sem repetir código.",
+        "Erro comum: usar = (atribuição) no lugar de === (comparação)."
+      ];
+    }
+    if (n.includes("funç") || n.includes("func")) {
+      return [
+        "Função = nome + parâmetros + corpo + retorno (opcional).",
+        "Uma função deve fazer uma coisa bem feita.",
+        "Parâmetros são entradas; return é a saída.",
+        "Exercício: extrair um cálculo repetido para uma função testável.",
+        "Evite funções de 100 linhas — quebre em partes."
+      ];
+    }
+    if (n.includes("laço") || n.includes("loop") || n.includes("for") || n.includes("while")) {
+      return [
+        "for: quando o intervalo é conhecido; while: quando a condição manda.",
+        "Sempre garanta que a condição de parada muda (senão loop infinito).",
+        "Exercício: somar números de uma lista e achar o maior valor.",
+        "Prefira métodos de array (map/filter) quando deixarem o código mais claro."
+      ];
+    }
+    return [
+      "Leia a definição e tente explicar com suas palavras.",
+      "Faça um exemplo mínimo no papel (teste de mesa).",
+      "Implemente um exercício de 5–15 linhas.",
+      "Relacione com um bug real que você já viu."
+    ];
+  };
+
   grid.innerHTML = "";
   (conceitosLogica || []).forEach((c, idx) => {
     const card = document.createElement("div");
     card.className = "concept-card card fade-in";
     card.style.animationDelay = `${idx * 0.03}s`;
-    const dets = c.detalhes || [];
+    let dets = c.detalhes || c.topicos || [];
+    if (!dets.length) dets = fallbackDetalhes(c.nome);
     card.innerHTML = `
       <h3>${c.nome}</h3>
       <p>${c.desc || c.texto || ""}</p>
@@ -1810,24 +1858,38 @@ function renderConceitos() {
 }
 
 function renderCursosLogica(lista) {
-  const grid = document.getElementById("courses-grid");
+  const grid = document.getElementById("cursos-logica-grid") || document.getElementById("logic-courses-grid");
   if (!grid) return;
-
-  if (lista.length === 0) {
-    grid.innerHTML = `<p class="no-results">Nenhum curso encontrado com este filtro.</p>`;
+  const list = lista || cursosLogica || [];
+  grid.innerHTML = "";
+  if (!list.length) {
+    grid.innerHTML = `<p class="no-results">Nenhum curso encontrado.</p>`;
     return;
   }
-
-  grid.innerHTML = lista.map(c => `
-    <div class="course-card fade-in">
-      <span class="badge ${c.tipo === "Gratuito" ? "badge-free" : "badge-paid"}">${c.tipo === "Gratuito" ? "🆓 Gratuito" : "💳 Pago"}</span>
-      <div class="course-platform">${c.plataforma}</div>
-      <h4>${c.nome}</h4>
-      <p>${c.desc}</p>
-      <p style="margin-top:0.5rem; font-size:0.8rem;"><strong>Foco:</strong> ${c.foco}</p>
-      <a href="${c.link}" target="_blank" rel="noopener" class="course-link">Acessar curso ↗</a>
-    </div>
-  `).join("");
+  list.forEach((c, idx) => {
+    const card = document.createElement("div");
+    card.className = "course-card card fade-in";
+    card.style.animationDelay = `${idx * 0.03}s`;
+    const dets = c.detalhes || c.modulos || c.topicos || [];
+    card.innerHTML = `
+      <span class="tag">${c.nivel || c.tipo || "Curso"}</span>
+      <h4>${c.nome || c.titulo}</h4>
+      <p>${c.desc || c.descricao || ""}</p>
+      <div class="details">
+        <ul>
+          ${c.foco ? `<li><strong>Foco:</strong> ${c.foco}</li>` : ""}
+          ${c.duracao ? `<li><strong>Duração:</strong> ${c.duracao}</li>` : ""}
+          ${c.link ? `<li><strong>Onde:</strong> ${c.link}</li>` : ""}
+          ${c.plataforma ? `<li><strong>Plataforma:</strong> ${c.plataforma}</li>` : ""}
+          ${(dets || []).map(d => `<li>${d}</li>`).join("")}
+          <li><strong>Como usar:</strong> faça anotações e um mini-projeto ao final de cada módulo.</li>
+        </ul>
+      </div>
+      <span class="card-hint">💡 Clique para expandir</span>
+    `;
+    card.addEventListener("click", () => card.classList.toggle("open"));
+    grid.appendChild(card);
+  });
 }
 
 function renderCursosTI(lista) {
@@ -2860,10 +2922,31 @@ function renderFaculdades(lista) {
 }
 
 (function mergeDataModule() {
+  // Ferramentas/engines NÃO entram no contador de "linguagens" da sidebar.
+  // Só linguagem | web | dados ficam em `linguagens`.
   if (typeof DP_LINGUAGENS !== "undefined" && Array.isArray(DP_LINGUAGENS) && DP_LINGUAGENS.length) {
-    // Mescla por nome: data.js enriquece ou adiciona
     const byName = new Map(linguagens.map(l => [l.nome.toLowerCase(), l]));
+    const extraTools = [];
     DP_LINGUAGENS.forEach(d => {
+      const cat = (d.categoria || "linguagem").toLowerCase();
+      if (cat === "ferramenta") {
+        extraTools.push({
+          nome: d.nome,
+          cat: d.tag || "Ferramenta",
+          categoria: "ferramenta",
+          desc: d.desc || "",
+          detalhes: d.detalhes || [],
+        });
+        return;
+      }
+      // normaliza categorias
+      if (cat !== "linguagem" && cat !== "web" && cat !== "dados") {
+        d.categoria = "linguagem";
+      }
+      // garante campos de comparação
+      if (!Array.isArray(d.relacionados)) d.relacionados = d.relacionados || [];
+      if (!d.nivel) d.nivel = "Intermediário";
+      if (!d.mercado) d.mercado = "Varia conforme região e senioridade";
       const key = d.nome.toLowerCase();
       if (byName.has(key)) {
         Object.assign(byName.get(key), d);
@@ -2872,6 +2955,17 @@ function renderFaculdades(lista) {
         byName.set(key, d);
       }
     });
+    // empurra tools extras para DP_FERRAMENTAS se existir
+    if (extraTools.length) {
+      if (typeof DP_FERRAMENTAS === "undefined") {
+        try { window.DP_FERRAMENTAS = extraTools; } catch (_) {}
+      } else if (Array.isArray(DP_FERRAMENTAS)) {
+        const seen = new Set(DP_FERRAMENTAS.map(t => (t.nome || "").toLowerCase()));
+        extraTools.forEach(t => {
+          if (!seen.has((t.nome || "").toLowerCase())) DP_FERRAMENTAS.push(t);
+        });
+      }
+    }
   }
   if (typeof DP_AREAS !== "undefined" && DP_AREAS.length) {
     const byName = new Map(areas.map(a => [a.nome.toLowerCase(), a]));
@@ -2890,26 +2984,48 @@ function renderFaculdades(lista) {
     });
   }
   if (typeof DP_FERRAMENTAS !== "undefined" && DP_FERRAMENTAS.length) {
-    try { renderFerramentas(DP_FERRAMENTAS); } catch (_) {}
+    try { /* render depois no DOMContentLoaded */ } catch (_) {}
   }
   if (typeof DP_TRILHAS !== "undefined" && DP_TRILHAS.length) {
-    try { renderTrilhas(); } catch (_) {}
+    try { /* render depois */ } catch (_) {}
   }
   if (typeof DP_FAQ !== "undefined" && DP_FAQ.length) {
     try {
-      const el = document.getElementById("faq-list") || document.getElementById("faq-grid");
-      if (el) {
-        el.innerHTML = DP_FAQ.map(f => `<details class="faq-item"><summary>${f.q}</summary><p>${f.a}</p></details>`).join("");
-      }
+      /* FAQ no DOMContentLoaded */
     } catch (_) {}
   }
   if (typeof DP_GLOSSARIO !== "undefined" && DP_GLOSSARIO.length) {
-    try { if (typeof renderGlossario === "function") renderGlossario(DP_GLOSSARIO); } catch (_) {}
+    // normaliza term/termo
+    DP_GLOSSARIO.forEach(g => {
+      if (!g.termo && g.term) g.termo = g.term;
+      if (!g.term && g.termo) g.term = g.termo;
+      if (!g.def && g.definicao) g.def = g.definicao;
+    });
   }
   if (typeof DP_FACULDADES !== "undefined" && DP_FACULDADES.length) {
-    try { if (typeof renderFaculdades === "function") renderFaculdades(DP_FACULDADES); } catch (_) {}
+    try { /* renderFaculdades no DOM ready */ } catch (_) {}
   }
 })();
+
+(function ensureComparabilidade() {
+  try {
+    const names = linguagens.map(l => l.nome);
+    linguagens.forEach(l => {
+      if (!Array.isArray(l.relacionados) || l.relacionados.length < 2) {
+        // pega 3 da mesma categoria
+        const peers = linguagens
+          .filter(x => x.nome !== l.nome && x.categoria === l.categoria)
+          .slice(0, 3)
+          .map(x => x.nome);
+        l.relacionados = peers.length ? peers : names.filter(n => n !== l.nome).slice(0, 3);
+      }
+      if (!l.nivel) l.nivel = "Intermediário";
+      if (!l.mercado) l.mercado = "Depende de região e experiência";
+      if (!l.quandoAprender) l.quandoAprender = "Quando fizer sentido para sua meta (web, dados, mobile, sistemas…)";
+    });
+  } catch (_) {}
+})();
+
 
 // ==========================================
 // 22. CONTA LOCAL (e-mail + senha no localStorage)
@@ -3141,16 +3257,32 @@ function renderTrilhas() {
 function renderGlossario(lista) {
   const grid = document.getElementById("glossario-grid");
   if (!grid) return;
-  if (!lista.length) {
+  const list = (lista && lista.length) ? lista : (typeof DP_GLOSSARIO !== "undefined" ? DP_GLOSSARIO : []);
+  if (!list.length) {
     grid.innerHTML = `<p class="no-results">Nenhum termo encontrado.</p>`;
     return;
   }
-  grid.innerHTML = lista.map(g => `
-    <div class="glossary-item">
-      <h4>${g.termo}</h4>
-      <p>${g.def}</p>
-    </div>
-  `).join("");
+  grid.innerHTML = "";
+  list.forEach((g, idx) => {
+    const termo = g.termo || g.term || g.nome || "Termo";
+    const def = g.def || g.definicao || g.desc || "";
+    const extra = g.detalhes || g.exemplos || [];
+    const card = document.createElement("div");
+    card.className = "glossary-item card fade-in";
+    card.style.animationDelay = `${idx * 0.02}s`;
+    card.innerHTML = `
+      <h4>${String(termo).replace(/</g, "&lt;")}</h4>
+      <p>${String(def).replace(/</g, "&lt;")}</p>
+      <div class="details">
+        <ul>${(Array.isArray(extra) ? extra : []).map(d => `<li>${String(d).replace(/</g, "&lt;")}</li>`).join("")}
+          <li><strong>Dica:</strong> use este termo ao pesquisar vagas e documentação.</li>
+        </ul>
+      </div>
+      <span class="card-hint">💡 Clique para expandir</span>
+    `;
+    card.addEventListener("click", () => card.classList.toggle("open"));
+    grid.appendChild(card);
+  });
 }
 
 function renderFerramentas(lista) {

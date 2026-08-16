@@ -3942,3 +3942,49 @@ body.owner-view .site-notify { border-left-color: #dc2626; }
   color: var(--text-muted);
   line-height: 1.5;
 }
+
+/* Glossário e cursos expansíveis */
+.glossary-item.card, .course-card.card {
+  cursor: pointer;
+}
+.glossary-item .details,
+.course-card .details {
+  display: none;
+  margin-top: 0.55rem;
+}
+.glossary-item.open .details,
+.course-card.open .details {
+  display: block;
+}
+.glossary-item .card-hint,
+.course-card .card-hint {
+  margin-top: 0.45rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Mobile mais limpo */
+@media (max-width: 720px) {
+  .card, .area-card, .concept-card, .course-card, .glossary-item.card {
+    padding: 1rem 1.05rem;
+  }
+  .card h3, .area-card h3 {
+    font-size: 1.02rem;
+    padding-right: 0.5rem;
+  }
+  .langs span {
+    font-size: 0.72rem;
+    padding: 0.15rem 0.4rem;
+  }
+  .chip-row {
+    gap: 0.35rem;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .chip { flex-shrink: 0; }
+  .section-desc { font-size: 0.82rem; }
+  .card-hint { font-size: 0.7rem; }
+  .details li { font-size: 0.82rem; line-height: 1.45; }
+}

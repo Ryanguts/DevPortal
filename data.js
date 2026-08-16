@@ -5189,6 +5189,5 @@ const DP_FACULDADES = [
 ];
 
 
-// Compatibilidade com scripts que esperam nomes globais
-if (typeof linguagens === "undefined") { var linguagens = DP_LINGUAGENS; }
-if (typeof areas === "undefined") { var areas = DP_AREAS; }
+// NÃO declarar var linguagens/areas aqui — o script.js já tem const linguagens/areas.
+// A mescla é feita em mergeDataModule() lendo DP_LINGUAGENS / DP_AREAS etc.

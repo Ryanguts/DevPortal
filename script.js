@@ -3280,12 +3280,28 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==========================================
 // 24. SPLASH DE ABERTURA (Matrix + DevPortal)
 // ==========================================
+function forceHideSplash() {
+  const splash = document.getElementById("splash-screen");
+  if (!splash) {
+    document.body.classList.remove("splash-active");
+    return;
+  }
+  splash.classList.add("splash-hide");
+  document.body.classList.remove("splash-active");
+  splash.setAttribute("aria-hidden", "true");
+  setTimeout(() => {
+    try { splash.remove(); } catch (_) {}
+  }, 700);
+}
+
 function initSplash() {
   const splash = document.getElementById("splash-screen");
   const canvas = document.getElementById("splash-matrix");
   if (!splash) return;
 
   document.body.classList.add("splash-active");
+  // failsafe absoluto: nunca trava a tela
+  setTimeout(forceHideSplash, 3200);
 
   // mini matrix só no splash
   if (canvas && canvas.getContext) {
@@ -3323,19 +3339,13 @@ function initSplash() {
     }
 
     // fecha em ~2.8s (barra anima 2.6s)
-    const DURATION = 2800;
+    const DURATION = 2600;
     setTimeout(() => {
       running = false;
-      splash.classList.add("splash-hide");
-      document.body.classList.remove("splash-active");
-      setTimeout(() => splash.remove(), 800);
+      forceHideSplash();
     }, DURATION);
   } else {
-    setTimeout(() => {
-      splash.classList.add("splash-hide");
-      document.body.classList.remove("splash-active");
-      setTimeout(() => splash.remove(), 800);
-    }, 2200);
+    setTimeout(forceHideSplash, 2000);
   }
 }
 
@@ -3769,9 +3779,14 @@ async function openAdminPanel() {
 
 // Splash + rebind auth no load
 document.addEventListener("DOMContentLoaded", () => {
-  try { initSplash(); } catch (e) { console.warn(e); }
-  // re-inicializa auth com versão API (substitui handlers do chip)
+  try { initSplash(); } catch (e) {
+    console.warn(e);
+    try { forceHideSplash(); } catch (_) {}
+  }
   try { initAuth(); } catch (e) { console.warn(e); }
+});
+window.addEventListener("load", () => {
+  setTimeout(() => { try { forceHideSplash(); } catch (_) {} }, 4000);
 });
 
 

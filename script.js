@@ -1759,17 +1759,29 @@ function renderAreas(lista) {
 
   lista.forEach((area, idx) => {
     const card = document.createElement("div");
-    card.className = "area-card fade-in";
+    card.className = "area-card card fade-in";
     card.style.animationDelay = `${idx * 0.03}s`;
+    const detalhes = area.detalhes || [];
+    const extra = [];
+    if (area.diaADia) extra.push(`<li><strong>Dia a dia:</strong> ${area.diaADia}</li>`);
+    if (area.softSkills?.length) extra.push(`<li><strong>Soft skills:</strong> ${area.softSkills.join(", ")}</li>`);
+    if (area.dica) extra.push(`<li><strong>Dica:</strong> ${area.dica}</li>`);
 
     card.innerHTML = `
       <h3>${area.nome}</h3>
       <p>${area.desc}</p>
       <div class="langs">
-        ${area.langs.map(l => `<span>${l}</span>`).join("")}
+        ${(area.langs || []).map(l => `<span>${l}</span>`).join("")}
       </div>
+      <div class="details">
+        <ul>
+          ${detalhes.map(d => `<li>${d}</li>`).join("")}
+          ${extra.join("")}
+        </ul>
+      </div>
+      <span class="card-hint">💡 Clique para expandir</span>
     `;
-
+    card.addEventListener("click", () => card.classList.toggle("open"));
     areasGrid.appendChild(card);
   });
 }
@@ -1778,14 +1790,23 @@ function renderConceitos() {
   const grid = document.getElementById("concepts-grid");
   if (!grid) return;
 
-  grid.innerHTML = conceitosLogica.map(c => `
-    <div class="concept-card">
-      <span class="concept-icon">${c.icone}</span>
-      <h4>${c.nome}</h4>
-      <p>${c.desc}</p>
-      <pre><code>${c.exemplo}</code></pre>
-    </div>
-  `).join("");
+  grid.innerHTML = "";
+  (conceitosLogica || []).forEach((c, idx) => {
+    const card = document.createElement("div");
+    card.className = "concept-card card fade-in";
+    card.style.animationDelay = `${idx * 0.03}s`;
+    const dets = c.detalhes || [];
+    card.innerHTML = `
+      <h3>${c.nome}</h3>
+      <p>${c.desc || c.texto || ""}</p>
+      <div class="details">
+        <ul>${dets.map(d => `<li>${d}</li>`).join("")}</ul>
+      </div>
+      <span class="card-hint">💡 Clique para expandir</span>
+    `;
+    card.addEventListener("click", () => card.classList.toggle("open"));
+    grid.appendChild(card);
+  });
 }
 
 function renderCursosLogica(lista) {
@@ -2317,10 +2338,15 @@ function aplicarFiltrosLinguagens() {
   const termo = (document.getElementById("search-lang-input")?.value || "").toLowerCase().trim();
 
   const filtradas = linguagens.filter(l => {
-    const matchTermo =
-      l.nome.toLowerCase().includes(termo) ||
-      l.tag.toLowerCase().includes(termo) ||
-      l.desc.toLowerCase().includes(termo);
+    const nome = l.nome.toLowerCase();
+    const matchTermo = !termo ||
+      nome === termo ||
+      nome.startsWith(termo + " ") ||
+      nome.startsWith(termo + "(") ||
+      nome.includes(termo) ||
+      (l.tag || "").toLowerCase().includes(termo) ||
+      (l.desc || "").toLowerCase().includes(termo) ||
+      (l.detalhes || []).some(d => String(d).toLowerCase().includes(termo));
 
     let matchCategoria = true;
     if (filtroCategoriaLinguagens === "favoritos") {
@@ -2801,6 +2827,38 @@ function initMatrixRain() {
 // ==========================================
 // 21. INTEGRAÇÃO COM data.js + ENRIQUECIMENTO
 // ==========================================
+
+function renderFaculdades(lista) {
+  const grid = document.getElementById("faculdades-grid") || document.getElementById("courses-grid") || document.getElementById("cursos-ti-grid");
+  if (!grid) return;
+  const list = lista || (typeof DP_FACULDADES !== "undefined" ? DP_FACULDADES : []);
+  // if grid already used by cursosTI, create section only if empty attribute data-fac
+  if (grid.dataset.facBound === "1") {
+    grid.innerHTML = "";
+  }
+  list.forEach((f, idx) => {
+    const card = document.createElement("div");
+    card.className = "card fade-in";
+    card.style.animationDelay = `${idx * 0.02}s`;
+    const dets = f.detalhes || [];
+    card.innerHTML = `
+      <span class="tag">${f.tipo || "Formação"}</span>
+      <h3>${f.nome}</h3>
+      <p>${f.foco || f.desc || ""}</p>
+      <div class="details">
+        <ul>
+          ${dets.map(d => `<li>${d}</li>`).join("")}
+          ${f.dica ? `<li><strong>Dica:</strong> ${f.dica}</li>` : ""}
+        </ul>
+      </div>
+      <span class="card-hint">💡 Clique para expandir</span>
+    `;
+    card.addEventListener("click", () => card.classList.toggle("open"));
+    grid.appendChild(card);
+  });
+  grid.dataset.facBound = "1";
+}
+
 (function mergeDataModule() {
   if (typeof DP_LINGUAGENS !== "undefined" && Array.isArray(DP_LINGUAGENS) && DP_LINGUAGENS.length) {
     // Mescla por nome: data.js enriquece ou adiciona
@@ -2822,6 +2880,34 @@ function initMatrixRain() {
       if (byName.has(key)) Object.assign(byName.get(key), d);
       else areas.push(d);
     });
+  }
+  if (typeof DP_CONCEITOS_LOGICA !== "undefined" && DP_CONCEITOS_LOGICA.length && typeof conceitosLogica !== "undefined") {
+    const byName = new Map(conceitosLogica.map(c => [c.nome.toLowerCase(), c]));
+    DP_CONCEITOS_LOGICA.forEach(d => {
+      const key = (d.nome || "").toLowerCase();
+      if (byName.has(key)) Object.assign(byName.get(key), d);
+      else conceitosLogica.push(d);
+    });
+  }
+  if (typeof DP_FERRAMENTAS !== "undefined" && DP_FERRAMENTAS.length) {
+    try { renderFerramentas(DP_FERRAMENTAS); } catch (_) {}
+  }
+  if (typeof DP_TRILHAS !== "undefined" && DP_TRILHAS.length) {
+    try { renderTrilhas(); } catch (_) {}
+  }
+  if (typeof DP_FAQ !== "undefined" && DP_FAQ.length) {
+    try {
+      const el = document.getElementById("faq-list") || document.getElementById("faq-grid");
+      if (el) {
+        el.innerHTML = DP_FAQ.map(f => `<details class="faq-item"><summary>${f.q}</summary><p>${f.a}</p></details>`).join("");
+      }
+    } catch (_) {}
+  }
+  if (typeof DP_GLOSSARIO !== "undefined" && DP_GLOSSARIO.length) {
+    try { if (typeof renderGlossario === "function") renderGlossario(DP_GLOSSARIO); } catch (_) {}
+  }
+  if (typeof DP_FACULDADES !== "undefined" && DP_FACULDADES.length) {
+    try { if (typeof renderFaculdades === "function") renderFaculdades(DP_FACULDADES); } catch (_) {}
   }
 })();
 
@@ -3029,25 +3115,27 @@ function initTrilhasPage() {
 }
 
 function renderTrilhas() {
-  const grid = document.getElementById("trilhas-grid");
+  const grid = document.getElementById("trilhas-grid") || document.getElementById("tracks-grid");
   if (!grid) return;
-  const list = typeof DP_TRILHAS !== "undefined" ? DP_TRILHAS : [];
-  grid.innerHTML = list.map(t => `
-    <div class="trilha-card">
-      <span class="tag">${t.nivel}</span>
-      <h3>${t.titulo}</h3>
-      <p>${t.resumo}</p>
-      <p class="meta"><strong>Tempo estimado:</strong> ${t.tempo}</p>
-      <div class="trilha-etapas">
-        ${t.etapas.map((e, i) => `
-          <div class="trilha-etapa">
-            <strong>${i + 1}. ${e.nome}</strong>
-            <ul>${e.itens.map(it => `<li>${it}</li>`).join("")}</ul>
-          </div>
-        `).join("")}
+  const lista = (typeof DP_TRILHAS !== "undefined" && DP_TRILHAS.length) ? DP_TRILHAS : (typeof trilhas !== "undefined" ? trilhas : []);
+  grid.innerHTML = "";
+  lista.forEach((t, idx) => {
+    const card = document.createElement("div");
+    card.className = "card fade-in";
+    card.style.animationDelay = `${idx * 0.03}s`;
+    const dets = t.detalhes || t.passos || [];
+    card.innerHTML = `
+      <span class="tag">Trilha</span>
+      <h3>${t.nome || t.titulo}</h3>
+      <p>${t.resumo || t.desc || ""}</p>
+      <div class="details">
+        <ul>${(dets || []).map(d => `<li>${d}</li>`).join("")}</ul>
       </div>
-    </div>
-  `).join("");
+      <span class="card-hint">💡 Clique para expandir</span>
+    `;
+    card.addEventListener("click", () => card.classList.toggle("open"));
+    grid.appendChild(card);
+  });
 }
 
 function renderGlossario(lista) {
@@ -3066,15 +3154,27 @@ function renderGlossario(lista) {
 }
 
 function renderFerramentas(lista) {
-  const grid = document.getElementById("ferramentas-grid");
+  const grid = document.getElementById("tools-grid") || document.getElementById("ferramentas-grid");
   if (!grid) return;
-  grid.innerHTML = lista.map(f => `
-    <div class="tool-card">
-      <span class="tag">${f.cat}</span>
-      <h4>${f.nome}</h4>
-      <p>${f.desc}</p>
-    </div>
-  `).join("");
+  const list = lista || (typeof DP_FERRAMENTAS !== "undefined" ? DP_FERRAMENTAS : []);
+  grid.innerHTML = "";
+  list.forEach((f, idx) => {
+    const card = document.createElement("div");
+    card.className = "card fade-in";
+    card.style.animationDelay = `${idx * 0.03}s`;
+    const dets = f.detalhes || [];
+    card.innerHTML = `
+      <span class="tag">${f.cat || f.categoria || "Ferramenta"}</span>
+      <h3>${f.nome}</h3>
+      <p>${f.desc || ""}</p>
+      <div class="details">
+        <ul>${dets.map(d => `<li>${d}</li>`).join("")}</ul>
+      </div>
+      <span class="card-hint">💡 Clique para expandir</span>
+    `;
+    card.addEventListener("click", () => card.classList.toggle("open"));
+    grid.appendChild(card);
+  });
 }
 
 function renderFaq(lista) {

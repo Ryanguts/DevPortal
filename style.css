@@ -3904,3 +3904,41 @@ body.owner-view .site-notify { border-left-color: #dc2626; }
 .chat-friends-panel {
   padding: 0.45rem 0.65rem;
 }
+
+/* Expandível: áreas, conceitos, trilhas, ferramentas */
+.area-card.card, .concept-card.card {
+  cursor: pointer;
+}
+.area-card .details,
+.concept-card .details {
+  display: none;
+  margin-top: 0.65rem;
+}
+.area-card.open .details,
+.concept-card.open .details,
+.card.open .details {
+  display: block;
+}
+.area-card .card-hint,
+.concept-card .card-hint {
+  display: inline-block;
+  margin-top: 0.45rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.faq-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+.faq-item p {
+  margin-top: 0.5rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}

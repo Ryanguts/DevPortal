@@ -1608,6 +1608,11 @@ function irParaPagina(pageId) {
   });
   document.querySelectorAll(".page-view").forEach(page => {
     page.classList.toggle("active", page.id === `page-${pageId}`);
+    if (page.id === `page-${pageId}`) {
+      page.classList.remove("page-enter");
+      void page.offsetWidth;
+      page.classList.add("page-enter");
+    }
   });
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -1769,24 +1774,22 @@ function renderAreas(lista) {
     const card = document.createElement("div");
     card.className = "area-card card fade-in";
     card.style.animationDelay = `${idx * 0.03}s`;
-    const detalhes = area.detalhes || [];
-    const extra = [];
-    if (area.diaADia) extra.push(`<li><strong>Dia a dia:</strong> ${area.diaADia}</li>`);
-    if (area.softSkills?.length) extra.push(`<li><strong>Soft skills:</strong> ${area.softSkills.join(", ")}</li>`);
-    if (area.dica) extra.push(`<li><strong>Dica:</strong> ${area.dica}</li>`);
-    if (!detalhes.length && !extra.length) {
-      extra.push(`<li><strong>Stack comum:</strong> ${(area.langs || []).join(", ") || "varia"}</li>`);
-      extra.push(`<li><strong>Próximo passo:</strong> monte um projeto pequeno e publique no GitHub.</li>`);
-      extra.push(`<li><strong>Mercado:</strong> pesquise vagas com esses termos no LinkedIn/Gupy.</li>`);
-    }
+    const stack = area.stackComum || (area.langs || []).slice(0, 8).join(", ") || "varia conforme a empresa";
+    const next = area.proximoPasso || area.dica || "Monte um projeto pequeno e publique no GitHub com README claro.";
+    const market = area.mercadoTexto || "Demanda existe no Brasil e no exterior; senioridade e portfólio pesam mais que modismos.";
+    const soft = (area.softSkills || []).length ? `<li><strong>Soft skills:</strong> ${area.softSkills.join(", ")}</li>` : "";
+    const dia = area.diaADia ? `<li><strong>Dia a dia:</strong> ${area.diaADia}</li>` : "";
     card.innerHTML = `
       <h3>${area.nome}</h3>
-      <p>${area.desc}</p>
+      <p>${area.desc || ""}</p>
       <div class="langs">${(area.langs || []).map(l => `<span>${l}</span>`).join("")}</div>
       <div class="details">
         <ul>
-          ${detalhes.map(d => `<li>${d}</li>`).join("")}
-          ${extra.join("")}
+          <li><strong>Stack comum:</strong> ${stack}</li>
+          <li><strong>Próximo passo:</strong> ${next}</li>
+          <li><strong>Mercado:</strong> ${market}</li>
+          ${dia}
+          ${soft}
         </ul>
       </div>
       <span class="card-hint">💡 Clique para expandir</span>
@@ -1858,7 +1861,7 @@ function renderConceitos() {
 }
 
 function renderCursosLogica(lista) {
-  const grid = document.getElementById("cursos-logica-grid") || document.getElementById("logic-courses-grid");
+  const grid = document.getElementById("courses-grid") || document.getElementById("cursos-logica-grid") || document.getElementById("logic-courses-grid");
   if (!grid) return;
   const list = lista || cursosLogica || [];
   grid.innerHTML = "";
@@ -2472,7 +2475,7 @@ function initCourseFilterLogica() {
       chips.forEach(c => c.classList.remove("active"));
       chip.classList.add("active");
       const filtro = chip.dataset.filtro;
-      const filtrados = filtro === "todos" ? cursosLogica : cursosLogica.filter(c => c.tipo === filtro);
+      const filtrados = filtro === "todos" ? cursosLogica : cursosLogica.filter(c => (c.tipo || "").toLowerCase() === filtro.toLowerCase());
       renderCursosLogica(filtrados);
     });
   });
@@ -3201,33 +3204,67 @@ function initTrilhasPage() {
     guias: document.getElementById("guias-panel")
   };
 
+  const titles = {
+    trilhas: {
+      h: "🗺️ Trilhas de estudo",
+      d: "Trilha é um roteiro em etapas (do zero ao avançado) com foco e ordem sugerida — para não estudar tudo ao mesmo tempo."
+    },
+    glossario: {
+      h: "📖 Glossário técnico",
+      d: "Glossário reúne termos do dia a dia (API, Git, deploy…) com definição direta — para ler docs e vagas sem travar no jargão."
+    },
+    ferramentas: {
+      h: "🛠️ Ferramentas",
+      d: "Ferramentas são apps e plataformas que você usa junto com a linguagem: editores, BI, cloud, engines e IAs."
+    },
+    faq: {
+      h: "❓ FAQ",
+      d: "Perguntas frequentes de quem está começando — respostas curtas para destravar antes de abrir o suporte."
+    },
+    guias: {
+      h: "📘 Guias práticos",
+      d: "Guias são checklists e orientações práticas (portfólio, primeira semana, pedir ajuda) além de notas de mercado e dicas de estudo."
+    }
+  };
+
+  function setTrilhasHeader(mode) {
+    const header = document.querySelector("#page-trilhas .section-header h2");
+    const desc = document.querySelector("#page-trilhas .section-header .section-desc");
+    const t = titles[mode] || titles.trilhas;
+    if (header) header.innerHTML = `<span class="emoji-icon"></span> ${t.h}`;
+    if (desc) desc.textContent = t.d;
+  }
+
   toggle.querySelectorAll(".segmented-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       toggle.querySelectorAll(".segmented-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       const mode = btn.dataset.tmode;
       Object.entries(panels).forEach(([k, el]) => {
-        if (el) el.style.display = k === mode ? "" : "none";
+        if (!el) return;
+        if (k === mode) {
+          el.style.display = "";
+          el.classList.remove("panel-fade");
+          void el.offsetWidth;
+          el.classList.add("panel-fade");
+        } else {
+          el.style.display = "none";
+        }
       });
+      setTrilhasHeader(mode);
     });
   });
 
+  setTrilhasHeader("trilhas");
   renderTrilhas();
   renderGlossario(typeof DP_GLOSSARIO !== "undefined" ? DP_GLOSSARIO : []);
-  renderFerramentas(typeof DP_FERRAMENTAS !== "undefined" ? DP_FERRAMENTAS : []);
-  renderFaq(typeof DP_FAQ !== "undefined" ? DP_FAQ : []);
-  renderGuias();
-
-  document.getElementById("search-glossario")?.addEventListener("input", (e) => {
-    const termo = e.target.value.toLowerCase().trim();
-    const all = typeof DP_GLOSSARIO !== "undefined" ? DP_GLOSSARIO : [];
-    const filtrado = all.filter(g =>
-      g.termo.toLowerCase().includes(termo) || g.def.toLowerCase().includes(termo)
-    );
-    renderGlossario(filtrado);
-  });
-
-  document.getElementById("feat-trilhas")?.addEventListener("click", () => irParaPagina("trilhas"));
+  try {
+    if (typeof DP_FERRAMENTAS !== "undefined") renderFerramentas(DP_FERRAMENTAS);
+  } catch (_) {}
+  try {
+    if (typeof DP_FAQ !== "undefined") renderFaq(DP_FAQ);
+  } catch (_) {}
+  try { renderGuias(); } catch (_) {}
 }
 
 function renderTrilhas() {
@@ -3321,32 +3358,56 @@ function renderFaq(lista) {
 }
 
 function renderGuias() {
-  const wrap = document.getElementById("guias-wrap");
-  const mercado = document.getElementById("mercado-grid");
-  const dicas = document.getElementById("dicas-grid");
-  if (wrap && typeof DP_GUIAS !== "undefined") {
-    wrap.innerHTML = DP_GUIAS.map(g => `
-      <article class="guia-card">
-        <h3>${g.titulo}</h3>
-        ${g.paragrafos.map(p => `<p>${p}</p>`).join("")}
-      </article>
-    `).join("");
-  }
-  if (mercado && typeof DP_MERCADO_NOTAS !== "undefined") {
-    mercado.innerHTML = DP_MERCADO_NOTAS.map(m => `
-      <div class="note-card">
+  const mercado = document.getElementById("mercado-grid") || document.getElementById("mercado-notas");
+  const dicas = document.getElementById("dicas-grid") || document.getElementById("dicas-estudo");
+  if (mercado) {
+    const list = (typeof DP_MERCADO_NOTAS !== "undefined" && DP_MERCADO_NOTAS.length) ? DP_MERCADO_NOTAS : [];
+    mercado.innerHTML = list.length ? list.map(m => `
+      <div class="note-card card">
         <h4>${m.titulo}</h4>
         <p>${m.texto}</p>
       </div>
-    `).join("");
+    `).join("") : `<p class="section-desc">Notas de mercado em breve.</p>`;
   }
-  if (dicas && typeof DP_DICAS !== "undefined") {
-    dicas.innerHTML = DP_DICAS.map(d => `
-      <div class="note-card">
+  if (dicas) {
+    const list = (typeof DP_DICAS !== "undefined" && DP_DICAS.length) ? DP_DICAS : [];
+    dicas.innerHTML = list.length ? list.map(d => `
+      <div class="note-card card">
         <h4>${d.titulo}</h4>
         <p>${d.texto}</p>
       </div>
-    `).join("");
+    `).join("") : `<p class="section-desc">Dicas em breve.</p>`;
+  }
+  // guias cards
+  const panel = document.getElementById("guias-panel");
+  if (panel && typeof DP_GUIAS !== "undefined" && DP_GUIAS.length) {
+    let grid = document.getElementById("guias-grid");
+    if (!grid) {
+      grid = document.createElement("div");
+      grid.id = "guias-grid";
+      grid.className = "grid";
+      panel.insertBefore(grid, panel.firstChild);
+      const h = document.createElement("h3");
+      h.className = "subsection-title";
+      h.textContent = "Guias rápidos";
+      panel.insertBefore(h, grid);
+    }
+    grid.innerHTML = "";
+    DP_GUIAS.forEach((g, idx) => {
+      const card = document.createElement("div");
+      card.className = "card fade-in";
+      card.style.animationDelay = `${idx * 0.03}s`;
+      const dets = g.detalhes || [];
+      card.innerHTML = `
+        <span class="tag">Guia</span>
+        <h3>${g.titulo}</h3>
+        <p>${g.resumo || ""}</p>
+        <div class="details"><ul>${dets.map(d => `<li>${d}</li>`).join("")}</ul></div>
+        <span class="card-hint">💡 Clique para expandir</span>
+      `;
+      card.addEventListener("click", () => card.classList.toggle("open"));
+      grid.appendChild(card);
+    });
   }
 }
 

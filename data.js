@@ -1,23 +1,18 @@
-// ==========================================
-// DevPortal — data.js (EXPANDIDO + CORRIGIDO)
-// Carregar ANTES de script.js
-// ==========================================
+// DevPortal data.js — conteúdo expandido e corrigido
 const DP_LINGUAGENS = [
   {
     "nome": "JavaScript",
-    "tag": "Web / Fullstack",
+    "tag": "Web",
     "categoria": "linguagem",
-    "desc": "Linguagem da web no navegador e no servidor (Node.js).",
+    "desc": "Linguagem da web e do Node.",
     "detalhes": [
-      "DOM e eventos",
-      "Node.js / Express / NestJS",
-      "NPM e ecossistema enorme",
-      "Base do TypeScript",
-      "Frameworks: React, Vue, Svelte, Angular"
+      "DOM",
+      "Node.js",
+      "NPM"
     ],
-    "nivel": "Iniciante",
-    "mercado": "Altíssimo",
-    "quandoAprender": "Primeira opção para web",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Altíssima",
+    "quandoAprender": "Quando alinhar à sua meta",
     "relacionados": [
       "TypeScript",
       "HTML",
@@ -26,19 +21,17 @@ const DP_LINGUAGENS = [
   },
   {
     "nome": "TypeScript",
-    "tag": "Web / Enterprise",
+    "tag": "Web tipado",
     "categoria": "linguagem",
-    "desc": "Superset tipado do JavaScript — menos bugs em projetos grandes.",
+    "desc": "JS com tipos estáticos.",
     "detalhes": [
-      "Tipos, generics, interfaces",
-      "Padrão em React/Next/Nest",
-      "Compila para JS",
-      "Ótimo para APIs tipadas",
-      "Comparado a C: alto nível web vs baixo nível sistemas"
+      "tsc",
+      "Interfaces e generics",
+      "Padrão em empresas"
     ],
     "nivel": "Iniciante a intermediário",
-    "mercado": "Altíssimo",
-    "quandoAprender": "Junto ou logo após JS",
+    "mercado": "Altíssima demanda web/enterprise",
+    "quandoAprender": "Quando alinhar à sua meta",
     "relacionados": [
       "JavaScript",
       "C#",
@@ -47,514 +40,483 @@ const DP_LINGUAGENS = [
   },
   {
     "nome": "Python",
-    "tag": "Dados / Backend / Automação",
+    "tag": "Geral",
     "categoria": "linguagem",
-    "desc": "Legível e versátil: dados, IA, web e scripts.",
+    "desc": "Legível: dados, web, automação.",
     "detalhes": [
-      "Django, Flask, FastAPI",
-      "Pandas, PyTorch, scikit-learn",
-      "Automação e DevOps",
-      "Excelente primeira linguagem"
+      "FastAPI",
+      "Pandas",
+      "Scripts"
     ],
-    "nivel": "Iniciante",
-    "mercado": "Altíssimo",
-    "quandoAprender": "Ótima porta de entrada",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Altíssima",
+    "quandoAprender": "Quando alinhar à sua meta",
     "relacionados": [
       "SQL",
-      "R",
-      "TypeScript"
+      "Go (Golang)"
     ]
   },
   {
     "nome": "Java",
-    "tag": "Enterprise / Android",
+    "tag": "Enterprise",
     "categoria": "linguagem",
-    "desc": "Pilar corporativo na JVM: Spring, bancos, Android histórico.",
+    "desc": "JVM e backend corporativo.",
     "detalhes": [
-      "Orientação a objetos",
-      "Spring Boot",
-      "JVM multiplataforma",
-      "Muito pedido em empresas"
+      "Spring Boot"
     ],
     "nivel": "Iniciante a intermediário",
     "mercado": "Estável e amplo",
     "relacionados": [
       "Kotlin",
-      "C#",
-      "Scala"
-    ]
+      "C#"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "C#",
-    "tag": "Games / .NET / Enterprise",
+    "tag": "NET/Games",
     "categoria": "linguagem",
-    "desc": "Linguagem do .NET e do Unity. Games, web, desktop e cloud Microsoft.",
+    "desc": "NET e Unity.",
     "detalhes": [
-      "Unity gameplay",
-      "ASP.NET Core",
-      "async/await e OO moderna",
-      "Blazor e MAUI"
+      "ASP.NET",
+      "Unity"
     ],
     "nivel": "Iniciante a intermediário",
-    "mercado": "Forte em games e enterprise",
+    "mercado": "Forte games/enterprise",
     "relacionados": [
-      "Unity (C#)",
       "Java",
-      "TypeScript",
-      "F#"
-    ]
+      "TypeScript"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "C",
-    "tag": "Sistemas / Embarcados",
+    "tag": "Sistemas",
     "categoria": "linguagem",
-    "desc": "Base de SO, embarcados e performance nativa. Clássica e ainda essencial.",
+    "desc": "Base de SO e embarcados.",
     "detalhes": [
-      "Ponteiros e memória manual",
-      "Kernels, firmwares, engines",
-      "Fundamento para C++/Rust",
-      "GCC, Clang, MSVC"
+      "Ponteiros",
+      "Memória manual"
     ],
     "nivel": "Intermediário",
-    "mercado": "Estável em sistemas e IoT",
-    "quandoAprender": "Depois de lógica, para entender o hardware",
+    "mercado": "Estável em sistemas/IoT",
+    "quandoAprender": "Quando alinhar à sua meta",
     "relacionados": [
       "C++",
-      "Rust",
-      "Zig",
-      "Assembly"
+      "Rust"
     ]
   },
   {
     "nome": "C++",
-    "tag": "Sistemas / Games / Performance",
+    "tag": "Performance",
     "categoria": "linguagem",
-    "desc": "C com OO e templates. Engines, HFT e software de alta performance.",
+    "desc": "Sistemas e games de alto desempenho.",
     "detalhes": [
-      "Unreal Engine",
-      "STL e RAII",
-      "Controle fino de memória",
-      "Curva íngreme"
+      "Unreal",
+      "STL"
     ],
-    "nivel": "Intermediário a avançado",
-    "mercado": "Games, sistemas, quant",
+    "nivel": "Avançado",
+    "mercado": "Games/sistemas",
     "relacionados": [
       "C",
-      "Rust",
-      "C#"
-    ]
+      "Rust"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Go (Golang)",
-    "tag": "Backend / Cloud",
+    "tag": "Cloud",
     "categoria": "linguagem",
-    "desc": "Simples, concorrente e rápida de compilar. Cloud e microsserviços.",
+    "desc": "Simples e concorrente.",
     "detalhes": [
       "Goroutines",
-      "Docker/K8s tooling",
-      "Binário estático"
+      "Cloud native"
     ],
     "nivel": "Iniciante a intermediário",
-    "mercado": "Muito forte em backend",
+    "mercado": "Forte backend/cloud",
     "relacionados": [
       "Rust",
-      "C",
       "Python"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Rust",
-    "tag": "Sistemas / Segurança",
+    "tag": "Sistemas seguros",
     "categoria": "linguagem",
-    "desc": "Performance de C/C++ com segurança de memória no compilador.",
+    "desc": "Memória segura sem GC.",
     "detalhes": [
       "Ownership",
-      "WASM, CLI, sistemas",
-      "Curva alta, recompensa alta"
+      "WASM"
     ],
-    "nivel": "Intermediário a avançado",
+    "nivel": "Avançado",
     "mercado": "Crescendo rápido",
     "relacionados": [
       "C",
-      "C++",
-      "Zig"
-    ]
+      "C++"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Kotlin",
-    "tag": "Android / JVM",
+    "tag": "Android",
     "categoria": "linguagem",
-    "desc": "Oficial no Android; concisa e null-safe sobre a JVM.",
+    "desc": "Oficial Android.",
     "detalhes": [
       "Corrotinas",
-      "Interopera com Java",
-      "Ktor / Spring"
+      "Null-safety"
     ],
     "nivel": "Iniciante a intermediário",
-    "mercado": "Forte em mobile",
+    "mercado": "Forte mobile",
     "relacionados": [
       "Java",
-      "Swift",
-      "Dart"
-    ]
+      "Swift"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Swift",
-    "tag": "Apple / iOS",
+    "tag": "Apple",
     "categoria": "linguagem",
-    "desc": "Linguagem moderna Apple: iOS, macOS, visionOS.",
+    "desc": "iOS/macOS.",
     "detalhes": [
-      "SwiftUI",
-      "Segurança de tipos",
-      "Playgrounds"
+      "SwiftUI"
     ],
     "nivel": "Iniciante a intermediário",
     "mercado": "Ecossistema Apple",
     "relacionados": [
       "Kotlin",
-      "Objective-C",
-      "Dart"
-    ]
+      "Objective-C"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Dart",
     "tag": "Flutter",
     "categoria": "linguagem",
-    "desc": "Linguagem do Flutter: mobile, web e desktop com uma base.",
+    "desc": "UI multiplataforma.",
     "detalhes": [
-      "Hot reload",
-      "Widgets",
-      "MVPs multiplataforma"
+      "Flutter widgets"
     ],
-    "nivel": "Iniciante",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Crescendo",
     "relacionados": [
       "Kotlin",
-      "Swift",
-      "JavaScript"
-    ]
+      "Swift"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "PHP",
-    "tag": "Web / CMS",
+    "tag": "Web",
     "categoria": "linguagem",
-    "desc": "WordPress, Laravel e grande parte da web ainda roda em PHP.",
+    "desc": "Laravel e WordPress.",
     "detalhes": [
-      "Laravel 11",
-      "PHP 8+",
-      "Hospedagem acessível"
+      "PHP 8+"
     ],
-    "nivel": "Iniciante",
-    "mercado": "Ainda enorme",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Ainda enorme na web",
     "relacionados": [
       "JavaScript",
-      "SQL",
-      "HTML"
-    ]
+      "SQL"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Ruby",
-    "tag": "Web / Produtividade",
+    "tag": "Web",
     "categoria": "linguagem",
-    "desc": "Famosa pelo Rails e produtividade em produtos web.",
+    "desc": "Rails e produtividade.",
     "detalhes": [
-      "Ruby on Rails",
-      "Sintaxe elegante",
-      "Startups"
+      "Convention over config"
     ],
-    "nivel": "Iniciante",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Nicho sólido",
     "relacionados": [
       "Python",
       "Elixir"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "SQL",
-    "tag": "Dados / Consulta",
+    "tag": "Relacional",
     "categoria": "dados",
-    "desc": "Padrão para bancos relacionais.",
+    "desc": "Consulta padrão em bancos relacionais.",
     "detalhes": [
-      "JOIN, índices, transações",
-      "PostgreSQL, MySQL, SQL Server",
-      "Todo backend precisa"
+      "JOIN",
+      "Índices",
+      "Transações"
     ],
-    "nivel": "Iniciante",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Universal",
     "relacionados": [
       "Python",
-      "GraphQL",
-      "NoSQL Query (MongoDB)"
-    ]
+      "PostgreSQL"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "HTML",
-    "tag": "Web / Estrutura",
+    "tag": "Marcação",
     "categoria": "web",
-    "desc": "Marcação que estrutura páginas.",
+    "desc": "Estrutura de páginas.",
     "detalhes": [
       "Semântica",
-      "Acessibilidade",
-      "Base do front"
+      "A11y",
+      "SEO"
     ],
-    "nivel": "Iniciante",
-    "mercado": "Universal",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Universal front",
     "relacionados": [
       "CSS",
       "JavaScript"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "CSS",
-    "tag": "Web / Estilo",
+    "tag": "Estilo",
     "categoria": "web",
-    "desc": "Layout, cores, responsivo e animação.",
+    "desc": "Layout e visual.",
     "detalhes": [
-      "Flexbox e Grid",
-      "Variáveis CSS",
-      "Mobile-first"
+      "Flex/Grid",
+      "Responsivo"
     ],
-    "nivel": "Iniciante",
-    "mercado": "Universal",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Universal front",
     "relacionados": [
       "HTML",
-      "Sass / SCSS",
-      "Tailwind CSS"
-    ]
+      "Sass / SCSS"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Sass / SCSS",
-    "tag": "Web / CSS",
+    "tag": "CSS",
     "categoria": "web",
-    "desc": "Pré-processador CSS com variáveis e mixins.",
+    "desc": "Pré-processador CSS.",
     "detalhes": [
-      "Organização em projetos grandes",
-      "Compila para CSS"
+      "Variáveis",
+      "Mixins"
     ],
-    "nivel": "Iniciante",
-    "mercado": "Comum em front",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Comum em times front",
     "relacionados": [
       "CSS",
       "Tailwind CSS"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Tailwind CSS",
     "tag": "Utility CSS",
     "categoria": "web",
-    "desc": "Classes utilitárias para montar UI rápido.",
+    "desc": "Classes utilitárias.",
     "detalhes": [
-      "Design tokens",
-      "React/Vue/Svelte",
-      "Não substitui CSS de verdade"
+      "Produtividade UI"
     ],
-    "nivel": "Iniciante",
-    "mercado": "Altíssimo",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Altíssimo em front moderno",
     "relacionados": [
       "CSS",
       "JavaScript"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "GraphQL",
-    "tag": "APIs",
+    "tag": "API query",
     "categoria": "dados",
-    "desc": "O cliente pede só os campos que precisa.",
+    "desc": "Cliente pede os campos.",
     "detalhes": [
-      "Schema tipado",
-      "Apollo/Relay",
-      "Alternativa flexível ao REST"
+      "Schema"
     ],
-    "nivel": "Intermediário",
-    "mercado": "Produtos web modernos",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "APIs modernas",
     "relacionados": [
       "TypeScript",
       "SQL"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Bash / Shell",
     "tag": "Terminal",
     "categoria": "linguagem",
-    "desc": "Scripts no Linux/macOS.",
+    "desc": "Automação Unix.",
     "detalhes": [
-      "Pipes, cron, SSH",
-      "Essencial em servidores"
+      "Pipes",
+      "SSH"
     ],
-    "nivel": "Iniciante",
-    "mercado": "Universal Unix",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Universal ops",
     "relacionados": [
       "PowerShell",
       "Python"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "PowerShell",
-    "tag": "Automação Windows",
+    "tag": "Windows",
     "categoria": "linguagem",
-    "desc": "Shell orientado a objetos Microsoft.",
+    "desc": "Automação Microsoft.",
     "detalhes": [
-      "Azure e AD",
-      "Multiplataforma"
+      "Azure"
     ],
     "nivel": "Iniciante a intermediário",
     "mercado": "Empresas Windows",
     "relacionados": [
       "Bash / Shell",
       "C#"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Assembly",
     "tag": "Baixo nível",
     "categoria": "linguagem",
-    "desc": "Instruções próximas da CPU.",
+    "desc": "Instruções de CPU.",
     "detalhes": [
-      "x86/ARM",
-      "Reverse engineering",
-      "Embarcados"
+      "x86/ARM"
     ],
     "nivel": "Avançado",
     "mercado": "Nicho",
     "relacionados": [
       "C",
       "Rust"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "R",
     "tag": "Estatística",
     "categoria": "linguagem",
-    "desc": "Estatística e visualização científica.",
+    "desc": "Análise estatística.",
     "detalhes": [
-      "tidyverse",
-      "ggplot2",
-      "Pesquisa"
+      "tidyverse"
     ],
     "nivel": "Iniciante a intermediário",
-    "mercado": "Ciência",
+    "mercado": "Ciência/pesquisa",
     "relacionados": [
       "Python",
       "SQL"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Julia",
-    "tag": "Científico / HPC",
+    "tag": "Científico",
     "categoria": "linguagem",
-    "desc": "Performance para ciência e simulação.",
+    "desc": "HPC científico.",
     "detalhes": [
-      "Multiple dispatch",
-      "Numérico"
+      "Performance"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Pesquisa",
     "relacionados": [
       "Python",
-      "MATLAB",
-      "C++"
-    ]
+      "MATLAB"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Scala",
-    "tag": "JVM / Dados",
+    "tag": "JVM dados",
     "categoria": "linguagem",
-    "desc": "Funcional+OO; histórico com Spark.",
+    "desc": "Funcional na JVM; Spark.",
     "detalhes": [
-      "Spark",
-      "Akka",
-      "Expressiva"
+      "Big data"
     ],
     "nivel": "Intermediário",
-    "mercado": "Dados/backend",
+    "mercado": "Dados",
     "relacionados": [
       "Java",
       "Kotlin"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Elixir",
-    "tag": "Backend concorrente",
+    "tag": "Concorrência",
     "categoria": "linguagem",
-    "desc": "BEAM/Erlang: fault-tolerance e realtime.",
+    "desc": "BEAM/Phoenix realtime.",
     "detalhes": [
-      "Phoenix",
       "OTP"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Nicho bem pago",
     "relacionados": [
       "Ruby",
-      "Erlang",
-      "Go (Golang)"
-    ]
+      "Erlang"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Haskell",
     "tag": "Funcional",
     "categoria": "linguagem",
-    "desc": "Funcional pura e tipos avançados.",
+    "desc": "Pura e tipada.",
     "detalhes": [
-      "Monads",
-      "Influencia outras langs"
+      "Academia/fintech"
     ],
     "nivel": "Avançado",
     "mercado": "Nicho",
     "relacionados": [
       "Scala",
-      "F#",
-      "OCaml"
-    ]
+      "F#"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Lua",
-    "tag": "Embutida / Games",
+    "tag": "Embutida",
     "categoria": "linguagem",
-    "desc": "Leve: Love2D, Roblox, Nginx, engines.",
+    "desc": "Games e scripting leve.",
     "detalhes": [
-      "Scripting embutido",
-      "Sintaxe simples"
+      "Love2D",
+      "Nginx"
     ],
-    "nivel": "Iniciante",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Games/script",
     "relacionados": [
-      "GDScript",
       "Python",
       "C"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Solidity",
     "tag": "Blockchain",
     "categoria": "linguagem",
-    "desc": "Smart contracts EVM/Ethereum.",
+    "desc": "Smart contracts EVM.",
     "detalhes": [
-      "Hardhat/Foundry",
-      "Segurança crítica"
+      "Hardhat"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Volátil",
     "relacionados": [
       "JavaScript",
       "Rust"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Zig",
     "tag": "Sistemas",
     "categoria": "linguagem",
-    "desc": "Alternativa moderna ao C.",
+    "desc": "Alternativa moderna a C.",
     "detalhes": [
-      "Cross-compile",
-      "Sem hidden control flow"
+      "Cross-compile"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Emergente",
     "relacionados": [
       "C",
-      "Rust",
-      "V"
-    ]
+      "Rust"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "V",
@@ -562,84 +524,86 @@ const DP_LINGUAGENS = [
     "categoria": "linguagem",
     "desc": "Simples e rápida de compilar.",
     "detalhes": [
-      "Sintaxe limpa",
-      "Ainda madurando"
+      "Sintaxe limpa"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Emergente",
     "relacionados": [
       "Go (Golang)",
       "C"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Nim",
     "tag": "Sistemas",
     "categoria": "linguagem",
-    "desc": "Expressiva, compila para C/JS.",
+    "desc": "Expressiva compila para C.",
     "detalhes": [
-      "Metaprogramação",
-      "CLIs"
+      "Meta"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Nicho",
     "relacionados": [
       "Python",
       "Rust"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Perl",
-    "tag": "Texto / Legado",
+    "tag": "Texto",
     "categoria": "linguagem",
-    "desc": "Regex e scripts clássicos.",
+    "desc": "Regex e legado.",
     "detalhes": [
-      "Legado bioinfo/sysadmin"
+      "CPAN"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Manutenção",
     "relacionados": [
       "Python",
       "Bash / Shell"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Objective-C",
     "tag": "Apple legado",
     "categoria": "linguagem",
-    "desc": "Antecessora do Swift.",
+    "desc": "Base antiga iOS.",
     "detalhes": [
-      "Interop com Swift"
+      "Interop Swift"
     ],
-    "nivel": "Intermediário",
-    "mercado": "Legado iOS",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Legado",
     "relacionados": [
       "Swift",
       "C"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Groovy",
-    "tag": "JVM / CI",
+    "tag": "JVM script",
     "categoria": "linguagem",
-    "desc": "Gradle e Jenkins pipelines.",
+    "desc": "Gradle e Jenkins.",
     "detalhes": [
-      "Sintaxe sobre Java"
+      "DSL"
     ],
-    "nivel": "Intermediário",
-    "mercado": "Build/CI",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "CI/build",
     "relacionados": [
       "Java",
       "Kotlin"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Clojure",
-    "tag": "Funcional JVM",
+    "tag": "Lisp JVM",
     "categoria": "linguagem",
-    "desc": "Lisp moderno na JVM.",
+    "desc": "Imutabilidade na JVM.",
     "detalhes": [
-      "Imutabilidade",
       "REPL"
     ],
     "nivel": "Avançado",
@@ -647,180 +611,182 @@ const DP_LINGUAGENS = [
     "relacionados": [
       "Scala",
       "Haskell"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "F#",
-    "tag": "Funcional .NET",
+    "tag": "NET funcional",
     "categoria": "linguagem",
-    "desc": "Funcional no ecossistema .NET.",
+    "desc": "Funcional no .NET.",
     "detalhes": [
-      "Type providers",
-      "Interop C#"
+      "Type providers"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Nicho .NET",
     "relacionados": [
       "C#",
       "Haskell"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Crystal",
-    "tag": "Ruby-like nativo",
+    "tag": "Nativo",
     "categoria": "linguagem",
-    "desc": "Sintaxe Ruby, binário nativo.",
+    "desc": "Ruby-like nativo.",
     "detalhes": [
-      "Performance alta"
+      "Performance"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Nicho",
     "relacionados": [
       "Ruby",
       "Go (Golang)"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "COBOL",
     "tag": "Mainframe",
     "categoria": "linguagem",
-    "desc": "Bancos e governo em mainframe.",
+    "desc": "Legado bancário.",
     "detalhes": [
-      "Batch financeiro",
-      "Bem pago em manutenção"
+      "Batch"
     ],
-    "nivel": "Intermediário",
-    "mercado": "Nicho",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Nicho bem pago",
     "relacionados": [
       "Java",
-      "SQL",
-      "C"
-    ]
+      "SQL"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "MATLAB",
     "tag": "Engenharia",
     "categoria": "linguagem",
-    "desc": "Controle, sinais e protótipos numéricos.",
+    "desc": "Sinais e controle.",
     "detalhes": [
-      "Simulink",
-      "Academia/indústria"
+      "Simulink"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Engenharia",
     "relacionados": [
       "Python",
-      "Julia",
-      "R"
-    ]
+      "Julia"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "WebAssembly (WASM)",
-    "tag": "Web performance",
+    "tag": "Performance web",
     "categoria": "web",
-    "desc": "Binário rápido no navegador.",
+    "desc": "Binário rápido no browser.",
     "detalhes": [
-      "De Rust/C/C++",
-      "Jogos e editors web"
+      "Rust/C++ → web"
     ],
-    "nivel": "Intermediário a avançado",
+    "nivel": "Avançado",
     "mercado": "Crescendo",
     "relacionados": [
       "Rust",
-      "C++",
       "JavaScript"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "NoSQL Query (MongoDB)",
     "tag": "Documentos",
     "categoria": "dados",
-    "desc": "Consultas em bancos documentais.",
+    "desc": "Filtros e aggregation.",
     "detalhes": [
-      "Aggregation pipeline",
-      "Flexível vs SQL"
+      "Pipeline"
     ],
     "nivel": "Iniciante a intermediário",
     "mercado": "Startups",
     "relacionados": [
       "SQL",
       "JavaScript"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Cypher",
     "tag": "Grafos",
     "categoria": "dados",
-    "desc": "Query language do Neo4j.",
+    "desc": "Neo4j query language.",
     "detalhes": [
-      "MATCH de relacionamentos"
+      "MATCH"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Nicho grafos",
     "relacionados": [
-      "SQL",
-      "SPARQL"
-    ]
+      "SQL"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "SPARQL",
-    "tag": "Web semântica",
+    "tag": "RDF",
     "categoria": "dados",
-    "desc": "Consulta RDF/linked data.",
+    "desc": "Web semântica.",
     "detalhes": [
-      "Knowledge graphs"
+      "Linked data"
     ],
     "nivel": "Avançado",
     "mercado": "Nicho",
     "relacionados": [
       "SQL",
       "Cypher"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Markdown",
-    "tag": "Documentação",
+    "tag": "Docs",
     "categoria": "web",
-    "desc": "Texto leve para README e docs.",
+    "desc": "Texto leve para docs.",
     "detalhes": [
-      "GitHub, blogs estáticos"
+      "README"
     ],
-    "nivel": "Iniciante",
-    "mercado": "Prática universal",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Universal na prática",
     "relacionados": [
       "HTML"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "JSON / YAML",
-    "tag": "Config / APIs",
+    "tag": "Config/dados",
     "categoria": "dados",
-    "desc": "JSON em APIs; YAML em K8s e CI.",
+    "desc": "Formatos de dados e config.",
     "detalhes": [
-      "Todo dev lê ambos"
+      "APIs e K8s"
     ],
-    "nivel": "Iniciante",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Universal",
     "relacionados": [
       "SQL",
       "Bash / Shell"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "PromQL",
-    "tag": "Observabilidade",
+    "tag": "Métricas",
     "categoria": "dados",
-    "desc": "Métricas no Prometheus.",
+    "desc": "Prometheus queries.",
     "detalhes": [
-      "Grafana",
-      "SRE"
+      "rate()"
     ],
-    "nivel": "Intermediário",
-    "mercado": "DevOps",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "SRE/DevOps",
     "relacionados": [
-      "Go (Golang)",
-      "SQL"
-    ]
+      "SQL",
+      "Go (Golang)"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Terraform (HCL)",
@@ -862,18 +828,17 @@ const DP_LINGUAGENS = [
     "nome": "GDScript",
     "tag": "Godot",
     "categoria": "linguagem",
-    "desc": "Linguagem do Godot, estilo Python.",
+    "desc": "Script do Godot.",
     "detalhes": [
-      "2D forte",
-      "Open-source"
+      "2D"
     ],
-    "nivel": "Iniciante",
-    "mercado": "Indie crescente",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Indie games",
     "relacionados": [
-      "Unity (C#)",
-      "Python",
-      "C#"
-    ]
+      "C#",
+      "Python"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Unreal Blueprints / C++",
@@ -896,79 +861,81 @@ const DP_LINGUAGENS = [
     "nome": "Erlang",
     "tag": "Telecom",
     "categoria": "linguagem",
-    "desc": "Base da BEAM, sistemas distribuídos.",
+    "desc": "Base da BEAM.",
     "detalhes": [
-      "Modelo de atores",
-      "Origem do Elixir"
+      "Atores"
     ],
     "nivel": "Avançado",
     "mercado": "Nicho",
     "relacionados": [
       "Elixir",
       "Go (Golang)"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "OCaml",
     "tag": "Funcional",
     "categoria": "linguagem",
-    "desc": "Funcional tipada; compiladores e fintech.",
+    "desc": "Tipagem forte.",
     "detalhes": [
-      "Inferência de tipos"
+      "Compiladores"
     ],
     "nivel": "Avançado",
     "mercado": "Nicho",
     "relacionados": [
       "Haskell",
-      "F#",
-      "Rust"
-    ]
+      "F#"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Fortran",
     "tag": "HPC",
     "categoria": "linguagem",
-    "desc": "Simulações científicas e supercomputação.",
+    "desc": "Simulações científicas.",
     "detalhes": [
-      "Legado numérico enorme"
+      "Legado numérico"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Academia/HPC",
     "relacionados": [
       "C",
-      "Python",
-      "Julia"
-    ]
+      "Python"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Ada",
-    "tag": "Sistemas críticos",
+    "tag": "Crítico",
     "categoria": "linguagem",
-    "desc": "Aviação e safety-critical.",
+    "desc": "Aviação e safety.",
     "detalhes": [
-      "Contratos e tipagem rígida"
+      "Contratos"
     ],
     "nivel": "Avançado",
     "mercado": "Nicho crítico",
     "relacionados": [
       "C",
       "Rust"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Scratch",
     "tag": "Educação",
     "categoria": "linguagem",
-    "desc": "Blocos visuais para lógica inicial.",
+    "desc": "Blocos para iniciantes.",
     "detalhes": [
-      "Transição para Python"
+      "Transição p/ Python"
     ],
-    "nivel": "Iniciante absoluto",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Educação",
     "relacionados": [
       "Python",
       "Lua"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Processing / p5.js",
@@ -1733,33 +1700,35 @@ const DP_LINGUAGENS = [
   },
   {
     "nome": "DAX",
-    "tag": "Linguagem BI",
+    "tag": "Power BI",
     "categoria": "dados",
-    "desc": "Fórmulas do Power BI / Analysis Services.",
+    "desc": "Medidas e cálculos BI.",
     "detalhes": [
-      "Medidas e colunas calculadas"
+      "Power BI"
     ],
-    "nivel": "Intermediário",
-    "mercado": "BI Microsoft",
+    "nivel": "Iniciante a intermediário",
+    "mercado": "BI corporativo",
     "relacionados": [
-      "Power BI",
-      "SQL"
-    ]
+      "SQL",
+      "Power BI"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "M (Power Query)",
-    "tag": "ETL planilhas",
+    "tag": "ETL planilha",
     "categoria": "dados",
-    "desc": "Linguagem do Power Query.",
+    "desc": "Transformação no Power Query.",
     "detalhes": [
-      "Transformação de dados no Excel/BI"
+      "Excel/BI"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "BI Microsoft",
     "relacionados": [
-      "Power BI",
-      "Excel / Google Sheets"
-    ]
+      "DAX",
+      "SQL"
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "Qlik Sense",
@@ -2158,20 +2127,19 @@ const DP_LINGUAGENS = [
   },
   {
     "nome": "Regex",
-    "tag": "Padrões de texto",
+    "tag": "Padrões",
     "categoria": "dados",
-    "desc": "Linguagem de padrões para buscar/validar texto.",
+    "desc": "Busca e validação de texto.",
     "detalhes": [
-      "Independe de linguagem host",
-      "Poderosa e perigosa se abusada"
+      "Independe da host lang"
     ],
-    "nivel": "Intermediário",
+    "nivel": "Iniciante a intermediário",
     "mercado": "Universal",
     "relacionados": [
-      "Perl",
       "Python",
       "JavaScript"
-    ]
+    ],
+    "quandoAprender": "Quando alinhar à sua meta"
   },
   {
     "nome": "LaTeX",
@@ -3096,6 +3064,707 @@ const DP_LINGUAGENS = [
       "Node.js",
       "Redis"
     ]
+  },
+  {
+    "nome": "VB.NET",
+    "tag": "NET legado",
+    "categoria": "linguagem",
+    "desc": "Visual Basic no .NET.",
+    "detalhes": [
+      "Apps internos"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Legado corporativo",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "C#"
+    ]
+  },
+  {
+    "nome": "Delphi / Object Pascal",
+    "tag": "Desktop",
+    "categoria": "linguagem",
+    "desc": "Apps desktop clássicos.",
+    "detalhes": [
+      "VCL"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Legado/desktop",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "C#",
+      "C++"
+    ]
+  },
+  {
+    "nome": "Prolog",
+    "tag": "Lógica",
+    "categoria": "linguagem",
+    "desc": "Programação em lógica.",
+    "detalhes": [
+      "IA simbólica"
+    ],
+    "nivel": "Avançado",
+    "mercado": "Nicho/academia",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "Haskell",
+      "Python"
+    ]
+  },
+  {
+    "nome": "Scheme",
+    "tag": "Funcional",
+    "categoria": "linguagem",
+    "desc": "Lisp minimalista educacional.",
+    "detalhes": [
+      "SICP"
+    ],
+    "nivel": "Intermediário",
+    "mercado": "Educação",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "Clojure",
+      "Haskell"
+    ]
+  },
+  {
+    "nome": "Smalltalk",
+    "tag": "OO clássica",
+    "categoria": "linguagem",
+    "desc": "OO pura e imagem viva.",
+    "detalhes": [
+      "História da OO"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Nicho",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "Ruby",
+      "Java"
+    ]
+  },
+  {
+    "nome": "Tcl",
+    "tag": "Scripting",
+    "categoria": "linguagem",
+    "desc": "Tool Command Language.",
+    "detalhes": [
+      "Expect",
+      "Embutida"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Nicho",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "Python",
+      "Lua"
+    ]
+  },
+  {
+    "nome": "Hack",
+    "tag": "PHP tipado",
+    "categoria": "linguagem",
+    "desc": "PHP tipado do Meta.",
+    "detalhes": [
+      "HHVM"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Nicho Meta/legado",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "PHP",
+      "TypeScript"
+    ]
+  },
+  {
+    "nome": "Reason / ReScript",
+    "tag": "JS tipado",
+    "categoria": "linguagem",
+    "desc": "OCaml→JS.",
+    "detalhes": [
+      "Tipos fortes no front"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Nicho",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "TypeScript",
+      "OCaml"
+    ]
+  },
+  {
+    "nome": "Elm",
+    "tag": "Front funcional",
+    "categoria": "linguagem",
+    "desc": "Front funcional sem runtime errors.",
+    "detalhes": [
+      "Architecture"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Nicho",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "Haskell",
+      "TypeScript"
+    ]
+  },
+  {
+    "nome": "PureScript",
+    "tag": "Front funcional",
+    "categoria": "linguagem",
+    "desc": "Haskell-like para JS.",
+    "detalhes": [
+      "Tipos"
+    ],
+    "nivel": "Avançado",
+    "mercado": "Nicho",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "Haskell",
+      "Elm"
+    ]
+  },
+  {
+    "nome": "CoffeeScript",
+    "tag": "JS alt",
+    "categoria": "linguagem",
+    "desc": "Sintaxe alternativa legada ao JS.",
+    "detalhes": [
+      "Compila para JS"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Legado",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "JavaScript",
+      "TypeScript"
+    ]
+  },
+  {
+    "nome": "ClojureScript",
+    "tag": "Lisp no browser",
+    "categoria": "linguagem",
+    "desc": "Clojure compilado para JS.",
+    "detalhes": [
+      "Immutabilidade"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Nicho",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "Clojure",
+      "JavaScript"
+    ]
+  },
+  {
+    "nome": "Haxe",
+    "tag": "Multi-alvo",
+    "categoria": "linguagem",
+    "desc": "Compila para várias plataformas.",
+    "detalhes": [
+      "Games"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Nicho games",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "TypeScript",
+      "C#"
+    ]
+  },
+  {
+    "nome": "Ring",
+    "tag": "Educação",
+    "categoria": "linguagem",
+    "desc": "Linguagem multiparadigma educacional.",
+    "detalhes": [
+      "Didática"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Educação",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "Python"
+    ]
+  },
+  {
+    "nome": "ABAP",
+    "tag": "SAP",
+    "categoria": "linguagem",
+    "desc": "Customização SAP.",
+    "detalhes": [
+      "ERP"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Corporativo SAP",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "Java",
+      "SQL"
+    ]
+  },
+  {
+    "nome": "Apex",
+    "tag": "Salesforce",
+    "categoria": "linguagem",
+    "desc": "Código na plataforma Salesforce.",
+    "detalhes": [
+      "CRM"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Salesforce",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "Java",
+      "TypeScript"
+    ]
+  },
+  {
+    "nome": "TIA Portal / Ladder",
+    "tag": "Industrial",
+    "categoria": "linguagem",
+    "desc": "CLPs e automação industrial (conceito).",
+    "detalhes": [
+      "Ladder/FBD"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Indústria",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "C",
+      "Python"
+    ]
+  },
+  {
+    "nome": "Less",
+    "tag": "CSS",
+    "categoria": "web",
+    "desc": "Outro pré-processador CSS.",
+    "detalhes": [
+      "Variáveis"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Legado front",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "CSS",
+      "Sass / SCSS"
+    ]
+  },
+  {
+    "nome": "PostCSS",
+    "tag": "CSS tooling",
+    "categoria": "web",
+    "desc": "Transformações de CSS.",
+    "detalhes": [
+      "Autoprefixer"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Tooling front",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "CSS",
+      "JavaScript"
+    ]
+  },
+  {
+    "nome": "HTML5 APIs",
+    "tag": "Browser APIs",
+    "categoria": "web",
+    "desc": "APIs do browser (storage, geo, workers).",
+    "detalhes": [
+      "localStorage",
+      "Fetch"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Front moderno",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "JavaScript",
+      "TypeScript"
+    ]
+  },
+  {
+    "nome": "Web Components",
+    "tag": "Componentes nativos",
+    "categoria": "web",
+    "desc": "Custom elements nativos.",
+    "detalhes": [
+      "Shadow DOM"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Crescendo",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "JavaScript",
+      "TypeScript"
+    ]
+  },
+  {
+    "nome": "SVG",
+    "tag": "Gráficos vetoriais",
+    "categoria": "web",
+    "desc": "Gráficos escaláveis na web.",
+    "detalhes": [
+      "Ícones",
+      "Charts"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "UI/web",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "HTML",
+      "CSS"
+    ]
+  },
+  {
+    "nome": "Canvas API",
+    "tag": "Desenho 2D",
+    "categoria": "web",
+    "desc": "Desenho bitmap no browser.",
+    "detalhes": [
+      "Jogos leves",
+      "Gráficos"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Front criativo",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "JavaScript",
+      "WebAssembly (WASM)"
+    ]
+  },
+  {
+    "nome": "WebGL",
+    "tag": "3D web",
+    "categoria": "web",
+    "desc": "Gráficos 3D no browser.",
+    "detalhes": [
+      "Three.js"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Criativo/games web",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "JavaScript",
+      "WebAssembly (WASM)"
+    ]
+  },
+  {
+    "nome": "Liquid / Jinja (templates)",
+    "tag": "Templates",
+    "categoria": "web",
+    "desc": "Templates server-side.",
+    "detalhes": [
+      "CMS/SSG"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Web/CMS",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "HTML",
+      "Python"
+    ]
+  },
+  {
+    "nome": "Pug / Jade",
+    "tag": "Templates HTML",
+    "categoria": "web",
+    "desc": "HTML com sintaxe indentada.",
+    "detalhes": [
+      "Legado front"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Nicho",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "HTML",
+      "JavaScript"
+    ]
+  },
+  {
+    "nome": "HTMX",
+    "tag": "HTML interativo",
+    "categoria": "web",
+    "desc": "Interatividade via atributos HTML.",
+    "detalhes": [
+      "Menos JS"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Crescendo",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "HTML",
+      "JavaScript"
+    ]
+  },
+  {
+    "nome": "Alpine.js",
+    "tag": "JS mínimo",
+    "categoria": "web",
+    "desc": "Reatividade leve no HTML.",
+    "detalhes": [
+      "Pequenos widgets"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Crescendo",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "JavaScript",
+      "HTML"
+    ]
+  },
+  {
+    "nome": "T-SQL",
+    "tag": "SQL Server",
+    "categoria": "dados",
+    "desc": "SQL procedural Microsoft.",
+    "detalhes": [
+      "Procedures"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Empresas Microsoft",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "SQL",
+      "C#"
+    ]
+  },
+  {
+    "nome": "PL/pgSQL",
+    "tag": "PostgreSQL",
+    "categoria": "dados",
+    "desc": "Procedural do Postgres.",
+    "detalhes": [
+      "Functions/triggers"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Alto com Postgres",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "SQL",
+      "Python"
+    ]
+  },
+  {
+    "nome": "PL/SQL",
+    "tag": "Oracle",
+    "categoria": "dados",
+    "desc": "Procedural Oracle.",
+    "detalhes": [
+      "Packages"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Enterprise Oracle",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "SQL",
+      "Java"
+    ]
+  },
+  {
+    "nome": "LogQL",
+    "tag": "Logs",
+    "categoria": "dados",
+    "desc": "Consultas de logs no Loki.",
+    "detalhes": [
+      "Grafana stack"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Observabilidade",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "PromQL"
+    ]
+  },
+  {
+    "nome": "Kusto (KQL)",
+    "tag": "Azure analytics",
+    "categoria": "dados",
+    "desc": "Query language Azure Data Explorer.",
+    "detalhes": [
+      "Telemetria"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Azure enterprise",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "SQL"
+    ]
+  },
+  {
+    "nome": "HiveQL",
+    "tag": "Big data",
+    "categoria": "dados",
+    "desc": "SQL-like no Hadoop/Hive.",
+    "detalhes": [
+      "Data lake legado"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Legado big data",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "SQL",
+      "Spark"
+    ]
+  },
+  {
+    "nome": "Spark SQL",
+    "tag": "Big data",
+    "categoria": "dados",
+    "desc": "SQL distribuído no Spark.",
+    "detalhes": [
+      "DataFrames"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Engenharia de dados",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "SQL",
+      "Scala"
+    ]
+  },
+  {
+    "nome": "PrQL",
+    "tag": "Pipelines SQL",
+    "categoria": "dados",
+    "desc": "SQL em pipeline legível.",
+    "detalhes": [
+      "Alternativa moderna"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Emergente",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "SQL"
+    ]
+  },
+  {
+    "nome": "EdgeQL",
+    "tag": "EdgeDB",
+    "categoria": "dados",
+    "desc": "Query language do EdgeDB.",
+    "detalhes": [
+      "Tipada"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Emergente",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "SQL",
+      "GraphQL"
+    ]
+  },
+  {
+    "nome": "CQL (Cassandra)",
+    "tag": "Wide-column",
+    "categoria": "dados",
+    "desc": "Cassandra Query Language.",
+    "detalhes": [
+      "Modelagem por query"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Escala",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "SQL"
+    ]
+  },
+  {
+    "nome": "N1QL",
+    "tag": "Couchbase",
+    "categoria": "dados",
+    "desc": "SQL-like para JSON no Couchbase.",
+    "detalhes": [
+      "Documentos"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Nicho",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "SQL",
+      "NoSQL Query (MongoDB)"
+    ]
+  },
+  {
+    "nome": "AQL",
+    "tag": "ArangoDB",
+    "categoria": "dados",
+    "desc": "Multi-model query.",
+    "detalhes": [
+      "Docs/grafos"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Nicho",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "Cypher",
+      "SQL"
+    ]
+  },
+  {
+    "nome": "Flux",
+    "tag": "InfluxDB",
+    "categoria": "dados",
+    "desc": "Query de séries temporais.",
+    "detalhes": [
+      "Observabilidade"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Monitoring",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "PromQL",
+      "SQL"
+    ]
+  },
+  {
+    "nome": "Gremlin",
+    "tag": "Grafos",
+    "categoria": "dados",
+    "desc": "Traversal de grafos (TinkerPop).",
+    "detalhes": [
+      "Grafos"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Nicho",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "Cypher"
+    ]
+  },
+  {
+    "nome": "MDX",
+    "tag": "OLAP",
+    "categoria": "dados",
+    "desc": "Cubos analíticos.",
+    "detalhes": [
+      "SSAS"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "BI clássico",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "SQL",
+      "DAX"
+    ]
+  },
+  {
+    "nome": "jq",
+    "tag": "JSON CLI",
+    "categoria": "dados",
+    "desc": "Processar JSON no terminal.",
+    "detalhes": [
+      "DevOps"
+    ],
+    "nivel": "Iniciante a intermediário",
+    "mercado": "Ops/dev",
+    "quandoAprender": "Quando alinhar à sua meta",
+    "relacionados": [
+      "JSON / YAML",
+      "Bash / Shell"
+    ]
   }
 ];
 const DP_AREAS = [
@@ -3111,12 +3780,14 @@ const DP_AREAS = [
       "Node.js"
     ],
     "detalhes": [
-      "Front + API + banco",
-      "Auth e deploy",
-      "Projeto: CRUD completo publicado",
-      "Armadilha: só tutorial de framework"
+      "<strong>Stack comum:</strong> HTML, CSS, JavaScript, TypeScript, SQL, Node.js",
+      "<strong>Próximo passo:</strong> GitHub com README claro vale mais que 10 cursos pela metade.",
+      "<strong>Mercado:</strong> No Brasil e no mundo a demanda por quem entrega front+API+banco continua alta, especialmente em produtos digitais e e-commerce. Plenos/sêniores com TypeScript e bom SQL se destacam; júnior puro sem portfólio sofre mais concorrência."
     ],
-    "dica": "GitHub com README claro vale mais que 10 cursos pela metade."
+    "dica": "GitHub com README claro vale mais que 10 cursos pela metade.",
+    "stackComum": "HTML, CSS, JavaScript, TypeScript, SQL, Node.js",
+    "proximoPasso": "GitHub com README claro vale mais que 10 cursos pela metade.",
+    "mercadoTexto": "No Brasil e no mundo a demanda por quem entrega front+API+banco continua alta, especialmente em produtos digitais e e-commerce. Plenos/sêniores com TypeScript e bom SQL se destacam; júnior puro sem portfólio sofre mais concorrência."
   },
   {
     "nome": "Frontend / UI Engineering",
@@ -3129,12 +3800,14 @@ const DP_AREAS = [
       "React"
     ],
     "detalhes": [
-      "Design system",
-      "Core Web Vitals",
-      "Acessibilidade",
-      "Projeto: dashboard responsivo"
+      "<strong>Stack comum:</strong> HTML, CSS, JavaScript, TypeScript, React",
+      "<strong>Próximo passo:</strong> CSS profundo > depender só de lib.",
+      "<strong>Mercado:</strong> Forte em mercados com muitos produtos SaaS (EUA, Europa, Brasil remoto). Ênfase em React/TypeScript, a11y e performance. Vagas júnior saturadas; mid com design system e métricas web se diferencia."
     ],
-    "dica": "CSS profundo > depender só de lib."
+    "dica": "CSS profundo > depender só de lib.",
+    "stackComum": "HTML, CSS, JavaScript, TypeScript, React",
+    "proximoPasso": "CSS profundo > depender só de lib.",
+    "mercadoTexto": "Forte em mercados com muitos produtos SaaS (EUA, Europa, Brasil remoto). Ênfase em React/TypeScript, a11y e performance. Vagas júnior saturadas; mid com design system e métricas web se diferencia."
   },
   {
     "nome": "Backend / APIs",
@@ -3148,12 +3821,14 @@ const DP_AREAS = [
       "TypeScript"
     ],
     "detalhes": [
-      "Modelagem e migrations",
-      "Auth, cache, filas",
-      "Observabilidade",
-      "Projeto: API versionada com testes"
+      "<strong>Stack comum:</strong> Java, Go (Golang), Python, C#, SQL, TypeScript",
+      "<strong>Próximo passo:</strong> SQL avançado é diferencial.",
+      "<strong>Mercado:</strong> Demanda estável globalmente (fintechs, varejo, saúde). Go, Java e Node lideram stacks; quem domina SQL, filas e observabilidade emprega bem no BR e exterior."
     ],
-    "dica": "SQL avançado é diferencial."
+    "dica": "SQL avançado é diferencial.",
+    "stackComum": "Java, Go (Golang), Python, C#, SQL, TypeScript",
+    "proximoPasso": "SQL avançado é diferencial.",
+    "mercadoTexto": "Demanda estável globalmente (fintechs, varejo, saúde). Go, Java e Node lideram stacks; quem domina SQL, filas e observabilidade emprega bem no BR e exterior."
   },
   {
     "nome": "Engenharia de Software (visão geral)",
@@ -3165,11 +3840,14 @@ const DP_AREAS = [
       "Python"
     ],
     "detalhes": [
-      "Arquitetura em camadas",
-      "Code review",
-      "Débito técnico consciente"
+      "<strong>Stack comum:</strong> Git, SQL, JavaScript, Python",
+      "<strong>Próximo passo:</strong> Escreva RFCs curtas.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Escreva RFCs curtas."
     ],
-    "dica": "Escreva RFCs curtas."
+    "dica": "Escreva RFCs curtas.",
+    "stackComum": "Git, SQL, JavaScript, Python",
+    "proximoPasso": "Escreva RFCs curtas.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Escreva RFCs curtas."
   },
   {
     "nome": "Mobile Android",
@@ -3180,11 +3858,14 @@ const DP_AREAS = [
       "SQL"
     ],
     "detalhes": [
-      "Android Studio",
-      "Play Store",
-      "Offline-first"
+      "<strong>Stack comum:</strong> Kotlin, Java, SQL",
+      "<strong>Próximo passo:</strong> Kotlin first.",
+      "<strong>Mercado:</strong> Mercado global grande; no BR há vagas em bancos e retail. Kotlin é o padrão. Concorrência alta em júnior; apps publicados e Play Console pesam."
     ],
-    "dica": "Kotlin first."
+    "dica": "Kotlin first.",
+    "stackComum": "Kotlin, Java, SQL",
+    "proximoPasso": "Kotlin first.",
+    "mercadoTexto": "Mercado global grande; no BR há vagas em bancos e retail. Kotlin é o padrão. Concorrência alta em júnior; apps publicados e Play Console pesam."
   },
   {
     "nome": "Mobile iOS",
@@ -3194,11 +3875,14 @@ const DP_AREAS = [
       "Objective-C"
     ],
     "detalhes": [
-      "Xcode",
-      "SwiftUI",
-      "App Store review"
+      "<strong>Stack comum:</strong> Swift, Objective-C",
+      "<strong>Próximo passo:</strong> SwiftUI + networking sólido.",
+      "<strong>Mercado:</strong> Concentrado em empresas com orçamento Apple e produtos premium. SwiftUI em alta. Menos vagas que Android no BR, porém bem pagas em hubs e remoto internacional."
     ],
-    "dica": "SwiftUI + networking sólido."
+    "dica": "SwiftUI + networking sólido.",
+    "stackComum": "Swift, Objective-C",
+    "proximoPasso": "SwiftUI + networking sólido.",
+    "mercadoTexto": "Concentrado em empresas com orçamento Apple e produtos premium. SwiftUI em alta. Menos vagas que Android no BR, porém bem pagas em hubs e remoto internacional."
   },
   {
     "nome": "Mobile Multiplataforma",
@@ -3210,10 +3894,14 @@ const DP_AREAS = [
       "React Native"
     ],
     "detalhes": [
-      "Trade-off vs nativo",
-      "Stores ainda exigem contas"
+      "<strong>Stack comum:</strong> Dart, Flutter, TypeScript, React Native",
+      "<strong>Próximo passo:</strong> Escolha Flutter OU RN e aprofunde.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Escolha Flutter OU RN e aprofunde."
     ],
-    "dica": "Escolha Flutter OU RN e aprofunde."
+    "dica": "Escolha Flutter OU RN e aprofunde.",
+    "stackComum": "Dart, Flutter, TypeScript, React Native",
+    "proximoPasso": "Escolha Flutter OU RN e aprofunde.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Escolha Flutter OU RN e aprofunde."
   },
   {
     "nome": "Game Development (Unity)",
@@ -3223,11 +3911,14 @@ const DP_AREAS = [
       "Unity (C#)"
     ],
     "detalhes": [
-      "Game loop",
-      "Física e UI",
-      "Publique jogo pequeno"
+      "<strong>Stack comum:</strong> C#, Unity (C#)",
+      "<strong>Próximo passo:</strong> Termine jogos curtos.",
+      "<strong>Mercado:</strong> Indie global aquecido; studios médios seletivos. C# + Unity ainda é a porta mais comum. Renda instável no indie; clutches em live-ops e mobile games."
     ],
-    "dica": "Termine jogos curtos."
+    "dica": "Termine jogos curtos.",
+    "stackComum": "C#, Unity (C#)",
+    "proximoPasso": "Termine jogos curtos.",
+    "mercadoTexto": "Indie global aquecido; studios médios seletivos. C# + Unity ainda é a porta mais comum. Renda instável no indie; clutches em live-ops e mobile games."
   },
   {
     "nome": "Game Development (Godot)",
@@ -3238,10 +3929,14 @@ const DP_AREAS = [
       "Godot"
     ],
     "detalhes": [
-      "2D excelente",
-      "Export multiplataforma"
+      "<strong>Stack comum:</strong> GDScript, C#, Godot",
+      "<strong>Próximo passo:</strong> Ideal indie sem taxa de engine.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Ideal indie sem taxa de engine."
     ],
-    "dica": "Ideal indie sem taxa de engine."
+    "dica": "Ideal indie sem taxa de engine.",
+    "stackComum": "GDScript, C#, Godot",
+    "proximoPasso": "Ideal indie sem taxa de engine.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Ideal indie sem taxa de engine."
   },
   {
     "nome": "Game Development (Unreal)",
@@ -3251,10 +3946,14 @@ const DP_AREAS = [
       "Unreal Blueprints / C++"
     ],
     "detalhes": [
-      "Blueprints + C++",
-      "Multiplayer"
+      "<strong>Stack comum:</strong> C++, Unreal Blueprints / C++",
+      "<strong>Próximo passo:</strong> Curva alta — foque um sistema por vez.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Curva alta — foque um sistema por vez."
     ],
-    "dica": "Curva alta — foque um sistema por vez."
+    "dica": "Curva alta — foque um sistema por vez.",
+    "stackComum": "C++, Unreal Blueprints / C++",
+    "proximoPasso": "Curva alta — foque um sistema por vez.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Curva alta — foque um sistema por vez."
   },
   {
     "nome": "Ciência de Dados",
@@ -3266,11 +3965,14 @@ const DP_AREAS = [
       "Pandas"
     ],
     "detalhes": [
-      "Estatística básica",
-      "Visualização",
-      "Storytelling"
+      "<strong>Stack comum:</strong> Python, SQL, R, Pandas",
+      "<strong>Próximo passo:</strong> SQL + pandas antes de deep learning.",
+      "<strong>Mercado:</strong> Demanda alta onde há dados maduros (EUA, Europa, grandes empresas BR). Exigem SQL forte + Python; título de 'cientista' sem entrega de negócio está mais filtrado."
     ],
-    "dica": "SQL + pandas antes de deep learning."
+    "dica": "SQL + pandas antes de deep learning.",
+    "stackComum": "Python, SQL, R, Pandas",
+    "proximoPasso": "SQL + pandas antes de deep learning.",
+    "mercadoTexto": "Demanda alta onde há dados maduros (EUA, Europa, grandes empresas BR). Exigem SQL forte + Python; título de 'cientista' sem entrega de negócio está mais filtrado."
   },
   {
     "nome": "Engenharia de Dados",
@@ -3283,11 +3985,14 @@ const DP_AREAS = [
       "dbt"
     ],
     "detalhes": [
-      "ETL/ELT",
-      "Modelagem dimensional",
-      "Observabilidade de dados"
+      "<strong>Stack comum:</strong> SQL, Python, Spark, Airflow, dbt",
+      "<strong>Próximo passo:</strong> Confiabilidade > modelo fancy.",
+      "<strong>Mercado:</strong> Uma das áreas mais aquecidas globalmente (pipelines, warehouse, qualidade). No BR, fintechs e varejo contratam bem quem sabe SQL + cloud + orquestração."
     ],
-    "dica": "Confiabilidade > modelo fancy."
+    "dica": "Confiabilidade > modelo fancy.",
+    "stackComum": "SQL, Python, Spark, Airflow, dbt",
+    "proximoPasso": "Confiabilidade > modelo fancy.",
+    "mercadoTexto": "Uma das áreas mais aquecidas globalmente (pipelines, warehouse, qualidade). No BR, fintechs e varejo contratam bem quem sabe SQL + cloud + orquestração."
   },
   {
     "nome": "Analytics / BI",
@@ -3300,11 +4005,14 @@ const DP_AREAS = [
       "Excel / Google Sheets"
     ],
     "detalhes": [
-      "Métricas de negócio",
-      "Camada semântica",
-      "Governança"
+      "<strong>Stack comum:</strong> SQL, Power BI, Tableau, DAX, Excel / Google Sheets",
+      "<strong>Próximo passo:</strong> Defina a métrica antes do gráfico.",
+      "<strong>Mercado:</strong> Forte no corporativo BR (Power BI/Tableau). Self-service cresce; falta de modelagem e governança ainda gera muita vaga de quem 'traduz negócio → métrica'."
     ],
-    "dica": "Defina a métrica antes do gráfico."
+    "dica": "Defina a métrica antes do gráfico.",
+    "stackComum": "SQL, Power BI, Tableau, DAX, Excel / Google Sheets",
+    "proximoPasso": "Defina a métrica antes do gráfico.",
+    "mercadoTexto": "Forte no corporativo BR (Power BI/Tableau). Self-service cresce; falta de modelagem e governança ainda gera muita vaga de quem 'traduz negócio → métrica'."
   },
   {
     "nome": "Machine Learning Engineering",
@@ -3316,11 +4024,14 @@ const DP_AREAS = [
       "MLFlow"
     ],
     "detalhes": [
-      "Feature store mental model",
-      "Monitoring de drift",
-      "APIs de inferência"
+      "<strong>Stack comum:</strong> Python, scikit-learn, PyTorch, MLFlow",
+      "<strong>Próximo passo:</strong> Baseline simples primeiro.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Baseline simples primeiro."
     ],
-    "dica": "Baseline simples primeiro."
+    "dica": "Baseline simples primeiro.",
+    "stackComum": "Python, scikit-learn, PyTorch, MLFlow",
+    "proximoPasso": "Baseline simples primeiro.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Baseline simples primeiro."
   },
   {
     "nome": "Deep Learning / IA Generativa",
@@ -3332,11 +4043,14 @@ const DP_AREAS = [
       "LangChain / LlamaIndex"
     ],
     "detalhes": [
-      "RAG e avaliação",
-      "Custo de inferência",
-      "Ética e vieses"
+      "<strong>Stack comum:</strong> Python, PyTorch, Hugging Face, LangChain / LlamaIndex",
+      "<strong>Próximo passo:</strong> Não pule fundamentos de ML.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Não pule fundamentos de ML."
     ],
-    "dica": "Não pule fundamentos de ML."
+    "dica": "Não pule fundamentos de ML.",
+    "stackComum": "Python, PyTorch, Hugging Face, LangChain / LlamaIndex",
+    "proximoPasso": "Não pule fundamentos de ML.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Não pule fundamentos de ML."
   },
   {
     "nome": "MLOps",
@@ -3348,11 +4062,14 @@ const DP_AREAS = [
       "MLFlow"
     ],
     "detalhes": [
-      "CI de dados/modelos",
-      "Registry",
-      "Rollback"
+      "<strong>Stack comum:</strong> Python, Docker, Kubernetes, MLFlow",
+      "<strong>Próximo passo:</strong> Trate modelo como software.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Trate modelo como software."
     ],
-    "dica": "Trate modelo como software."
+    "dica": "Trate modelo como software.",
+    "stackComum": "Python, Docker, Kubernetes, MLFlow",
+    "proximoPasso": "Trate modelo como software.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Trate modelo como software."
   },
   {
     "nome": "DevOps",
@@ -3364,11 +4081,14 @@ const DP_AREAS = [
       "Terraform (HCL)"
     ],
     "detalhes": [
-      "Pipelines",
-      "IaC",
-      "Cultura de feedback"
+      "<strong>Stack comum:</strong> Bash / Shell, Docker, GitHub Actions, Terraform (HCL)",
+      "<strong>Próximo passo:</strong> Automatize a terceira repetição.",
+      "<strong>Mercado:</strong> Demanda alta mundial por CI/CD, cloud e automação. No BR, perfil híbrido (dev que opera) está valorizado; Kubernetes sem base de Linux/rede não segura vaga boa."
     ],
-    "dica": "Automatize a terceira repetição."
+    "dica": "Automatize a terceira repetição.",
+    "stackComum": "Bash / Shell, Docker, GitHub Actions, Terraform (HCL)",
+    "proximoPasso": "Automatize a terceira repetição.",
+    "mercadoTexto": "Demanda alta mundial por CI/CD, cloud e automação. No BR, perfil híbrido (dev que opera) está valorizado; Kubernetes sem base de Linux/rede não segura vaga boa."
   },
   {
     "nome": "SRE (Site Reliability)",
@@ -3380,11 +4100,14 @@ const DP_AREAS = [
       "Grafana"
     ],
     "detalhes": [
-      "SLIs/SLOs",
-      "Error budgets",
-      "Postmortems"
+      "<strong>Stack comum:</strong> Go (Golang), Python, Prometheus, Grafana",
+      "<strong>Próximo passo:</strong> Métrica de dor do usuário > CPU só.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Métrica de dor do usuário > CPU só."
     ],
-    "dica": "Métrica de dor do usuário > CPU só."
+    "dica": "Métrica de dor do usuário > CPU só.",
+    "stackComum": "Go (Golang), Python, Prometheus, Grafana",
+    "proximoPasso": "Métrica de dor do usuário > CPU só.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Métrica de dor do usuário > CPU só."
   },
   {
     "nome": "Cloud Architect (visão)",
@@ -3396,10 +4119,14 @@ const DP_AREAS = [
       "Terraform (HCL)"
     ],
     "detalhes": [
-      "Custo, segurança, HA",
-      "Well-Architected"
+      "<strong>Stack comum:</strong> AWS, GCP, Azure, Terraform (HCL)",
+      "<strong>Próximo passo:</strong> Comece por uma cloud só.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Comece por uma cloud só."
     ],
-    "dica": "Comece por uma cloud só."
+    "dica": "Comece por uma cloud só.",
+    "stackComum": "AWS, GCP, Azure, Terraform (HCL)",
+    "proximoPasso": "Comece por uma cloud só.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Comece por uma cloud só."
   },
   {
     "nome": "Cibersegurança Ofensiva",
@@ -3411,11 +4138,14 @@ const DP_AREAS = [
       "OWASP ZAP"
     ],
     "detalhes": [
-      "OWASP Top 10",
-      "Labs legais",
-      "Relatórios"
+      "<strong>Stack comum:</strong> Python, Bash / Shell, Burp Suite, OWASP ZAP",
+      "<strong>Próximo passo:</strong> Sem autorização é crime.",
+      "<strong>Mercado:</strong> Escassez global de profissionais sérios. No BR cresce compliance e appsec. Sem labs/portfólio ético a entrada é difícil; senior bem pago."
     ],
-    "dica": "Sem autorização é crime."
+    "dica": "Sem autorização é crime.",
+    "stackComum": "Python, Bash / Shell, Burp Suite, OWASP ZAP",
+    "proximoPasso": "Sem autorização é crime.",
+    "mercadoTexto": "Escassez global de profissionais sérios. No BR cresce compliance e appsec. Sem labs/portfólio ético a entrada é difícil; senior bem pago."
   },
   {
     "nome": "Cibersegurança Defensiva",
@@ -3427,11 +4157,14 @@ const DP_AREAS = [
       "Linux"
     ],
     "detalhes": [
-      "Logs",
-      "SIEM mental model",
-      "Resposta a incidente"
+      "<strong>Stack comum:</strong> Python, SQL, Elasticsearch, Linux",
+      "<strong>Próximo passo:</strong> Fundamentos de rede e SO.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Fundamentos de rede e SO."
     ],
-    "dica": "Fundamentos de rede e SO."
+    "dica": "Fundamentos de rede e SO.",
+    "stackComum": "Python, SQL, Elasticsearch, Linux",
+    "proximoPasso": "Fundamentos de rede e SO.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Fundamentos de rede e SO."
   },
   {
     "nome": "AppSec",
@@ -3443,11 +4176,14 @@ const DP_AREAS = [
       "Python"
     ],
     "detalhes": [
-      "Threat modeling",
-      "SAST/DAST",
-      "Secure defaults"
+      "<strong>Stack comum:</strong> OWASP ZAP, SonarQube, JavaScript, Python",
+      "<strong>Próximo passo:</strong> Shift-left de verdade.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Shift-left de verdade."
     ],
-    "dica": "Shift-left de verdade."
+    "dica": "Shift-left de verdade.",
+    "stackComum": "OWASP ZAP, SonarQube, JavaScript, Python",
+    "proximoPasso": "Shift-left de verdade.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Shift-left de verdade."
   },
   {
     "nome": "QA Manual",
@@ -3458,11 +4194,14 @@ const DP_AREAS = [
       "SQL"
     ],
     "detalhes": [
-      "Casos de borda",
-      "Regressão",
-      "Report claro"
+      "<strong>Stack comum:</strong> Jira, Markdown, SQL",
+      "<strong>Próximo passo:</strong> Reproduzir > opinião.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Reproduzir > opinião."
     ],
-    "dica": "Reproduzir > opinião."
+    "dica": "Reproduzir > opinião.",
+    "stackComum": "Jira, Markdown, SQL",
+    "proximoPasso": "Reproduzir > opinião.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Reproduzir > opinião."
   },
   {
     "nome": "QA Automation",
@@ -3475,11 +4214,14 @@ const DP_AREAS = [
       "Python"
     ],
     "detalhes": [
-      "Pirâmide de testes",
-      "E2E estável",
-      "CI"
+      "<strong>Stack comum:</strong> Playwright, Cypress, Selenium, TypeScript, Python",
+      "<strong>Próximo passo:</strong> Menos E2E frágeis, mais unit/API.",
+      "<strong>Mercado:</strong> Empresas maduras (global e BR) buscam automação além do clique manual. Playwright/Cypress + API tests abrem portas; só QA manual está mais apertado."
     ],
-    "dica": "Menos E2E frágeis, mais unit/API."
+    "dica": "Menos E2E frágeis, mais unit/API.",
+    "stackComum": "Playwright, Cypress, Selenium, TypeScript, Python",
+    "proximoPasso": "Menos E2E frágeis, mais unit/API.",
+    "mercadoTexto": "Empresas maduras (global e BR) buscam automação além do clique manual. Playwright/Cypress + API tests abrem portas; só QA manual está mais apertado."
   },
   {
     "nome": "Engenharia de Plataforma",
@@ -3491,10 +4233,14 @@ const DP_AREAS = [
       "Terraform (HCL)"
     ],
     "detalhes": [
-      "Developer experience",
-      "Golden paths"
+      "<strong>Stack comum:</strong> Kubernetes, Go (Golang), TypeScript, Terraform (HCL)",
+      "<strong>Próximo passo:</strong> Reduza toil do time.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Reduza toil do time."
     ],
-    "dica": "Reduza toil do time."
+    "dica": "Reduza toil do time.",
+    "stackComum": "Kubernetes, Go (Golang), TypeScript, Terraform (HCL)",
+    "proximoPasso": "Reduza toil do time.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Reduza toil do time."
   },
   {
     "nome": "Arquitetura de Software",
@@ -3506,11 +4252,14 @@ const DP_AREAS = [
       "TypeScript"
     ],
     "detalhes": [
-      "C4 model",
-      "Event vs request",
-      "Consistência"
+      "<strong>Stack comum:</strong> SQL, Java, Go (Golang), TypeScript",
+      "<strong>Próximo passo:</strong> Documente decisões (ADR).",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Documente decisões (ADR)."
     ],
-    "dica": "Documente decisões (ADR)."
+    "dica": "Documente decisões (ADR).",
+    "stackComum": "SQL, Java, Go (Golang), TypeScript",
+    "proximoPasso": "Documente decisões (ADR).",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Documente decisões (ADR)."
   },
   {
     "nome": "Integração de Sistemas / Middleware",
@@ -3522,11 +4271,14 @@ const DP_AREAS = [
       "RabbitMQ"
     ],
     "detalhes": [
-      "Filas",
-      "Transformação",
-      "Idempotência"
+      "<strong>Stack comum:</strong> Java, C#, Kafka, RabbitMQ",
+      "<strong>Próximo passo:</strong> Contratos explícitos.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Contratos explícitos."
     ],
-    "dica": "Contratos explícitos."
+    "dica": "Contratos explícitos.",
+    "stackComum": "Java, C#, Kafka, RabbitMQ",
+    "proximoPasso": "Contratos explícitos.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Contratos explícitos."
   },
   {
     "nome": "ERP / Sistemas Corporativos",
@@ -3537,10 +4289,14 @@ const DP_AREAS = [
       "Java"
     ],
     "detalhes": [
-      "Processos financeiros/logísticos",
-      "Customização vs padrão"
+      "<strong>Stack comum:</strong> ABAP (conceito), SQL, Java",
+      "<strong>Próximo passo:</strong> Negócio + sistema, não só tela.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Negócio + sistema, não só tela."
     ],
-    "dica": "Negócio + sistema, não só tela."
+    "dica": "Negócio + sistema, não só tela.",
+    "stackComum": "ABAP (conceito), SQL, Java",
+    "proximoPasso": "Negócio + sistema, não só tela.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Negócio + sistema, não só tela."
   },
   {
     "nome": "Mainframe & Legado",
@@ -3551,11 +4307,14 @@ const DP_AREAS = [
       "Java"
     ],
     "detalhes": [
-      "Batch",
-      "Alta criticidade",
-      "Modernização gradual"
+      "<strong>Stack comum:</strong> COBOL, SQL, Java",
+      "<strong>Próximo passo:</strong> Pagamento alto, stack antiga.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Pagamento alto, stack antiga."
     ],
-    "dica": "Pagamento alto, stack antiga."
+    "dica": "Pagamento alto, stack antiga.",
+    "stackComum": "COBOL, SQL, Java",
+    "proximoPasso": "Pagamento alto, stack antiga.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Pagamento alto, stack antiga."
   },
   {
     "nome": "Embarcados / Firmware",
@@ -3567,11 +4326,14 @@ const DP_AREAS = [
       "Assembly"
     ],
     "detalhes": [
-      "RTOS",
-      "Consumo",
-      "Periféricos"
+      "<strong>Stack comum:</strong> C, C++, Rust, Assembly",
+      "<strong>Próximo passo:</strong> Comece com ESP32 + C.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Comece com ESP32 + C."
     ],
-    "dica": "Comece com ESP32 + C."
+    "dica": "Comece com ESP32 + C.",
+    "stackComum": "C, C++, Rust, Assembly",
+    "proximoPasso": "Comece com ESP32 + C.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Comece com ESP32 + C."
   },
   {
     "nome": "IoT",
@@ -3583,10 +4345,14 @@ const DP_AREAS = [
       "Linux"
     ],
     "detalhes": [
-      "Firmware + cloud",
-      "Segurança de device"
+      "<strong>Stack comum:</strong> C, Python, MQTT (conceito), Linux",
+      "<strong>Próximo passo:</strong> Protótipo ponta a ponta simples.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Protótipo ponta a ponta simples."
     ],
-    "dica": "Protótipo ponta a ponta simples."
+    "dica": "Protótipo ponta a ponta simples.",
+    "stackComum": "C, Python, MQTT (conceito), Linux",
+    "proximoPasso": "Protótipo ponta a ponta simples.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Protótipo ponta a ponta simples."
   },
   {
     "nome": "Redes e Infraestrutura",
@@ -3597,11 +4363,14 @@ const DP_AREAS = [
       "Wireshark"
     ],
     "detalhes": [
-      "TCP/IP",
-      "DNS",
-      "Firewall"
+      "<strong>Stack comum:</strong> Linux, Bash / Shell, Wireshark",
+      "<strong>Próximo passo:</strong> Laboratório caseiro ajuda.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Laboratório caseiro ajuda."
     ],
-    "dica": "Laboratório caseiro ajuda."
+    "dica": "Laboratório caseiro ajuda.",
+    "stackComum": "Linux, Bash / Shell, Wireshark",
+    "proximoPasso": "Laboratório caseiro ajuda.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Laboratório caseiro ajuda."
   },
   {
     "nome": "Administração de Sistemas",
@@ -3613,11 +4382,14 @@ const DP_AREAS = [
       "Nginx"
     ],
     "detalhes": [
-      "Hardening",
-      "Backup",
-      "Monitoramento"
+      "<strong>Stack comum:</strong> Linux, Bash / Shell, Ansible, Nginx",
+      "<strong>Próximo passo:</strong> Infrastructure as code cedo.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Infrastructure as code cedo."
     ],
-    "dica": "Infrastructure as code cedo."
+    "dica": "Infrastructure as code cedo.",
+    "stackComum": "Linux, Bash / Shell, Ansible, Nginx",
+    "proximoPasso": "Infrastructure as code cedo.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Infrastructure as code cedo."
   },
   {
     "nome": "Banco de Dados (DBA)",
@@ -3628,11 +4400,14 @@ const DP_AREAS = [
       "MySQL / MariaDB"
     ],
     "detalhes": [
-      "Índices",
-      "Vacuum/maintenance",
-      "HA"
+      "<strong>Stack comum:</strong> SQL, PostgreSQL, MySQL / MariaDB",
+      "<strong>Próximo passo:</strong> Entenda planos de execução.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Entenda planos de execução."
     ],
-    "dica": "Entenda planos de execução."
+    "dica": "Entenda planos de execução.",
+    "stackComum": "SQL, PostgreSQL, MySQL / MariaDB",
+    "proximoPasso": "Entenda planos de execução.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Entenda planos de execução."
   },
   {
     "nome": "Data Analytics Product",
@@ -3644,11 +4419,14 @@ const DP_AREAS = [
       "Looker / Looker Studio"
     ],
     "detalhes": [
-      "Funis",
-      "Experimentos",
-      "North star"
+      "<strong>Stack comum:</strong> SQL, Python, Metabase, Looker / Looker Studio",
+      "<strong>Próximo passo:</strong> Métrica acionável > vaidade.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Métrica acionável > vaidade."
     ],
-    "dica": "Métrica acionável > vaidade."
+    "dica": "Métrica acionável > vaidade.",
+    "stackComum": "SQL, Python, Metabase, Looker / Looker Studio",
+    "proximoPasso": "Métrica acionável > vaidade.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Métrica acionável > vaidade."
   },
   {
     "nome": "Business Intelligence Corporativo",
@@ -3660,10 +4438,14 @@ const DP_AREAS = [
       "DAX"
     ],
     "detalhes": [
-      "Camada semântica",
-      "Row-level security"
+      "<strong>Stack comum:</strong> Power BI, Tableau, SQL, DAX",
+      "<strong>Próximo passo:</strong> Negócio define KPI.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Negócio define KPI."
     ],
-    "dica": "Negócio define KPI."
+    "dica": "Negócio define KPI.",
+    "stackComum": "Power BI, Tableau, SQL, DAX",
+    "proximoPasso": "Negócio define KPI.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Negócio define KPI."
   },
   {
     "nome": "Engenharia Frontend de Design Systems",
@@ -3675,10 +4457,14 @@ const DP_AREAS = [
       "Figma"
     ],
     "detalhes": [
-      "Acessibilidade",
-      "Versionamento de lib"
+      "<strong>Stack comum:</strong> TypeScript, React, CSS, Figma",
+      "<strong>Próximo passo:</strong> Documentação é feature.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Documentação é feature."
     ],
-    "dica": "Documentação é feature."
+    "dica": "Documentação é feature.",
+    "stackComum": "TypeScript, React, CSS, Figma",
+    "proximoPasso": "Documentação é feature.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Documentação é feature."
   },
   {
     "nome": "Web Performance",
@@ -3689,11 +4475,14 @@ const DP_AREAS = [
       "WebAssembly (WASM)"
     ],
     "detalhes": [
-      "LCP/INP",
-      "Caching",
-      "Bundles"
+      "<strong>Stack comum:</strong> JavaScript, CSS, WebAssembly (WASM)",
+      "<strong>Próximo passo:</strong> Meça no device lento.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Meça no device lento."
     ],
-    "dica": "Meça no device lento."
+    "dica": "Meça no device lento.",
+    "stackComum": "JavaScript, CSS, WebAssembly (WASM)",
+    "proximoPasso": "Meça no device lento.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Meça no device lento."
   },
   {
     "nome": "Acessibilidade Digital (a11y)",
@@ -3704,11 +4493,14 @@ const DP_AREAS = [
       "JavaScript"
     ],
     "detalhes": [
-      "WCAG",
-      "Teclado e leitores",
-      "Contraste"
+      "<strong>Stack comum:</strong> HTML, CSS, JavaScript",
+      "<strong>Próximo passo:</strong> a11y desde o primeiro PR.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. a11y desde o primeiro PR."
     ],
-    "dica": "a11y desde o primeiro PR."
+    "dica": "a11y desde o primeiro PR.",
+    "stackComum": "HTML, CSS, JavaScript",
+    "proximoPasso": "a11y desde o primeiro PR.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. a11y desde o primeiro PR."
   },
   {
     "nome": "Tech Writing",
@@ -3718,11 +4510,14 @@ const DP_AREAS = [
       "Git"
     ],
     "detalhes": [
-      "Tutoriais",
-      "ADRs",
-      "API docs"
+      "<strong>Stack comum:</strong> Markdown, Git",
+      "<strong>Próximo passo:</strong> Escreva para o você do futuro.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Escreva para o você do futuro."
     ],
-    "dica": "Escreva para o você do futuro."
+    "dica": "Escreva para o você do futuro.",
+    "stackComum": "Markdown, Git",
+    "proximoPasso": "Escreva para o você do futuro.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Escreva para o você do futuro."
   },
   {
     "nome": "Developer Relations / Advocacy",
@@ -3733,11 +4528,14 @@ const DP_AREAS = [
       "Python"
     ],
     "detalhes": [
-      "Talks",
-      "Demos",
-      "Feedback de users"
+      "<strong>Stack comum:</strong> Markdown, JavaScript, Python",
+      "<strong>Próximo passo:</strong> Credibilidade vem de código real.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Credibilidade vem de código real."
     ],
-    "dica": "Credibilidade vem de código real."
+    "dica": "Credibilidade vem de código real.",
+    "stackComum": "Markdown, JavaScript, Python",
+    "proximoPasso": "Credibilidade vem de código real.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Credibilidade vem de código real."
   },
   {
     "nome": "Product Management técnico",
@@ -3748,11 +4546,14 @@ const DP_AREAS = [
       "Jira"
     ],
     "detalhes": [
-      "Discovery",
-      "Priorização",
-      "Trade-offs"
+      "<strong>Stack comum:</strong> SQL, Markdown, Jira",
+      "<strong>Próximo passo:</strong> Fale a língua de dados e de pessoas.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Fale a língua de dados e de pessoas."
     ],
-    "dica": "Fale a língua de dados e de pessoas."
+    "dica": "Fale a língua de dados e de pessoas.",
+    "stackComum": "SQL, Markdown, Jira",
+    "proximoPasso": "Fale a língua de dados e de pessoas.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Fale a língua de dados e de pessoas."
   },
   {
     "nome": "Engineering Management",
@@ -3763,11 +4564,14 @@ const DP_AREAS = [
       "Git"
     ],
     "detalhes": [
-      "1:1",
-      "Hiring",
-      "Processo leve"
+      "<strong>Stack comum:</strong> Markdown, Jira, Git",
+      "<strong>Próximo passo:</strong> Contexto > controle.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Contexto > controle."
     ],
-    "dica": "Contexto > controle."
+    "dica": "Contexto > controle.",
+    "stackComum": "Markdown, Jira, Git",
+    "proximoPasso": "Contexto > controle.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Contexto > controle."
   },
   {
     "nome": "Compliance & Privacy (tech)",
@@ -3777,10 +4581,14 @@ const DP_AREAS = [
       "Python"
     ],
     "detalhes": [
-      "Minimização de dados",
-      "Trilhas de auditoria"
+      "<strong>Stack comum:</strong> SQL, Python",
+      "<strong>Próximo passo:</strong> Privacidade por design.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Privacidade por design."
     ],
-    "dica": "Privacidade por design."
+    "dica": "Privacidade por design.",
+    "stackComum": "SQL, Python",
+    "proximoPasso": "Privacidade por design.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Privacidade por design."
   },
   {
     "nome": "FinOps",
@@ -3792,11 +4600,14 @@ const DP_AREAS = [
       "Azure"
     ],
     "detalhes": [
-      "Tags",
-      "Budgets",
-      "Rightsizing"
+      "<strong>Stack comum:</strong> SQL, AWS, GCP, Azure",
+      "<strong>Próximo passo:</strong> Custo é métrica de engenharia.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Custo é métrica de engenharia."
     ],
-    "dica": "Custo é métrica de engenharia."
+    "dica": "Custo é métrica de engenharia.",
+    "stackComum": "SQL, AWS, GCP, Azure",
+    "proximoPasso": "Custo é métrica de engenharia.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Custo é métrica de engenharia."
   },
   {
     "nome": "Blockchain / Web3 Engineering",
@@ -3807,11 +4618,14 @@ const DP_AREAS = [
       "Rust"
     ],
     "detalhes": [
-      "Carteiras",
-      "Auditoria",
-      "Testes"
+      "<strong>Stack comum:</strong> Solidity, JavaScript, Rust",
+      "<strong>Próximo passo:</strong> Segurança primeiro.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Segurança primeiro."
     ],
-    "dica": "Segurança primeiro."
+    "dica": "Segurança primeiro.",
+    "stackComum": "Solidity, JavaScript, Rust",
+    "proximoPasso": "Segurança primeiro.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Segurança primeiro."
   },
   {
     "nome": "Computer Vision",
@@ -3822,11 +4636,14 @@ const DP_AREAS = [
       "PyTorch"
     ],
     "detalhes": [
-      "Datasets",
-      "Métricas",
-      "Deploy edge/cloud"
+      "<strong>Stack comum:</strong> Python, OpenCV, PyTorch",
+      "<strong>Próximo passo:</strong> Dados rotulados são o gargalo.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Dados rotulados são o gargalo."
     ],
-    "dica": "Dados rotulados são o gargalo."
+    "dica": "Dados rotulados são o gargalo.",
+    "stackComum": "Python, OpenCV, PyTorch",
+    "proximoPasso": "Dados rotulados são o gargalo.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Dados rotulados são o gargalo."
   },
   {
     "nome": "NLP / Language AI",
@@ -3837,11 +4654,14 @@ const DP_AREAS = [
       "PyTorch"
     ],
     "detalhes": [
-      "Tokenização",
-      "Avaliação humana",
-      "RAG"
+      "<strong>Stack comum:</strong> Python, Hugging Face, PyTorch",
+      "<strong>Próximo passo:</strong> Gold set de avaliação cedo.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Gold set de avaliação cedo."
     ],
-    "dica": "Gold set de avaliação cedo."
+    "dica": "Gold set de avaliação cedo.",
+    "stackComum": "Python, Hugging Face, PyTorch",
+    "proximoPasso": "Gold set de avaliação cedo.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Gold set de avaliação cedo."
   },
   {
     "nome": "Robotics Software",
@@ -3852,10 +4672,14 @@ const DP_AREAS = [
       "Linux"
     ],
     "detalhes": [
-      "ROS (conceito)",
-      "Simulação"
+      "<strong>Stack comum:</strong> C++, Python, Linux",
+      "<strong>Próximo passo:</strong> Simulador antes de hardware caro.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Simulador antes de hardware caro."
     ],
-    "dica": "Simulador antes de hardware caro."
+    "dica": "Simulador antes de hardware caro.",
+    "stackComum": "C++, Python, Linux",
+    "proximoPasso": "Simulador antes de hardware caro.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Simulador antes de hardware caro."
   },
   {
     "nome": "AR/VR Development",
@@ -3866,10 +4690,14 @@ const DP_AREAS = [
       "C++"
     ],
     "detalhes": [
-      "UX de movimento",
-      "Performance GPU"
+      "<strong>Stack comum:</strong> C#, Unity (C#), C++",
+      "<strong>Próximo passo:</strong> Conforto do usuário é requisito.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Conforto do usuário é requisito."
     ],
-    "dica": "Conforto do usuário é requisito."
+    "dica": "Conforto do usuário é requisito.",
+    "stackComum": "C#, Unity (C#), C++",
+    "proximoPasso": "Conforto do usuário é requisito.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Conforto do usuário é requisito."
   },
   {
     "nome": "Audio Programming",
@@ -3880,10 +4708,14 @@ const DP_AREAS = [
       "C"
     ],
     "detalhes": [
-      "Latência",
-      "Buffers"
+      "<strong>Stack comum:</strong> C++, Rust, C",
+      "<strong>Próximo passo:</strong> Ouça o bug.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Ouça o bug."
     ],
-    "dica": "Ouça o bug."
+    "dica": "Ouça o bug.",
+    "stackComum": "C++, Rust, C",
+    "proximoPasso": "Ouça o bug.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Ouça o bug."
   },
   {
     "nome": "Quantitative / Fintech Engineering",
@@ -3895,10 +4727,14 @@ const DP_AREAS = [
       "SQL"
     ],
     "detalhes": [
-      "Precisão numérica",
-      "Auditoria"
+      "<strong>Stack comum:</strong> C++, Java, Python, SQL",
+      "<strong>Próximo passo:</strong> Testes e conformidade.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Testes e conformidade."
     ],
-    "dica": "Testes e conformidade."
+    "dica": "Testes e conformidade.",
+    "stackComum": "C++, Java, Python, SQL",
+    "proximoPasso": "Testes e conformidade.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Testes e conformidade."
   },
   {
     "nome": "Suporte técnico N2/N3 (tech)",
@@ -3909,11 +4745,14 @@ const DP_AREAS = [
       "Bash / Shell"
     ],
     "detalhes": [
-      "Logs",
-      "Reprodução",
-      "Escalation"
+      "<strong>Stack comum:</strong> SQL, Linux, Bash / Shell",
+      "<strong>Próximo passo:</strong> Notas de caso salvam o time.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Notas de caso salvam o time."
     ],
-    "dica": "Notas de caso salvam o time."
+    "dica": "Notas de caso salvam o time.",
+    "stackComum": "SQL, Linux, Bash / Shell",
+    "proximoPasso": "Notas de caso salvam o time.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Notas de caso salvam o time."
   },
   {
     "nome": "Customer Success técnico",
@@ -3923,10 +4762,14 @@ const DP_AREAS = [
       "Markdown"
     ],
     "detalhes": [
-      "Onboarding",
-      "Health scores"
+      "<strong>Stack comum:</strong> SQL, Markdown",
+      "<strong>Próximo passo:</strong> Ouça o workflow real do cliente.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Ouça o workflow real do cliente."
     ],
-    "dica": "Ouça o workflow real do cliente."
+    "dica": "Ouça o workflow real do cliente.",
+    "stackComum": "SQL, Markdown",
+    "proximoPasso": "Ouça o workflow real do cliente.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Ouça o workflow real do cliente."
   },
   {
     "nome": "Solutions Architecture",
@@ -3938,10 +4781,14 @@ const DP_AREAS = [
       "Java"
     ],
     "detalhes": [
-      "PoCs",
-      "Trade-offs comerciais"
+      "<strong>Stack comum:</strong> AWS, Azure, SQL, Java",
+      "<strong>Próximo passo:</strong> Documente limites.",
+      "<strong>Mercado:</strong> Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Documente limites."
     ],
-    "dica": "Documente limites."
+    "dica": "Documente limites.",
+    "stackComum": "AWS, Azure, SQL, Java",
+    "proximoPasso": "Documente limites.",
+    "mercadoTexto": "Demanda existe no Brasil e no exterior, com variação por senioridade e stack. Documente limites."
   }
 ];
 const DP_CONCEITOS_LOGICA = [
@@ -5265,5 +6112,98 @@ const DP_FACULDADES = [
     "dica": "Construa base de rede/SO antes."
   }
 ];
+const DP_MERCADO_NOTAS = [
+  {
+    "titulo": "Júnior no Brasil",
+    "texto": "A porta de entrada está mais exigente: empresas pedem Git, uma stack e evidência de projeto. Estágio e open source ainda são os melhores atalhos."
+  },
+  {
+    "titulo": "Remoto internacional",
+    "texto": "Inglês + portfólio sólido abrem vagas em product companies. Fusos e comunicação assíncrona importam tanto quanto a stack."
+  },
+  {
+    "titulo": "IA no fluxo de trabalho",
+    "texto": "IA acelera quem já revisa código. Vagas pedem cada vez mais quem usa ferramentas com critério, não quem só cola resposta."
+  },
+  {
+    "titulo": "Dados e cloud",
+    "texto": "Engenharia de dados, analytics e cloud continuam entre as áreas com melhor relação demanda/oferta no BR e no exterior."
+  },
+  {
+    "titulo": "Mobile e games",
+    "texto": "Mobile estabilizou após o boom; games dependem de nicho (mobile live-ops, Unity indie). Portfólio jogável vale mais que certificado."
+  },
+  {
+    "titulo": "Segurança",
+    "texto": "Escassez real de profissionais com prática. Compliance (LGPD) e appsec aumentaram verba mesmo em empresas tradicionais."
+  }
+];
+const DP_DICAS = [
+  {
+    "titulo": "Projeto > playlist infinita",
+    "texto": "Escolha um problema seu e entregue uma versão 0.1. Curso sem projeto gruda pouco."
+  },
+  {
+    "titulo": "SQL cedo",
+    "texto": "Independente da stack, SQL aparece em vagas de web, dados, QA e até mobile com backend."
+  },
+  {
+    "titulo": "Leia erro completo",
+    "texto": "A mensagem de erro é o melhor tutor grátis. Copie inteira antes de pedir ajuda."
+  },
+  {
+    "titulo": "Bloqueios de 45 minutos",
+    "texto": "Estude em blocos curtos e frequentes. Maratona de domingo costuma virar abandono na terça."
+  },
+  {
+    "titulo": "Explique para aprender",
+    "texto": "Escreva em voz alta ou num README o que o código faz. Se travar, você achou a lacuna."
+  },
+  {
+    "titulo": "Compare com propósito",
+    "texto": "Usar o comparador do DevPortal só faz sentido com uma meta (web, dados, mobile…). 'Qual a melhor linguagem?' sem contexto não ajuda."
+  }
+];
+const DP_GUIAS = [
+  {
+    "titulo": "Como montar um portfólio júnior",
+    "resumo": "3 projetos, README claro, deploy se possível.",
+    "detalhes": [
+      "Problema → solução → stack → como rodar",
+      "Um projeto full ciclo (CRUD + auth)",
+      "Evite só clones de tutorial sem mudança"
+    ]
+  },
+  {
+    "titulo": "Como pedir ajuda no suporte",
+    "resumo": "Objetivo, tentativas, erro, trecho mínimo.",
+    "detalhes": [
+      "O que você queria fazer",
+      "O que já tentou",
+      "Erro completo",
+      "Trecho mínimo que reproduz"
+    ]
+  },
+  {
+    "titulo": "Primeira semana de estudos",
+    "resumo": "Lógica + Git + um exercício por dia.",
+    "detalhes": [
+      "Dia 1-2: sequência e variáveis",
+      "Dia 3-4: if e while",
+      "Dia 5: funções",
+      "Dia 6-7: Git init + GitHub"
+    ]
+  },
+  {
+    "titulo": "Do zero à primeira API",
+    "resumo": "HTTP, JSON, rota, banco.",
+    "detalhes": [
+      "Entenda GET/POST",
+      "Modele uma tabela simples",
+      "CRUD mínimo",
+      "Teste no Postman"
+    ]
+  }
+];
 
-// NÃO criar var linguagens/areas — script.js já declara const.
+// NÃO declarar var linguagens/areas — script.js usa const + merge DP_*.
